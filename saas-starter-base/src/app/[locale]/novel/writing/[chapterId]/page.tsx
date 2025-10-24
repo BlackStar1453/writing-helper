@@ -34,6 +34,7 @@ export default function ChapterWritingPage() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [generatingTimelineItemId, setGeneratingTimelineItemId] = useState<string | null>(null);
   const [candidateVersions, setCandidateVersions] = useState<CandidateVersions | null>(null);
+  const [isWritingModalOpen, setIsWritingModalOpen] = useState(false);
 
   // 加载章节数据
   useEffect(() => {
@@ -442,6 +443,8 @@ export default function ChapterWritingPage() {
           onApplyVersion={handleApplyVersion}
           onClearCandidates={handleClearCandidates}
           onJumpToTimelineContent={handleJumpToTimelineContent}
+          isOpen={isWritingModalOpen}
+          onOpenChange={setIsWritingModalOpen}
         />
 
         {/* 生成初稿设置Modal */}
@@ -483,6 +486,8 @@ function WritingModalWrapper({
   onApplyVersion,
   onClearCandidates,
   onJumpToTimelineContent,
+  isOpen,
+  onOpenChange,
 }: {
   chapter: Chapter;
   novelContext: NovelContext;
@@ -497,8 +502,9 @@ function WritingModalWrapper({
   onApplyVersion: (version: ContentVersion) => void;
   onClearCandidates: () => void;
   onJumpToTimelineContent: (timelineItemId: string) => void;
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState(chapter.content || '');
 
   // 当chapter.content变化时更新text状态
@@ -507,19 +513,19 @@ function WritingModalWrapper({
   }, [chapter.content]);
 
   useEffect(() => {
-    const handleOpen = () => setIsOpen(true);
+    const handleOpen = () => onOpenChange(true);
     window.addEventListener('open-writing-modal', handleOpen);
     return () => window.removeEventListener('open-writing-modal', handleOpen);
-  }, []);
+  }, [onOpenChange]);
 
   // 传递原始内容(带标记),WritingModal内部会进行清理
   return (
     <WritingModal
       isOpen={isOpen}
-      onClose={() => setIsOpen(false)}
-      onSubmit={(data) => {
+      onClose={() => onOpenChange(false)}
+      onSubmit={() => {
         onSubmit({ text });
-        setIsOpen(false);
+        onOpenChange(false);
       }}
       onTextChange={setText}
       initialText={chapter.content || ''}
