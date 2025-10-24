@@ -65,9 +65,15 @@ export async function POST(request: NextRequest) {
     const rawContent = data.choices?.[0]?.message?.content || '';
 
     // 解析timeline和content
-    const { timeline, content } = parseGeneratedContent(rawContent);
+    const { timeline, content: parsedContent } = parseGeneratedContent(rawContent);
 
-    return NextResponse.json({ content, timeline });
+    // 如果有timeline,为内容添加标记
+    let finalContent = parsedContent;
+    if (context.timeline && context.timeline.length > 0) {
+      finalContent = addTimelineMarkersToContent(parsedContent, context.timeline);
+    }
+
+    return NextResponse.json({ content: finalContent, timeline });
   } catch (error) {
     console.error('Generate draft error:', error);
     return NextResponse.json(
@@ -75,6 +81,53 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+/**
+ * 为生成的内容添加timeline标记
+ * 将内容按timeline节点数量分段,并为每段添加标记
+ */
+function addTimelineMarkersToContent(content: string, timeline: Array<{ id: string; order: number; content: string }>): string {
+  if (!timeline || timeline.length === 0) {
+    return content;
+  }
+
+  // 将内容按段落分割
+  const paragraphs = content.split(/\n\n+/).filter(p => p.trim());
+
+  if (paragraphs.length === 0) {
+    return content;
+  }
+
+  // 计算每个timeline节点应该对应多少段落
+  const paragraphsPerNode = Math.max(1, Math.floor(paragraphs.length / timeline.length));
+
+  const markedParagraphs: string[] = [];
+  let currentParagraphIndex = 0;
+
+  timeline.forEach((item, index) => {
+    // 计算这个节点应该包含多少段落
+    let nodeParagraphCount = paragraphsPerNode;
+
+    // 最后一个节点包含所有剩余段落
+    if (index === timeline.length - 1) {
+      nodeParagraphCount = paragraphs.length - currentParagraphIndex;
+    }
+
+    // 添加开始标记
+    markedParagraphs.push(`<!-- TIMELINE_NODE:${item.id} -->`);
+
+    // 添加这个节点对应的段落
+    for (let i = 0; i < nodeParagraphCount && currentParagraphIndex < paragraphs.length; i++) {
+      markedParagraphs.push(paragraphs[currentParagraphIndex]);
+      currentParagraphIndex++;
+    }
+
+    // 添加结束标记
+    markedParagraphs.push(`<!-- /TIMELINE_NODE -->`);
+  });
+
+  return markedParagraphs.join('\n\n');
 }
 
 /**

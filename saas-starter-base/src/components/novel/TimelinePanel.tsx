@@ -11,12 +11,26 @@ export interface TimelineItem {
   content: string;
 }
 
+export interface ContentVersion {
+  version: number;
+  content: string;
+}
+
+export interface CandidateVersions {
+  timelineItemId: string;
+  versions: ContentVersion[];
+}
+
 interface TimelinePanelProps {
   timeline: TimelineItem[];
   onChange: (timeline: TimelineItem[]) => void;
   readOnly?: boolean;
   onGenerateContent?: (timelineItem: TimelineItem, index: number) => void;
   generatingItemId?: string | null;
+  candidateVersions?: CandidateVersions | null;
+  onApplyVersion?: (version: ContentVersion) => void;
+  onClearCandidates?: () => void;
+  onJumpToContent?: (timelineItemId: string) => void;
 }
 
 export function TimelinePanel({
@@ -24,12 +38,17 @@ export function TimelinePanel({
   onChange,
   readOnly = false,
   onGenerateContent,
-  generatingItemId
+  generatingItemId,
+  candidateVersions,
+  onApplyVersion,
+  onClearCandidates,
+  onJumpToContent
 }: TimelinePanelProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
   const [newItemContent, setNewItemContent] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
 
   const handleStartEdit = (item: TimelineItem) => {
     setEditingId(item.id);
@@ -196,70 +215,146 @@ export function TimelinePanel({
               </div>
             ) : (
               // 显示模式
-              <div className="flex items-start gap-2">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-medium">
-                  {item.order}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                    {item.content}
-                  </p>
-                </div>
-                {!readOnly && (
-                  <div className="flex-shrink-0 flex gap-1">
-                    {onGenerateContent && (
+              <>
+                <div className="flex items-start gap-2">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-medium">
+                    {item.order}
+                  </div>
+                  <div
+                    className="flex-1 min-w-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 -my-1 transition-colors"
+                    onClick={() => onJumpToContent?.(item.id)}
+                    title="点击跳转到对应内容"
+                  >
+                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+                      {item.content}
+                    </p>
+                  </div>
+                  {!readOnly && (
+                    <div className="flex-shrink-0 flex gap-1">
+                      {onGenerateContent && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => onGenerateContent(item, index)}
+                          disabled={generatingItemId === item.id}
+                          className="h-8 w-8 p-0 text-purple-500 hover:text-purple-600"
+                          title="生成该节点对应的内容"
+                        >
+                          {generatingItemId === item.id ? (
+                            <div className="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full" />
+                          ) : (
+                            <Sparkles className="h-4 w-4" />
+                          )}
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => onGenerateContent(item, index)}
-                        disabled={generatingItemId === item.id}
-                        className="h-8 w-8 p-0 text-purple-500 hover:text-purple-600"
-                        title="生成该节点对应的内容"
+                        onClick={() => handleMoveUp(index)}
+                        disabled={index === 0}
+                        className="h-8 w-8 p-0"
                       >
-                        {generatingItemId === item.id ? (
-                          <div className="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full" />
-                        ) : (
-                          <Sparkles className="h-4 w-4" />
-                        )}
+                        ↑
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleMoveDown(index)}
+                        disabled={index === timeline.length - 1}
+                        className="h-8 w-8 p-0"
+                      >
+                        ↓
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleStartEdit(item)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDelete(item.id)}
+                        className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* 候选版本显示 */}
+                {candidateVersions && candidateVersions.timelineItemId === item.id && (
+                  <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
+                    <div className="flex items-center justify-between mb-2">
+                      <h5 className="text-xs font-medium text-purple-700 dark:text-purple-300">
+                        候选内容 (选择一个应用)
+                      </h5>
+                      {onClearCandidates && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={onClearCandidates}
+                          className="h-6 px-2 text-xs"
+                        >
+                          <X className="h-3 w-3 mr-1" />
+                          取消
+                        </Button>
+                      )}
+                    </div>
+                    <div className="space-y-2">
+                      {candidateVersions.versions.map((ver) => (
+                        <div
+                          key={ver.version}
+                          className={`p-2 rounded border cursor-pointer transition-colors ${
+                            selectedVersion === ver.version
+                              ? 'bg-purple-100 dark:bg-purple-900/40 border-purple-400 dark:border-purple-600'
+                              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:border-purple-300 dark:hover:border-purple-700'
+                          }`}
+                          onClick={() => setSelectedVersion(ver.version)}
+                        >
+                          <div className="flex items-start gap-2">
+                            <input
+                              type="radio"
+                              name={`version-${item.id}`}
+                              checked={selectedVersion === ver.version}
+                              onChange={() => setSelectedVersion(ver.version)}
+                              className="mt-1 flex-shrink-0"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <div className="text-xs font-medium text-purple-600 dark:text-purple-400 mb-1">
+                                版本 {ver.version}
+                              </div>
+                              <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-3">
+                                {ver.content.replace(/<!-- TIMELINE_NODE:.*? -->\n?/g, '').replace(/\n?<!-- \/TIMELINE_NODE -->/g, '').trim()}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {onApplyVersion && (
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          const selected = candidateVersions.versions.find(v => v.version === selectedVersion);
+                          if (selected) {
+                            onApplyVersion(selected);
+                            setSelectedVersion(null);
+                          }
+                        }}
+                        disabled={selectedVersion === null}
+                        className="w-full mt-3"
+                      >
+                        <Check className="h-4 w-4 mr-1" />
+                        应用选中版本
                       </Button>
                     )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleMoveUp(index)}
-                      disabled={index === 0}
-                      className="h-8 w-8 p-0"
-                    >
-                      ↑
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleMoveDown(index)}
-                      disabled={index === timeline.length - 1}
-                      className="h-8 w-8 p-0"
-                    >
-                      ↓
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleStartEdit(item)}
-                      className="h-8 w-8 p-0"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handleDelete(item.id)}
-                      className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
                   </div>
                 )}
-              </div>
+              </>
             )}
           </div>
         ))}

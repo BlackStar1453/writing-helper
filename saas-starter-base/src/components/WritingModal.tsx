@@ -15,7 +15,8 @@ import {
 import { MarkdownContent } from './MarkdownContent';
 import { NovelContext, ChapterTimelineItem } from '@/lib/novel/types';
 import { NovelContextPanel } from './novel/NovelContextPanel';
-import { TimelinePanel } from './novel/TimelinePanel';
+import { TimelinePanel, CandidateVersions, ContentVersion } from './novel/TimelinePanel';
+import { cleanContentForDisplay } from '@/lib/novel/content-utils';
 
 interface WritingModalProps {
   isOpen: boolean;
@@ -60,6 +61,10 @@ interface WritingModalProps {
   onTimelineChange?: (timeline: ChapterTimelineItem[]) => void;
   onGenerateTimelineContent?: (timelineItem: ChapterTimelineItem, index: number) => void;
   generatingTimelineItemId?: string | null;
+  candidateVersions?: CandidateVersions | null;
+  onApplyVersion?: (version: ContentVersion) => void;
+  onClearCandidates?: () => void;
+  onJumpToTimelineContent?: (timelineItemId: string) => void;
 }
 
 // 导出ref方法接口
@@ -102,13 +107,89 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     timeline = [],
     onTimelineChange,
     onGenerateTimelineContent,
-    generatingTimelineItemId
+    generatingTimelineItemId,
+    candidateVersions,
+    onApplyVersion,
+    onClearCandidates,
+    onJumpToTimelineContent
   } = props;
-  const [text, setText] = useState(initialText);
+  // 清理Timeline标记用于显示
+  const [text, setText] = useState(cleanContentForDisplay(initialText));
 
   // 当initialText变化时更新text状态
   useEffect(() => {
-    setText(initialText);
+    setText(cleanContentForDisplay(initialText));
+  }, [initialText]);
+
+  // 监听跳转到Timeline内容的事件
+  useEffect(() => {
+    const handleJumpToContent = (e: CustomEvent) => {
+      const { timelineItemId } = e.detail;
+      if (!textareaRef.current) return;
+
+      // 在原始内容(带标记)中查找标记位置
+      const marker = `<!-- TIMELINE_NODE:${timelineItemId} -->`;
+      const markerIndex = initialText.indexOf(marker);
+
+      if (markerIndex === -1) {
+        // 如果找不到标记,说明这个节点还没有生成内容
+        alert('该时间线节点还没有生成对应的内容');
+        return;
+      }
+
+      // 计算标记之前有多少行
+      const textBeforeMarker = initialText.substring(0, markerIndex);
+      const linesBefore = textBeforeMarker.split('\n').length;
+
+      // 获取textarea的行高
+      const lineHeight = parseInt(window.getComputedStyle(textareaRef.current).lineHeight);
+
+      // 计算滚动位置(留一些余量,让标记位置在视口中间)
+      const scrollTop = Math.max(0, (linesBefore - 5) * lineHeight);
+
+      // 滚动到对应位置
+      textareaRef.current.scrollTop = scrollTop;
+
+      // 同步高亮层的滚动
+      if (highlightRef.current) {
+        highlightRef.current.scrollTop = scrollTop;
+      }
+
+      // 可选: 高亮显示该区域(通过临时选中文本)
+      // 找到标记结束位置
+      const endMarker = '<!-- /TIMELINE_NODE -->';
+      const endMarkerIndex = initialText.indexOf(endMarker, markerIndex);
+      if (endMarkerIndex !== -1) {
+        // 计算在清理后的text中的位置
+        // 我们需要计算标记之前有多少个标记,然后减去这些标记的长度
+        const textBeforeMarkerInOriginal = initialText.substring(0, markerIndex);
+        const markersBefore = (textBeforeMarkerInOriginal.match(/<!-- TIMELINE_NODE:.*? -->/g) || []).length;
+        const endMarkersBefore = (textBeforeMarkerInOriginal.match(/<!-- \/TIMELINE_NODE -->/g) || []).length;
+
+        // 计算清理后的起始位置
+        const cleanedStartPos = markerIndex - markersBefore * marker.length - endMarkersBefore * endMarker.length;
+
+        // 计算内容长度(不包括标记)
+        const contentWithMarkers = initialText.substring(markerIndex + marker.length, endMarkerIndex);
+        const contentLength = contentWithMarkers.length;
+
+        // 选中这段内容(包括标记)
+        textareaRef.current.focus();
+        textareaRef.current.setSelectionRange(cleanedStartPos, cleanedStartPos + contentLength);
+
+        // 1秒后取消选中
+        setTimeout(() => {
+          if (textareaRef.current) {
+            textareaRef.current.setSelectionRange(cleanedStartPos, cleanedStartPos);
+          }
+        }, 1000);
+      }
+    };
+
+    window.addEventListener('jump-to-timeline-content', handleJumpToContent as EventListener);
+    return () => {
+      window.removeEventListener('jump-to-timeline-content', handleJumpToContent as EventListener);
+    };
   }, [initialText]);
   const [rightPanelView, setRightPanelView] = useState<'suggestions' | 'agent' | 'novelContext' | 'timeline'>('suggestions'); // 右侧面板切换,默认显示suggestions
   const [agentInput, setAgentInput] = useState('');
@@ -1149,6 +1230,10 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                       onChange={onTimelineChange}
                       onGenerateContent={onGenerateTimelineContent}
                       generatingItemId={generatingTimelineItemId}
+                      candidateVersions={candidateVersions}
+                      onApplyVersion={onApplyVersion}
+                      onClearCandidates={onClearCandidates}
+                      onJumpToContent={onJumpToTimelineContent}
                     />
                   ) : null}
                 </div>

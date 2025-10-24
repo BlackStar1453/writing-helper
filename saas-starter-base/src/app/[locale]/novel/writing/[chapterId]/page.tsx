@@ -15,6 +15,7 @@ import { NovelContext, Chapter, ChapterTimelineItem } from '@/lib/novel/types';
 import { getSettings } from '@/lib/db-utils';
 import { GenerateDraftSettingsModal, GenerateDraftSettings } from '@/components/novel/GenerateDraftSettingsModal';
 import { insertContentAtTimelinePosition, cleanContentForDisplay } from '@/lib/novel/content-utils';
+import { CandidateVersions, ContentVersion } from '@/components/novel/TimelinePanel';
 
 export default function ChapterWritingPage() {
   const params = useParams();
@@ -32,6 +33,7 @@ export default function ChapterWritingPage() {
   const [isGeneratingTimeline, setIsGeneratingTimeline] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [generatingTimelineItemId, setGeneratingTimelineItemId] = useState<string | null>(null);
+  const [candidateVersions, setCandidateVersions] = useState<CandidateVersions | null>(null);
 
   // 加载章节数据
   useEffect(() => {
@@ -193,14 +195,21 @@ export default function ChapterWritingPage() {
 
       // 更新章节内容和时间线
       if (chapter) {
-        await updateChapter(chapter.id, {
+        // 只有当API返回了新的timeline时才更新,否则保留现有timeline
+        const updateData: any = {
           content: data.content,
           selectedCharacters: settings.selectedCharacters?.map(c => c.id),
           selectedLocations: settings.selectedLocations?.map(l => l.id),
           plotSummary: settings.plotSummary,
           chapterPrompt: settings.chapterPrompt,
-          timeline: data.timeline || [], // 保存生成的时间线
-        });
+        };
+
+        // 如果API返回了timeline(即没有传入timeline时生成的),则更新timeline
+        if (data.timeline && data.timeline.length > 0) {
+          updateData.timeline = data.timeline;
+        }
+
+        await updateChapter(chapter.id, updateData);
 
         // 重新加载章节
         await loadChapter();
@@ -275,12 +284,40 @@ export default function ChapterWritingPage() {
 
       const data = await response.json();
 
+      // 保存候选版本供用户选择
+      setCandidateVersions({
+        timelineItemId: data.timelineItemId,
+        versions: data.versions,
+      });
+
+      // 不再自动插入,等待用户选择
+    } catch (err) {
+      console.error('Failed to generate timeline content:', err);
+      alert('生成内容失败: ' + (err instanceof Error ? err.message : '未知错误'));
+    } finally {
+      setGeneratingTimelineItemId(null);
+    }
+  };
+
+  // 应用选中的版本
+  const handleApplyVersion = async (version: ContentVersion) => {
+    try {
+      if (!chapter || !candidateVersions) return;
+
       // 使用智能插入逻辑,将内容插入到正确位置
+      const targetIndex = chapter.timeline?.findIndex(
+        item => item.id === candidateVersions.timelineItemId
+      ) ?? -1;
+
+      if (targetIndex === -1) {
+        throw new Error('Timeline item not found');
+      }
+
       const newContent = insertContentAtTimelinePosition(
         chapter.content || '',
-        data.content,
-        data.timelineItemId,
-        data.targetIndex,
+        version.content,
+        candidateVersions.timelineItemId,
+        targetIndex,
         chapter.timeline || []
       );
 
@@ -288,16 +325,22 @@ export default function ChapterWritingPage() {
         content: newContent,
       });
 
+      // 清空候选版本
+      setCandidateVersions(null);
+
       // 重新加载章节
       await loadChapter();
 
-      alert('内容生成成功！');
+      alert('内容应用成功！');
     } catch (err) {
-      console.error('Failed to generate timeline content:', err);
-      alert('生成内容失败: ' + (err instanceof Error ? err.message : '未知错误'));
-    } finally {
-      setGeneratingTimelineItemId(null);
+      console.error('Failed to apply version:', err);
+      alert('应用失败: ' + (err instanceof Error ? err.message : '未知错误'));
     }
+  };
+
+  // 清空候选版本
+  const handleClearCandidates = () => {
+    setCandidateVersions(null);
   };
 
   // 处理写作内容提交
@@ -323,6 +366,15 @@ export default function ChapterWritingPage() {
       console.error('Failed to save chapter:', err);
       alert('保存失败: ' + (err instanceof Error ? err.message : '未知错误'));
     }
+  };
+
+  // 跳转到Timeline节点对应的内容位置
+  const handleJumpToTimelineContent = (timelineItemId: string) => {
+    // 触发自定义事件,让WritingModal处理滚动
+    const event = new CustomEvent('jump-to-timeline-content', {
+      detail: { timelineItemId }
+    });
+    window.dispatchEvent(event);
   };
 
   if (loading) {
@@ -386,6 +438,10 @@ export default function ChapterWritingPage() {
           onTimelineChange={handleTimelineChange}
           onGenerateTimelineContent={handleGenerateTimelineContent}
           generatingTimelineItemId={generatingTimelineItemId}
+          candidateVersions={candidateVersions}
+          onApplyVersion={handleApplyVersion}
+          onClearCandidates={handleClearCandidates}
+          onJumpToTimelineContent={handleJumpToTimelineContent}
         />
 
         {/* 生成初稿设置Modal */}
@@ -423,6 +479,10 @@ function WritingModalWrapper({
   onTimelineChange,
   onGenerateTimelineContent,
   generatingTimelineItemId,
+  candidateVersions,
+  onApplyVersion,
+  onClearCandidates,
+  onJumpToTimelineContent,
 }: {
   chapter: Chapter;
   novelContext: NovelContext;
@@ -433,6 +493,10 @@ function WritingModalWrapper({
   onTimelineChange: (timeline: ChapterTimelineItem[]) => void;
   onGenerateTimelineContent: (timelineItem: ChapterTimelineItem, index: number) => void;
   generatingTimelineItemId: string | null;
+  candidateVersions: CandidateVersions | null;
+  onApplyVersion: (version: ContentVersion) => void;
+  onClearCandidates: () => void;
+  onJumpToTimelineContent: (timelineItemId: string) => void;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [text, setText] = useState(chapter.content || '');
@@ -448,9 +512,7 @@ function WritingModalWrapper({
     return () => window.removeEventListener('open-writing-modal', handleOpen);
   }, []);
 
-  // 清理内容中的Timeline标记,用于显示
-  const displayContent = cleanContentForDisplay(chapter.content || '');
-
+  // 传递原始内容(带标记),WritingModal内部会进行清理
   return (
     <WritingModal
       isOpen={isOpen}
@@ -460,7 +522,7 @@ function WritingModalWrapper({
         setIsOpen(false);
       }}
       onTextChange={setText}
-      initialText={displayContent}
+      initialText={chapter.content || ''}
       novelContext={novelContext}
       onNovelContextChange={onNovelContextChange}
       onGenerateDraft={onGenerateDraft}
@@ -469,6 +531,10 @@ function WritingModalWrapper({
       onTimelineChange={onTimelineChange}
       onGenerateTimelineContent={onGenerateTimelineContent}
       generatingTimelineItemId={generatingTimelineItemId}
+      candidateVersions={candidateVersions}
+      onApplyVersion={onApplyVersion}
+      onClearCandidates={onClearCandidates}
+      onJumpToTimelineContent={onJumpToTimelineContent}
     />
   );
 }

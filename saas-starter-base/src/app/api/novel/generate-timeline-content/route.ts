@@ -118,6 +118,23 @@ async function generateContent(
   return completion.choices[0]?.message?.content || '';
 }
 
+/**
+ * 生成多个候选版本
+ */
+async function generateMultipleVersions(
+  prompt: string,
+  apiToken: string,
+  model: string = 'deepseek-chat',
+  count: number = 3
+): Promise<string[]> {
+  // 并行生成多个版本
+  const promises = Array.from({ length: count }, () =>
+    generateContent(prompt, apiToken, model)
+  );
+
+  return Promise.all(promises);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body: GenerateTimelineContentRequest = await request.json();
@@ -147,26 +164,30 @@ export async function POST(request: NextRequest) {
     // 构建Prompt
     const prompt = buildPrompt(body);
 
-    // 调用AI生成内容
-    const content = await generateContent(
+    // 生成3个候选版本
+    const versions = await generateMultipleVersions(
       prompt,
       body.apiToken,
-      body.model
+      body.model,
+      3
     );
 
-    // 为生成的内容添加Timeline标记
-    const markedContent = `<!-- TIMELINE_NODE:${body.targetItem.id} -->\n${content.trim()}\n<!-- /TIMELINE_NODE -->`;
+    // 为每个版本添加Timeline标记
+    const markedVersions = versions.map((content, index) => ({
+      version: index + 1,
+      content: `<!-- TIMELINE_NODE:${body.targetItem.id} -->\n${content.trim()}\n<!-- /TIMELINE_NODE -->`
+    }));
 
-    // 返回生成的内容
+    // 返回生成的多个版本
     return NextResponse.json({
-      content: markedContent,
+      versions: markedVersions,
       timelineItemId: body.targetItem.id,
       targetIndex: body.targetIndex,
     });
   } catch (error) {
     console.error('Error generating timeline content:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to generate timeline content',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
