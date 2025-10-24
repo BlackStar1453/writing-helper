@@ -527,15 +527,20 @@ function WritingModalWrapper({
     return () => window.removeEventListener('open-writing-modal', handleOpen);
   }, [onOpenChange]);
 
+  // 关闭时自动保存
+  const handleClose = () => {
+    // 保存当前内容
+    onSubmit({ text });
+    // 关闭modal
+    onOpenChange(false);
+  };
+
   // 传递原始内容(带标记),WritingModal内部会进行清理
   return (
     <WritingModal
       isOpen={isOpen}
-      onClose={() => onOpenChange(false)}
-      onSubmit={() => {
-        onSubmit({ text });
-        onOpenChange(false);
-      }}
+      onClose={handleClose}
+      onSubmit={handleClose}
       onTextChange={setText}
       initialText={chapter.content || ''}
       novelContext={novelContext}
