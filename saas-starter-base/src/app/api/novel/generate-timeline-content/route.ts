@@ -154,9 +154,14 @@ export async function POST(request: NextRequest) {
       body.model
     );
 
+    // 为生成的内容添加Timeline标记
+    const markedContent = `<!-- TIMELINE_NODE:${body.targetItem.id} -->\n${content.trim()}\n<!-- /TIMELINE_NODE -->`;
+
     // 返回生成的内容
     return NextResponse.json({
-      content: content.trim(),
+      content: markedContent,
+      timelineItemId: body.targetItem.id,
+      targetIndex: body.targetIndex,
     });
   } catch (error) {
     console.error('Error generating timeline content:', error);

@@ -14,6 +14,7 @@ import { useLocations } from '@/lib/novel/hooks/use-locations';
 import { NovelContext, Chapter, ChapterTimelineItem } from '@/lib/novel/types';
 import { getSettings } from '@/lib/db-utils';
 import { GenerateDraftSettingsModal, GenerateDraftSettings } from '@/components/novel/GenerateDraftSettingsModal';
+import { insertContentAtTimelinePosition, cleanContentForDisplay } from '@/lib/novel/content-utils';
 
 export default function ChapterWritingPage() {
   const params = useParams();
@@ -274,10 +275,14 @@ export default function ChapterWritingPage() {
 
       const data = await response.json();
 
-      // 将生成的内容追加到章节内容中
-      const newContent = chapter.content
-        ? `${chapter.content}\n\n${data.content}`
-        : data.content;
+      // 使用智能插入逻辑,将内容插入到正确位置
+      const newContent = insertContentAtTimelinePosition(
+        chapter.content || '',
+        data.content,
+        data.timelineItemId,
+        data.targetIndex,
+        chapter.timeline || []
+      );
 
       await updateChapter(chapter.id, {
         content: newContent,
@@ -299,6 +304,10 @@ export default function ChapterWritingPage() {
   const handleWritingSubmit = async (data: { text: string }) => {
     try {
       if (!chapter) return;
+
+      // 注意: 用户手动编辑后,Timeline标记会丢失
+      // 这是预期行为,因为手动编辑的内容可能不再对应原timeline节点
+      // 如果需要重新生成,可以再次点击timeline节点的生成按钮
 
       // 保存章节内容
       await updateChapter(chapter.id, {
@@ -439,6 +448,9 @@ function WritingModalWrapper({
     return () => window.removeEventListener('open-writing-modal', handleOpen);
   }, []);
 
+  // 清理内容中的Timeline标记,用于显示
+  const displayContent = cleanContentForDisplay(chapter.content || '');
+
   return (
     <WritingModal
       isOpen={isOpen}
@@ -448,7 +460,7 @@ function WritingModalWrapper({
         setIsOpen(false);
       }}
       onTextChange={setText}
-      initialText={chapter.content || ''}
+      initialText={displayContent}
       novelContext={novelContext}
       onNovelContextChange={onNovelContextChange}
       onGenerateDraft={onGenerateDraft}
