@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elick - AI驱动的智能查词革命</title>
+    
+    <!-- CDN 引入 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+            color: #e2e8f0;
+        }
+        .poppins { font-family: 'Poppins', sans-serif; }
+        .visual-anchor {
+            font-size: 12rem;
+            line-height: 0.8;
+            color: transparent;
+            -webkit-text-stroke: 3px #06b6d4;
+            text-stroke: 3px #06b6d4;
+            filter: drop-shadow(0 0 20px rgba(6, 182, 212, 0.5));
+        }
+        .neon-glow {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.3), 0 0 40px rgba(6, 182, 212, 0.1);
+        }
+        .tech-card {
+            background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.6) 100%);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .grid-pattern {
+            background-image: 
+                linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="min-h-screen grid-pattern">
+    <!-- 页头 Header -->
+    <header class="bg-slate-900/80 backdrop-blur-md border-b border-cyan-500/30 px-8 py-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-black text-cyan-400 mb-2 pulse-animation">Elick AI</h1>
+                    <p class="text-lg font-medium text-cyan-300 poppins">Next-Gen Word Intelligence</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium text-cyan-400 poppins">v2.0 Tech</p>
+                    <p class="text-sm text-slate-400 poppins">AI-Powered</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 Main Body (4+8 网格) -->
+    <main class="max-w-7xl mx-auto px-8 py-12">
+        <div class="grid grid-cols-12 gap-8">
+            <!-- 视觉锚点区 (4列) -->
+            <div class="col-span-4 flex items-center justify-center">
+                <div class="text-center">
+                    <div class="visual-anchor font-black pulse-animation">AI</div>
+                    <p class="text-xl font-bold text-cyan-400 mt-4 poppins">INTELLIGENCE</p>
+                </div>
+            </div>
+            
+            <!-- 核心信息区 (8列) -->
+            <div class="col-span-8 space-y-6">
+                <!-- 产品核心价值 -->
+                <div class="tech-card rounded-xl p-6 neon-glow">
+                    <h2 class="text-3xl font-black text-white mb-4">AI驱动的查词革命</h2>
+                    <p class="text-xl font-semibold text-slate-200 leading-relaxed mb-4">
+                        突破传统查词瓶颈，从<span class="text-red-400 font-black">分钟级</span>到<span class="text-green-400 font-black">秒级</span>，
+                        性能提升<span class="text-cyan-400 font-black text-2xl">20-60x</span>
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/20">
+                            <i class="fas fa-bolt text-cyan-400 text-xl mb-2"></i>
+                            <h3 class="font-bold text-lg mb-1 text-white">瞬时响应</h3>
+                            <p class="text-slate-300 text-sm">毫秒级AI解析，零延迟体验</p>
+                        </div>
+                        <div class="bg-slate-800/50 rounded-lg p-4 border border-cyan-500/20">
+                            <i class="fas fa-brain text-cyan-400 text-xl mb-2"></i>
+                            <h3 class="font-bold text-lg mb-1 text-white">智能理解</h3>
+                            <p class="text-slate-300 text-sm">深度语境分析，精准含义匹配</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 技术特性 -->
+                <div class="tech-card rounded-xl p-6">
+                    <h3 class="text-2xl font-black text-white mb-4">
+                        <i class="fas fa-microchip text-cyan-400 mr-2"></i>
+                        技术特性
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-robot text-cyan-400"></i>
+                            <span class="font-semibold text-lg text-slate-200">AI自动上下文捕获，零手动操作</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-rocket text-cyan-400"></i>
+                            <span class="font-semibold text-lg text-slate-200">超高速处理引擎，&lt;10秒完成查询</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-network-wired text-cyan-400"></i>
+                            <span class="font-semibold text-lg text-slate-200">全平台兼容，无缝集成体验</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-comments text-cyan-400"></i>
+                            <span class="font-semibold text-lg text-slate-200">智能对话系统，支持深度交互</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 中段分隔区 Mid-Breaker -->
+    <section class="bg-gradient-to-r from-slate-800/80 to-slate-700/80 py-12 border-y border-cyan-500/20">
+        <div class="max-w-7xl mx-auto px-8">
+            <h3 class="text-2xl font-black text-center text-cyan-400 mb-8 poppins">PERFORMANCE COMPARISON</h3>
+            <div class="grid grid-cols-3 gap-8 text-center">
+                <div class="tech-card rounded-xl p-6">
+                    <h4 class="text-lg font-bold text-red-400 mb-2 poppins">Legacy Dictionary</h4>
+                    <p class="text-3xl font-black text-red-400 mb-2">3-10min</p>
+                    <p class="text-sm text-slate-400">Slow • Manual • Offline</p>
+                </div>
+                <div class="tech-card rounded-xl p-6">
+                    <h4 class="text-lg font-bold text-orange-400 mb-2 poppins">ChatGPT</h4>
+                    <p class="text-3xl font-black text-orange-400 mb-2">~1min</p>
+                    <p class="text-sm text-slate-400">Copy • Paste • Switch</p>
+                </div>
+                <div class="tech-card rounded-xl p-6 border-2 border-cyan-400 neon-glow">
+                    <h4 class="text-lg font-bold text-cyan-400 mb-2 poppins">Elick AI</h4>
+                    <p class="text-3xl font-black text-cyan-400 mb-2">&lt;10s</p>
+                    <p class="text-sm text-slate-300">Click • AI • Done</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 深色页脚 Dark Footer -->
+    <footer class="bg-slate-900 border-t border-cyan-500/30 py-12">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="grid grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-2xl font-black mb-4 text-cyan-400">启动 Elick AI</h3>
+                    <p class="text-lg font-medium mb-6 text-slate-200">体验下一代智能查词技术</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-globe text-cyan-400"></i>
+                            <a href="https://elick.it.com/" class="text-cyan-400 hover:text-cyan-300 font-medium poppins transition-colors">elick.it.com</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fab fa-github text-cyan-400"></i>
+                            <a href="https://github.com/BlackStar1453/Elick-public" class="text-cyan-400 hover:text-cyan-300 font-medium poppins transition-colors">Open Source</a>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold mb-4 text-white">Connect</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-envelope text-slate-400"></i>
+                            <span class="poppins text-slate-300">support@elick.it.com</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fab fa-twitter text-slate-400"></i>
+                            <span class="text-slate-400">X Platform (Coming Soon)</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-heart text-slate-400"></i>
+                            <span class="text-slate-400">小红书 (Coming Soon)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-700 mt-8 pt-6 text-center">
+                <p class="text-slate-400 poppins">&copy; 2025 Elick AI. Powered by Intelligence. | 让AI重新定义查词体验</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

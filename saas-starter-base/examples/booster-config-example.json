@@ -1,0 +1,48 @@
+{
+  "boosterOptions": [
+    {
+      "type": "premium",
+      "name": "高级模型加油包",
+      "description": "50次高级模型查询",
+      "amount": 50,
+      "stripePrice": 499,
+      "xorpayPrice": 2999,
+      "isPopular": true,
+      "isActive": true,
+      "sortOrder": 1
+    },
+    {
+      "type": "premium",
+      "name": "高级模型大礼包",
+      "description": "100次高级模型查询",
+      "amount": 100,
+      "stripePrice": 899,
+      "xorpayPrice": 5999,
+      "isPopular": false,
+      "isActive": true,
+      "sortOrder": 2
+    },
+    {
+      "type": "fast",
+      "name": "基础模型加油包",
+      "description": "500次基础模型查询",
+      "amount": 500,
+      "stripePrice": 299,
+      "xorpayPrice": 1999,
+      "isPopular": false,
+      "isActive": true,
+      "sortOrder": 3
+    },
+    {
+      "type": "fast",
+      "name": "基础模型大礼包",
+      "description": "1000次基础模型查询",
+      "amount": 1000,
+      "stripePrice": 499,
+      "xorpayPrice": 2999,
+      "isPopular": false,
+      "isActive": true,
+      "sortOrder": 4
+    }
+  ]
+}

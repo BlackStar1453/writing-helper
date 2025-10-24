@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elick + Anki - 高效单词学习复习方案</title>
+    
+    <!-- CDN 引入 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        .poppins { font-family: 'Poppins', sans-serif; }
+        .soft-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .gentle-gradient {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+        }
+        .hover-lift {
+            transition: transform 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="flex flex-col">
+    <!-- 页头 Header -->
+    <header class="bg-white/80 backdrop-blur-sm border-b border-green-100 px-8 py-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-black text-gray-800 mb-1">Elick + Anki</h1>
+                    <p class="text-lg font-medium text-green-600 poppins">Smart Learning & Review System</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium text-green-600 poppins">v4.0</p>
+                    <p class="text-sm text-gray-500 poppins">Learning Edition</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 Main Body (2x2 网格) -->
+    <main class="flex-1 max-w-7xl mx-auto px-8 py-6">
+        <div class="grid grid-cols-2 gap-6 h-full">
+            <!-- 左上：学习复习方案 -->
+            <div class="gentle-gradient rounded-2xl p-6 soft-shadow">
+                <div class="grid grid-cols-5 gap-4 h-full items-center">
+                    <!-- 左侧：大标题 -->
+                    <div class="col-span-2">
+                        <h1 class="text-3xl font-black bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent leading-tight">
+                            复习单词
+                        </h1>
+                    </div>
+                    
+                    <!-- 右侧：特性列表 -->
+                    <div class="col-span-3 space-y-3">
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">结合 Anki：</span>
+                                <span class="text-gray-600 text-sm">将查词结果添加到 Anki 制作记忆卡片</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">高效复习：</span>
+                                <span class="text-gray-600 text-sm">基于遗忘曲线的复习计划，</span>
+                                <span class="underline font-semibold text-sm">记忆效果最佳</span>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">电脑和手机同步进行复习：</span>
+                                <span class="text-gray-600 text-sm">在电脑和手机上使用Anki进行复习，</span>
+                                <span class="underline font-semibold text-sm">同步复习记录</span>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右上：跨平台同步 -->
+            <div class="bg-white rounded-2xl p-6 soft-shadow">
+                <div class="grid grid-cols-5 gap-4 h-full items-center">
+                    <!-- 左侧：标题 -->
+                    <div class="col-span-2">
+                        <h2 class="text-2xl font-black text-blue-600 leading-tight">
+                            跨平台
+                        </h2>
+                        <h3 class="text-2xl font-black text-gray-800 mt-1">
+                            同步复习
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-2">
+                            随时随地学习
+                        </p>
+                    </div>
+                    
+                    <!-- 右侧：同步功能 -->
+                    <div class="col-span-3 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">电脑端：</span>
+                                <span class="text-gray-600 text-sm">在电脑上使用 Elick 查词学习，</span>
+                                <span class="underline font-semibold text-sm">自动同步到 Anki</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">手机端：</span>
+                                <span class="text-gray-600 text-sm">在手机上打开 AnkiDroid/AnkiMobile，</span>
+                                <span class="underline font-semibold text-sm">随时复习单词</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">云端同步：</span>
+                                <span class="text-gray-600 text-sm">学习记录实时同步，</span>
+                                <span class="underline font-semibold text-sm">进度不丢失</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 左下：学习流程 -->
+            <div class="bg-white rounded-2xl p-6 soft-shadow">
+                <div class="grid grid-cols-5 gap-4 h-full items-center">
+                    <!-- 左侧：标题 -->
+                    <div class="col-span-2">
+                        <h2 class="text-2xl font-black text-purple-600 leading-tight">
+                            学习
+                        </h2>
+                        <h3 class="text-2xl font-black text-gray-800 mt-1">
+                            流程
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-2">
+                            简单三步骤
+                        </p>
+                    </div>
+                    
+                    <!-- 右侧：流程步骤 -->
+                    <div class="col-span-3 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 bg-purple-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
+                            <div>
+                                <span class="font-semibold text-gray-800">阅读查词：</span>
+                                <span class="text-gray-600 text-sm">使用 Elick 查询不认识的单词，</span>
+                                <span class="underline font-semibold text-sm">自动保存到单词本</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
+                            <div>
+                                <span class="font-semibold text-gray-800">导入 Anki：</span>
+                                <span class="text-gray-600 text-sm">将单词本导出并制作成 Anki 卡片，</span>
+                                <span class="underline font-semibold text-sm">包含语境例句</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
+                            <div>
+                                <span class="font-semibold text-gray-800">定期复习：</span>
+                                <span class="text-gray-600 text-sm">按照 Anki 的复习计划，</span>
+                                <span class="underline font-semibold text-sm">巩固记忆效果</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右下：学习优势 -->
+            <div class="bg-white rounded-2xl p-6 soft-shadow">
+                <div class="grid grid-cols-5 gap-4 h-full items-center">
+                    <!-- 左侧：标题 -->
+                    <div class="col-span-2">
+                        <h2 class="text-2xl font-black text-orange-600 leading-tight">
+                            学习
+                        </h2>
+                        <h3 class="text-2xl font-black text-gray-800 mt-1">
+                            优势
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-2">
+                            科学高效
+                        </p>
+                    </div>
+                    
+                    <!-- 右侧：优势列表 -->
+                    <div class="col-span-3 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">语境学习：</span>
+                                <span class="text-gray-600 text-sm">保留原文语境，</span>
+                                <span class="underline font-semibold text-sm">理解更深刻</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">个性化：</span>
+                                <span class="text-gray-600 text-sm">只学习真正遇到的单词，</span>
+                                <span class="underline font-semibold text-sm">针对性强</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-pink-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">持续性：</span>
+                                <span class="text-gray-600 text-sm">结合日常阅读和科学复习，</span>
+                                <span class="underline font-semibold text-sm">形成学习闭环</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 深色页脚 Dark Footer -->
+    <footer class="bg-gray-800 text-white py-3">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <span class="text-green-400 font-bold text-lg">Elick + Anki</span>
+                    <span class="text-gray-400 text-sm">让单词学习更科学高效</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-graduation-cap text-green-400 text-sm"></i>
+                        <span class="poppins text-sm text-gray-300">Smart Learning Solution</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">&copy; 2025 Elick. Learn Smarter, Not Harder.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

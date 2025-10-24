@@ -1,0 +1,611 @@
+{
+    "HomePage": {
+      "mainTitle": "解释",
+      "title1": "任何事情",
+      "title2": "任何地方",
+      "title3": "一键点击"
+    },
+    "NotFoundPage": {
+      "title": "页面未找到",
+      "description": "您正在寻找的页面可能已被删除、更名或暂时不可用。",
+      "backToHome": "返回首页"
+    },
+    "Auth": {
+      "signInTitle": "登录您的账户",
+      "signUpTitle": "创建新账户",
+      "email": "邮箱",
+      "password": "密码",
+      "emailPlaceholder": "请输入邮箱地址",
+      "passwordPlaceholder": "请输入密码",
+      "loading": "加载中...",
+      "signIn": "登录",
+      "signUp": "注册",
+      "noAccount": "还没有账户?",
+      "hasAccount": "已有账户?",
+      "createAccount": "创建新账户",
+      "signInToAccount": "登录已有账户",
+      "orLoginWith": "或者使用第三方账号",
+      "githubSignIn": "使用 GitHub 登录",
+      "githubSignUp": "使用 GitHub 注册",
+      "googleSignIn": "使用 Google 登录",
+      "googleSignUp": "使用 Google 注册",
+      "connectingGitHub": "连接 GitHub...",
+      "connectingGoogle": "连接 Google...",
+      "turnstileNotice": "点击完成机器人校验"
+    },
+    "SetPassword": {
+      "title": "设置账户密码",
+      "subtitle": "为了在桌面端登录，请为您的账户设置一个密码",
+      "accountLabel": "账户：",
+      "newPassword": "新密码",
+      "confirmPassword": "确认密码",
+      "passwordPlaceholder": "请输入至少8个字符的密码",
+      "confirmPasswordPlaceholder": "请再次输入密码",
+      "setPasswordButton": "设置密码",
+      "settingPassword": "设置中...",
+      "successTitle": "密码设置成功！",
+      "successSubtitle": "您现在可以使用邮箱和密码在桌面端登录了",
+      "redirecting": "正在跳转到桌面端登录...",
+      "helpText": "设置密码后，您就可以在桌面端使用邮箱和密码登录了",
+      "passwordTooShort": "密码至少需要8个字符",
+      "passwordMismatch": "密码确认不匹配",
+      "sessionExpired": "用户会话已过期，请重新登录",
+      "setPasswordFailed": "设置密码失败",
+      "networkError": "设置密码时发生错误，请重试"
+    },
+    "RegistrationSuccess": {
+      "title": "注册成功！",
+      "subtitle": "您的账户已创建成功",
+      "description": "感谢您的注册！您的账户已成功创建。",
+      "clientLoginTitle": "客户端登录",
+      "clientLoginDescription": "请在您的桌面客户端或浏览器扩展中使用以下账户信息登录：",
+      "emailLabel": "邮箱地址",
+      "loginInstructions": "请使用上述邮箱地址和您设置的密码在客户端中登录。",
+      "dashboardButton": "访问 Web 仪表板",
+      "dashboardDescription": "您也可以访问我们的 Web 仪表板来管理您的账户和使用情况。",
+      "quickLoginTitle": "快速登录",
+      "quickLoginDescription": "您也可以直接在此页面登录到客户端：",
+      "tauriLoginButton": "登录到桌面客户端",
+      "extensionLoginButton": "登录到浏览器扩展",
+      "loading": "加载中...",
+      "supportTitle": "需要帮助？",
+      "supportDescription": "如果您在登录过程中遇到任何问题，请联系我们的客户支持团队。",
+      "backToHome": "返回首页"
+    },
+    "Navigation": {
+      "features": "功能路线图",
+      "pricing": "定价",
+      "signUp": "注册",
+      "dashboard": "仪表板",
+      "signOut": "退出登录"
+    },
+    "Features": {
+      "title": "功能路线图",
+      "description": "查看即将推出的功能和已完成的功能。Premium 和 Lifetime 用户可以为喜欢的功能投票，帮助我们确定开发优先级。",
+      "upcomingFeatures": "最近预计完成",
+      "pendingFeatures": "待完成功能",
+      "completedFeatures": "已完成的功能",
+      "completedDescription": "按完成时间排序的已发布功能",
+      "estimatedCompletion": "预计完成",
+      "inDevelopment": "开发中",
+      "planned": "计划中",
+      "completed": "已完成",
+      "version": "版本",
+      "completedAt": "完成时间",
+      "voteForFeature": "为此功能投票",
+      "premiumOnly": "仅限 Premium 和 Lifetime 用户",
+      "upgradeToVote": "升级到 Premium 或 Lifetime 以投票",
+      "alreadyVoted": "您已投票",
+      "voteSuccess": "投票成功！",
+      "voteError": "投票失败，请稍后重试",
+      "likes": "点赞数",
+      "noFeatures": "暂无功能",
+      "status": {
+        "planned": "计划中",
+        "inDevelopment": "开发中",
+        "completed": "已完成"
+      }
+    },
+    "AdminFeatures": {
+      "title": "功能管理",
+      "description": "管理功能路线图，创建、编辑和删除功能项目",
+      "createFeature": "创建功能",
+      "editFeature": "编辑功能",
+      "deleteFeature": "删除功能",
+      "featureTitle": "功能标题",
+      "featureDescription": "功能描述",
+      "featureStatus": "功能状态",
+      "featurePriority": "优先级",
+      "featureVersion": "版本号",
+      "completedDate": "完成日期",
+      "actions": "操作",
+      "edit": "编辑",
+      "delete": "删除",
+      "save": "保存",
+      "cancel": "取消",
+      "confirm": "确认",
+      "confirmDelete": "确认删除此功能？此操作将同时删除所有相关投票。",
+      "createSuccess": "功能创建成功",
+      "updateSuccess": "功能更新成功",
+      "deleteSuccess": "功能删除成功",
+      "createError": "创建功能失败",
+      "updateError": "更新功能失败",
+      "deleteError": "删除功能失败",
+      "titleRequired": "标题是必填项",
+      "descriptionRequired": "描述是必填项",
+      "voteManagement": "投票管理",
+      "viewVotes": "查看投票",
+      "totalVotes": "总投票数",
+      "likesCount": "点赞数",
+      "dislikesCount": "踩数",
+      "voterEmail": "投票用户",
+      "voterPlan": "用户计划",
+      "voteType": "投票类型",
+      "voteTime": "投票时间",
+      "deleteVote": "删除投票",
+      "editVote": "编辑投票",
+      "confirmDeleteVote": "确认删除此投票？",
+      "deleteVoteSuccess": "投票删除成功",
+      "deleteVoteError": "删除投票失败",
+      "editVoteSuccess": "投票修改成功",
+      "editVoteError": "修改投票失败",
+      "changeToLike": "改为点赞",
+      "changeToDislike": "改为踩",
+      "editVoteCounts": "编辑投票数量",
+      "setVoteCounts": "设置投票数量",
+      "likesCountInput": "点赞数量",
+      "dislikesCountInput": "踩数量",
+      "updateVoteCounts": "更新投票数量",
+      "voteCountsUpdated": "投票数量更新成功",
+      "voteCountsUpdateError": "更新投票数量失败",
+      "invalidVoteCount": "投票数量必须为非负整数",
+      "noVotes": "暂无投票",
+      "backToList": "返回列表",
+      "status": {
+        "planned": "计划中",
+        "inDevelopment": "开发中",
+        "completed": "已完成"
+      }
+    },
+    "Pricing": {
+      "stripe": "Stripe",
+      "stripeDesc": "信用卡支付 · 海外用户",
+      "wechat": "微信",
+      "wechatDesc": "扫码支付 · 国内用户",
+      "stripeSuffix": "海外用户 (Stripe)",
+      "wechatSuffix": "国内用户 (扫码支付)",
+      "notSupported": "暂不支持",
+      "notAvailable": "暂不可用",
+      "wechatNotSupport": "此支付方式暂不支持该计划",
+      "currentPlan": "当前方案",
+      "selectPlan": "选择方案",
+      "description": "首先选择支付方式，然后选择适合您的计划",
+      "title": "定价方案",
+      "loading": "加载中...",
+      "freePlan": "免费版",
+      "premiumPlan": "高级版",
+      "oneTimePlan": "终身版",
+      "plusPlan": "Plus版",
+      "choosePlan": "选择方案",
+      "choosePaymentAndPlan": "选择支付方式和方案",
+      "selectPaymentMethod": "选择支付方式",
+      "month": "月",
+      "year": "年",
+      "lifetime": "终身",
+      "annualSubscription": "年付订阅 (节省20%)",
+      "annualBilling": "年付",
+      "save20": "省20%",
+      "useOwnApiKey": "使用自己的API密钥",
+      "save40": "省40%",
+      "savePerYear": "每年节省 {amount}",
+      "perYear": "/ 年",
+      "perMonth": "/月",
+      "features": {
+        "freeBasic": "50次基础模型查询/月",
+        "freeSupport": "社区支持",
+        "freePremium": "无高级模型",
+        "premiumBasic": "1000次基础模型查询",
+        "premiumAdvanced": "100次高级模型查询",
+        "lifetimeUnlimited": "无限模型查询",
+        "lifetimeApiKey": "使用您自己的API密钥"
+      },
+      "promotion": "限时优惠",
+      "off": "折扣",
+      "save": "立省",
+      "expired": "已过期",
+      "days": "天",
+      "hours": "小时",
+      "minutes": "分钟",
+      "seconds": "秒",
+      "promotionActive": "促销进行中",
+      "originalPrice": "原价",
+      "discountPrice": "优惠价",
+      "limitedTime": "限时优惠",
+      "promoCode": {
+        "title": "促销码",
+        "placeholder": "输入促销码",
+        "apply": "应用",
+        "validating": "验证中...",
+        "applied": "已应用",
+        "remove": "移除",
+        "invalid": "无效的促销码",
+        "expired": "促销码已过期",
+        "notApplicable": "此促销码不适用于该计划",
+        "usageLimitReached": "促销码使用次数已达上限",
+        "networkError": "网络错误，请重试",
+        "notFound": "促销码不存在或已失效",
+        "notStarted": "促销码尚未生效",
+        "paymentMethodNotSupported": "此促销码不适用于该支付方式",
+        "success": "促销码应用成功！",
+        "discount": "折扣",
+        "finalPrice": "最终价格",
+        "youSave": "您节省了"
+      }
+    },
+    "LanguageSwitcher": {
+      "switchLanguage": "切换语言"
+    },
+    "Settings": {
+      "subscription": "订阅",
+      "currentPlan": "当前方案",
+      "billedMonthly": "每月计费",
+      "purchaseBooster": "获取更多使用次数",
+      "share": "转发获取",
+      "trialPeriod": "试用期",
+      "noActiveSubscription": "无有效订阅",
+      "manageSubscription": "管理订阅",
+      "usage": "使用量",
+      "last30Days": "过去30天",
+      "premiumModels": "高级模型",
+      "basicModels": "基础模型",
+      "free": "免费版"
+    },
+    "ElickFeatures": {
+      "tagline": "Explain Everything with One Click",
+      "title": "Elick",
+      "description": "查询单词的最佳方案：更方便：在任意区域（网页，阅读器或者是视频字幕中）选取单词，一键点击即可给出最佳的解释；更快：将查询单词所需的时间从数分钟缩短到数秒钟，查词效率提升了",
+      "descriptionHighlight": "20-60 倍",
+      "descriptionEnd": "；更准确：结合当前语境对单词进行解释，直接找出单词最准确的含义",
+      "coreFeatures": "核心功能特性",
+      "featuresDescription": "Elick 实现了查词流程的革命性简化，让阅读体验更加流畅自然",
+      "solvedProblems": "解决的核心问题",
+      "elickSolution": "Elick 的解决方案",
+      "macosDownload": "macOS 下载",
+      "windowsDownload": "Windows 下载",
+      "chromeExtension": "Chrome 扩展",
+      "systemRequirements": "支持 macOS 10.14+, Windows 10+ 和 Chrome 浏览器",
+      "currentVersion": "当前版本",
+      "releaseDate": "发布时间",
+      "hideVersionHistory": "隐藏历史版本",
+      "viewVersionHistory": "查看历史版本",
+      "selectVersion": "选择版本",
+      "latestVersion": "最新版本",
+      "loadingVersions": "正在加载历史版本...",
+      "loadingLatestVersion": "正在获取最新版本信息…",
+      "loading": "加载中…",
+      "detectingSystem": "正在检测系统环境…",
+      "features": {
+        "oneClick": {
+          "title": "一键解释",
+          "description": "选中单词后使用快捷键，立即在附近弹出解释窗口"
+        },
+        "autoContext": {
+          "title": "自动获取上下文",
+          "description": "无需手动复制句子，自动识别单词所在的完整句子"
+        },
+        "preciseMeaning": {
+          "title": "语境精准解释",
+          "description": "基于上下文直接给出准确的单词含义"
+        },
+        "fastQuery": {
+          "title": "极速查询",
+          "description": "整个查词流程缩短至10秒以内，不打断阅读心流"
+        },
+        "furtherQuestion": {
+          "title": "进一步提问",
+          "description": "如有疑问可继续追问"
+        },
+        "crossPlatform": {
+          "title": "支持在任意区域使用",
+          "description": "在浏览器、阅读器乃至电脑任何区域都可使用，无需切换到ChatGPT"
+        }
+      },
+      "problems": [
+        "传统词典只支持输入单词来找到单词所有的含义",
+        "需要复制粘贴，频繁切换界面",
+        "查词流程繁琐，打断阅读沉浸感"
+      ],
+      "solutions": [
+        "选中单词 + 快捷键，一步到位",
+        "自动获取上下文，无需手动操作",
+        "直接给出语境中的准确含义"
+      ],
+      "viewRoadmap": "查看功能路线图",
+      "roadmapDescription": "了解已完成的功能和即将推出的新特性",
+      "openSourceNotice": "该项目基于 OpenAI translator 进行开发，遵循 AGPLv3 开源协议，源代码可从",
+      "sourceCodeLink": "此处",
+      "downloadText": "下载。",
+      "viewAllDownloads": "查看所有下载",
+      "demoGif": "/gifs/elick-demo-zh.gif",
+      "demoGifAlt": "Elick 演示",
+      "demoGifFallbackTitle": "Elick 演示",
+      "demoGifFallbackDescription": "一键智能解释单词",
+      "scrollDownText": "向下滚动查看更多",
+      "startFreeTrial": "开始免费试用",
+      "downloadVersion": "下载版本：",
+      "subtitle": "查询单词的最佳方案",
+      "aiDescription": "使用AI来帮助你查询单词，跳过繁琐的步骤，直接获取单词最准确的含义。",
+      "heroSectionTitle": "Elick vs 传统查词方式",
+      "heroSectionDescription": "看看 Elick 如何彻底改变查词体验，从繁琐的多步骤操作到一键智能解释",
+      "viewMoreFeatures": "查看更多功能",
+      "mainFeatures": {
+        "convenient": {
+          "title": "更方便：",
+          "description": "在",
+          "highlight": "任意区域",
+          "descriptionEnd": "（网页，阅读器或者是视频字幕中）选取单词，一键点击即可给出最佳的解释"
+        },
+        "faster": {
+          "title": "更快：",
+          "description": "将查询单词所需的时间从数分钟缩短到数秒钟，查词效率提升了",
+          "highlight": "20-60",
+          "suffix": "倍"
+        },
+        "accurate": {
+          "title": "更准确：",
+          "description": "结合",
+          "highlight1": "当前语境",
+          "descriptionMiddle": "对单词进行解释，直接找出单词",
+          "highlight2": "最准确的含义",
+          "descriptionEnd": ""
+        }
+      },
+      "systemArchitecture": {
+        "macAppleSilicon": "macOS Apple Silicon (M1/M2/M3/M4)",
+        "macIntel": "macOS Intel (x86_64)"
+      },
+      "alerts": {
+        "macNotSupported": "抱歉，当前版本暂不支持您的系统架构，请稍后再试或联系客服。",
+        "windowsNotSupported": "抱歉，当前版本暂不支持Windows系统，请稍后再试或联系客服。",
+        "mobileNotSupported": "抱歉，Elick 目前仅支持桌面设备（Windows 和 macOS）。请在电脑上访问本页面进行下载。"
+      },
+      "status": {
+        "notSupported": "暂不支持",
+        "currentVersionNotSupported": "当前版本暂不支持您的系统架构，请稍后再试。",
+        "currentVersionNotSupportedWindows": "当前版本暂不支持Windows系统，请稍后再试。",
+        "mobileNotSupported": "移动设备暂不支持",
+        "mobileNotSupportedDescription": "Elick 是一款桌面应用，目前仅支持 Windows 和 macOS 系统。请在电脑上访问本页面进行下载和使用。",
+        "otherPlatformNotSupported": "Elick 目前仅支持 Windows 和 macOS 桌面系统。如果您使用的是其他操作系统，请联系我们获取支持信息。"
+      },
+      "footer": {
+        "copyright": "© 2025 Elick. All rights reserved.",
+        "privacyPolicy": "隐私政策",
+        "contact": "联系我们"
+      }
+    },
+    "DictionaryEvolution": {
+      "exampleSentence": "示例句子：",
+      "queryWord": "查询单词：",
+      "demoGifAlt": "Elick 演示",
+      "demoGif": "/gifs/elick-demo-zh.gif",
+      "bankSentence": "\"I need to go to the bank to deposit my paycheck.\"",
+      "wordBank": "bank",
+      "usageFlow": "使用流程",
+      "aiAdvantages": "AI优势",
+      "advancedFlow": "在ChatGPT的基础上实现更流畅的操作",
+      "dictionaries": {
+        "paper": {
+          "title": "纸质词典",
+          "subtitle": "传统查词方式",
+          "time": "3-10 分钟",
+          "steps": [
+            "根据bank的首字母打开词典B进行检索",
+            "然后根据第二个字母a确定大概位置",
+            "精确定位bank单词所在的位置",
+            "查阅bank的所有含义",
+            "从多个单词含义中根据上下文确定含义"
+          ],
+          "problems": [
+            "查找耗时长",
+            "携带不便",
+            "需要从单词的多种含义中确定准确的含义"
+          ]
+        },
+        "electronic": {
+          "title": "电子词典",
+          "subtitle": "数字化查词",
+          "time": "~1 分钟",
+          "inputStep": "输入",
+          "outputStep": "输出（电子词典结果）",
+          "judgeStep": "从多个含义中判断哪个适合当前语境",
+          "resultWord": "银行",
+          "steps": [
+            "输入单词进行搜索",
+            "查看单词的所有含义",
+            "根据上下文确定含义"
+          ],
+          "problems": [
+            "需要从单词的许多种含义来找到准确含义",
+            "无法结合句子来直接解释单词的含义",
+            "收录的词语过时或者不全面，经常无法找到俚语、网络用语和缩写词的解释"
+          ]
+        },
+        "chatgpt": {
+          "title": "ChatGPT",
+          "subtitle": "AI智能查词",
+          "time": "~1 分钟",
+          "inputQuery": "输入查询",
+          "chatgptReply": "ChatGPT回复",
+                     "queryText": "请解释句子\"I need to go to the bank to deposit my paycheck.\"中的\"bank\"是什么意思？",
+           "replyText": "在这个句子中，\"bank\"指的是银行。根据句子中的\"deposit my paycheck\"（存入我的工资支票），可以明确这里说的是金融机构的银行，而不是河岸等其他含义。",
+          "steps": [
+            "复制单词和所在句子",
+            "打开ChatGPT界面",
+            "输入查询请求",
+            "获得语境化解释"
+          ],
+          "advantages": [
+            "相比传统词典，能够同时输入单词和句子",
+            "跳过从繁多含义中寻找正确答案的步骤，直接给出单词的正确含义",
+            "支持进一步追问，让AI帮助你更好地理解"
+          ],
+          "problems": [
+            "需要复制粘贴",
+            "频繁切换界面",
+            "打断阅读心流"
+          ]
+        },
+        "elick": {
+          "title": "Elick",
+          "subtitle": "一键智能解释",
+          "time": "<10 秒",
+          "selectWord": "选中单词",
+          "useHotkey": "快捷键",
+          "getExplanation": "获得解释",
+          "steps": [
+            "选中不认识的单词",
+            "使用快捷键或点击按钮",
+            "立即获得语境化解释"
+          ],
+          "advantages": [
+            "在任意界面使用，选取单词即可立即获取正确含义",
+            "自动获取单词的句子，不需要自己复制粘粘",
+            "不需要切换界面，不打断阅读心流",
+            "支持进一步追问,让AI帮助你更好地理解"
+          ]
+        }
+      },
+      "common": {
+        "demo": "演示",
+        "estimatedTime": "预计用时",
+        "usageSteps": "使用步骤",
+        "mainProblems": "主要问题",
+        "coreAdvantages": "核心优势",
+        "previous": "上一个",
+        "next": "下一个",
+        "elickDemo": "Elick 演示",
+        "selectWordInstruction": "选中单词 → 快捷键 → 获得解释",
+        "dictionaryResultLoading": "词典查询结果图片加载中...",
+        "bankDefinitionNote": "显示bank的完整词典条目，包含多个含义",
+        "dictionaryImage": "/img/bank.png"
+      }
+    },
+    "UsageBooster": {
+      "title": "购买使用量加油包",
+      "purchase": "购买加油包",
+      "share": "转发获取",
+      "needUpgrade": "需要升级账户",
+      "onlyPremium": "只有高级用户和终身用户才能购买使用量加油包",
+      "learnUpgrade": "了解升级方案",
+      "selectPaymentMethod": "选择支付方式",
+      "stripe": "信用卡/Stripe",
+      "creditCard": "信用卡",
+      "xorpay": "微信",
+      "scanCodePayment": "扫码支付",
+      "selectBooster": "选择加油包",
+      "quantityAndTotal": "数量和总计",
+      "quantity": "购买数量",
+      "unitPrice": "单价",
+      "getAmount": "获得使用量",
+      "total": "总计",
+      "cancel": "取消",
+      "buyNow": "立即购买",
+      "processing": "处理中...",
+      "recommended": "推荐",
+      "boosterOptions": {
+        "premium-50": {
+          "name": "高级模型加油包",
+          "description": "50次高级模型查询"
+        },
+        "premium-100": {
+          "name": "高级模型大礼包",
+          "description": "100次高级模型查询"
+        },
+        "fast-500": {
+          "name": "基础模型加油包",
+          "description": "500次基础模型查询"
+        },
+        "fast-1000": {
+          "name": "基础模型大礼包",
+          "description": "1000次基础模型查询"
+        }
+      },
+      "shareTab": {
+        "title": "免费获取使用次数",
+        "description": "通过在社交媒体上转发我们的内容，您可以免费获得基础模型使用次数！",
+        "platforms": {
+          "twitter": "X (Twitter)",
+          "xiaohongshu": "小红书",
+          "weibo": "微博"
+        },
+        "rewardDescription": "转发并点赞获得 {amount} 次基础模型使用",
+        "startShare": "开始转发",
+        "completed": "已完成",
+        "verifying": "验证中",
+        "estimatedTime": "预计验证时间：{time}",
+        "instructions": {
+          "step1": "选择一个社交平台",
+          "step2": "转发我们的内容并点赞",
+          "step3": "上传截图进行验证",
+          "step4": "获得免费使用次数"
+        },
+        "benefits": [
+          "每个平台可获得100次基础模型使用",
+          "验证通过后立即到账",
+          "支持多个平台分别完成",
+          "完全免费，无需付费"
+        ]
+      }
+    },
+    "XorpayPayment": {
+      "boosterSuccess": "🎉 加油包购买成功！正在更新您的使用量并跳转到控制台...",
+      "success": "🎉 支付成功！正在更新您的账户并跳转到控制台...",
+      "boosterFailed": "❌ 加油包购买失败，请重试",
+      "failed": "❌ 支付失败，请重试",
+      "boosterTimeout": "⏰ 加油包购买超时，请重新发起支付",
+      "timeout": "⏰ 支付超时，请重新发起支付",
+      "boosterPending": "请使用微信扫描二维码完成加油包购买",
+      "pending": "请使用微信扫描二维码完成支付",
+      "errorTitle": "支付信息错误",
+      "errorDesc": "缺少必要的支付参数",
+      "backToPricing": "返回定价页面",
+      "scanTip": "扫描二维码完成支付",
+      "leftTime": "剩余时间",
+      "autoRedirect": "支付完成后将自动跳转",
+      "paidGoDashboard": "支付已完成，进入控制台",
+      "paidManualTip": "如果已完成支付但页面未跳转，请使用上方按钮",
+      "retry": "重新支付",
+      "backToDashboard": "返回控制台",
+      "successActivating": "✅ 支付成功！正在为您激活服务...",
+      "syncToDesktopTip": "如果您使用桌面应用，点击上方按钮同步最新的订阅状态"
+    },
+    "SubscriptionSuccess": {
+      "title": "订阅激活成功！",
+      "boosterTitle": "加油包购买成功！",
+      "planActivated": "{planName} 计划已激活",
+      "boosterAdded": "加油包已添加到您的账户",
+      "syncingStatus": "正在为您的桌面应用同步最新状态...",
+      "generatingLink": "生成同步链接中...",
+      "linkGenerated": "同步链接已生成，正在自动打开桌面应用...",
+      "manualSync": "手动打开桌面应用",
+      "syncFailed": "同步链接生成失败: {error}",
+      "syncFailedRetry": "请稍后重试或联系客服",
+      "autoOpeningApp": "如果桌面应用没有自动打开，请点击上方按钮手动打开"
+    },
+    "SyncButton": {
+      "syncing": "同步中...",
+      "syncToDesktop": "同步到桌面应用",
+      "syncFailed": "同步失败: {error}"
+    }
+,
+    "TauriAuth": {
+      "tipTitle": "提示：无法直接打开桌面应用？",
+      "tipDescription": "如果 deep-link 没有自动唤起桌面应用，请直接打开桌面应用，在桌面应用中输入邮箱和密码登录。"
+    },
+    "WritingAssistant": {
+      "apiTokenNotSet": "未设置 API Token",
+      "apiTokenNotSetMessage": "请在设置中输入您的 API Token 以使用 AI 功能。",
+      "openSettings": "打开设置"
+    }
+
+  }

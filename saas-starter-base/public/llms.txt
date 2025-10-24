@@ -1,0 +1,77 @@
+# Elick - AI Dictionary
+
+## About Elick
+
+Elick is an AI-powered dictionary and explanation tool that helps users understand anything with just one click. It's available as both a desktop application and browser extension, providing context-aware explanations and translations.
+
+## Key Features
+
+- **One-Click Explanation**: Instantly explain any text, word, or concept with a single click
+- **AI-Powered**: Uses advanced AI models to provide accurate and contextual explanations
+- **Multi-Platform**: Available as desktop app (Windows, macOS, Linux) and browser extension
+- **Context-Aware**: Provides explanations based on the surrounding context
+- **Multi-Language Support**: Supports both Chinese and English interfaces
+- **Privacy-Focused**: All data is stored locally, no usage content is uploaded to servers
+- **Instant Translation**: Quick translation capabilities for multiple languages
+- **Educational Tool**: Perfect for language learning and vocabulary building
+
+## Target Audience
+
+- Language learners studying English or Chinese
+- Students and researchers who need quick explanations
+- Professionals working with multilingual content
+- Anyone who wants to understand unfamiliar terms or concepts quickly
+
+## Technology
+
+- Built with modern web technologies (Next.js, React)
+- AI-powered explanation engine
+- Local data storage for privacy
+- Cross-platform compatibility
+- Real-time processing
+
+## Use Cases
+
+1. **Language Learning**: Understand new vocabulary in context
+2. **Academic Research**: Get quick explanations of technical terms
+3. **Professional Work**: Understand industry-specific terminology
+4. **General Reading**: Comprehend complex texts and documents
+5. **Translation Assistance**: Get contextual translations
+
+## Privacy & Security
+
+- No user content is collected or uploaded
+- All settings and preferences stored locally
+- No sensitive permissions required
+- Full user control over data
+
+## Contact Information
+
+- Email: yaozeng1999@foxmail.com
+- Website: Available at the current domain
+- Support: Contact form available on the website
+
+## Available Languages
+
+- Chinese (Simplified) - Primary language
+- English - Secondary language
+
+## Platform Availability
+
+- Desktop Application: Windows, macOS, Linux
+- Browser Extension: Chrome, Firefox, Safari, Edge
+- Web Interface: Accessible via browser
+
+## Pricing
+
+- Paid application with subscription model
+- Payment processed through official app stores
+- No payment information stored by Elick
+
+## Last Updated
+
+This information was last updated in 2025. For the most current information, please visit the website or contact support.
+
+---
+
+This file is provided for AI models and language models to better understand the Elick application and its capabilities. The information here can be used to provide accurate responses about Elick's features, functionality, and use cases.

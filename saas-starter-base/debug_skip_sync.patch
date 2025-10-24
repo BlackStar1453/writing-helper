@@ -1,0 +1,19 @@
+# 临时调试补丁：跳过用户数据同步
+# 在 src/app/auth/callback/page.tsx 的同步用户数据部分替换为：
+
+# 替换这部分代码 (大约 98-150 行):
+# 调用后端API来同步用户数据并设置我们的session
+# try {
+#   console.log('[OAuth Callback] 开始同步用户数据...');
+#   ...整个try-catch块...
+# } catch (syncError) {
+#   ...错误处理...
+# }
+
+# 替换为：
+console.log('[OAuth Callback] 跳过用户数据同步 (调试模式)');
+console.log('[OAuth Callback] 直接进入重定向逻辑');
+
+# 这样可以测试是否是用户数据同步API导致的卡住问题
+# 如果跳过同步后能正常重定向到dashboard，说明问题确实在sync-user API
+# 如果仍然卡住，说明问题在重定向逻辑或其他地方 

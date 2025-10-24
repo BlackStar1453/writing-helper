@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elick 产品信息卡片 - 版本管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Noto Serif SC', serif; }
+        .poppins { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-6xl mx-auto py-12 px-6">
+        <!-- 页头 -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-black text-gray-900 mb-4">Elick 产品信息卡片</h1>
+            <p class="text-xl text-gray-600 mb-2">多版本设计，适配不同使用场景</p>
+            <p class="text-sm text-gray-500 poppins">Version Management System</p>
+        </header>
+
+        <!-- 推荐版本 -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white text-center">
+                <h2 class="text-xl font-bold mb-2">🌟 产品介绍</h2>
+                <p class="text-green-100 mb-4 text-sm">v3.2 四模块网格布局 - 完整产品信息</p>
+                <a href="elick-card-v3.2-grid.html" target="_blank"
+                   class="inline-block bg-white text-green-600 px-4 py-2 rounded-lg font-bold hover:bg-green-50 transition-colors text-sm">
+                    <i class="fas fa-eye mr-2"></i>查看产品介绍
+                </a>
+            </div>
+            <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white text-center">
+                <h2 class="text-xl font-bold mb-2">🎓 学习方案</h2>
+                <p class="text-blue-100 mb-4 text-sm">v4.0 学习复习方案 - Elick + Anki</p>
+                <a href="elick-card-v4-learning.html" target="_blank"
+                   class="inline-block bg-white text-blue-600 px-4 py-2 rounded-lg font-bold hover:bg-blue-50 transition-colors text-sm">
+                    <i class="fas fa-graduation-cap mr-2"></i>查看学习方案
+                </a>
+            </div>
+        </div>
+
+        <!-- 版本列表 -->
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-12">
+            <!-- v1.0 商务版 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-blue-100">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white">
+                    <h3 class="text-2xl font-bold mb-2">v1.0 商务版</h3>
+                    <p class="text-blue-100 poppins">Business Edition</p>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full font-medium">经典商务风格</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">专业商务感设计，强调效率提升数据，适合商务场合展示</p>
+                    <div class="space-y-2 text-sm text-gray-500 mb-6">
+                        <div><i class="fas fa-palette text-blue-500 mr-2"></i>主题色：蓝色系</div>
+                        <div><i class="fas fa-font text-blue-500 mr-2"></i>视觉锚点：字母 "E"</div>
+                        <div><i class="fas fa-star text-blue-500 mr-2"></i>特色：权威感设计</div>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="elick-card-v1-business.html" target="_blank" 
+                           class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 px-4 rounded-lg font-medium transition-colors">
+                            <i class="fas fa-eye mr-2"></i>预览
+                        </a>
+                        <a href="elick-card-v1-business.html" download 
+                           class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v2.0 科技版 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-cyan-100">
+                <div class="bg-gradient-to-r from-cyan-500 to-cyan-600 p-6 text-white">
+                    <h3 class="text-2xl font-bold mb-2">v2.0 科技版</h3>
+                    <p class="text-cyan-100 poppins">Tech Edition</p>
+                </div>
+                <div class="p-6">
+                    <div class="mb-4">
+                        <span class="inline-block bg-cyan-100 text-cyan-800 text-xs px-2 py-1 rounded-full font-medium">现代科技风格</span>
+                    </div>
+                    <p class="text-gray-600 mb-4">深色背景配霓虹效果，强调AI技术特性，适合技术展示</p>
+                    <div class="space-y-2 text-sm text-gray-500 mb-6">
+                        <div><i class="fas fa-palette text-cyan-500 mr-2"></i>主题色：青色系</div>
+                        <div><i class="fas fa-font text-cyan-500 mr-2"></i>视觉锚点：字母 "AI"</div>
+                        <div><i class="fas fa-star text-cyan-500 mr-2"></i>特色：霓虹发光效果</div>
+                    </div>
+                    <div class="flex gap-3">
+                        <a href="elick-card-v2-tech.html" target="_blank" 
+                           class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white text-center py-2 px-4 rounded-lg font-medium transition-colors">
+                            <i class="fas fa-eye mr-2"></i>预览
+                        </a>
+                        <a href="elick-card-v2-tech.html" download 
+                           class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg transition-colors">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v3.1 紧凑版 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border-2 border-green-400">
+                <div class="bg-gradient-to-r from-green-500 to-green-600 p-4 text-white relative">
+                    <div class="absolute top-2 right-2">
+                        <span class="bg-yellow-400 text-yellow-900 text-xs px-2 py-1 rounded-full font-bold">推荐</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-1">v3.1 紧凑版</h3>
+                    <p class="text-green-100 text-sm poppins">Compact Edition</p>
+                </div>
+                <div class="p-4">
+                    <div class="mb-3">
+                        <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">一屏显示优化</span>
+                    </div>
+                    <p class="text-gray-600 mb-3 text-sm">无需滚动，一屏显示所有信息，最适合截图分享</p>
+                    <div class="space-y-1 text-xs text-gray-500 mb-4">
+                        <div><i class="fas fa-palette text-green-500 mr-2"></i>主题色：绿色系</div>
+                        <div><i class="fas fa-font text-green-500 mr-2"></i>视觉锚点：汉字 "简"</div>
+                        <div><i class="fas fa-star text-green-500 mr-2"></i>特色：紧凑布局</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="elick-card-v3.1-compact.html" target="_blank"
+                           class="flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 px-3 rounded-lg font-medium transition-colors text-sm">
+                            <i class="fas fa-eye mr-1"></i>预览
+                        </a>
+                        <a href="elick-card-v3.1-compact.html" download
+                           class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-lg transition-colors text-sm">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v3.0 简约版 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-green-100">
+                <div class="bg-gradient-to-r from-green-400 to-green-500 p-4 text-white">
+                    <h3 class="text-xl font-bold mb-1">v3.0 简约版</h3>
+                    <p class="text-green-100 text-sm poppins">Minimal Edition</p>
+                </div>
+                <div class="p-4">
+                    <div class="mb-3">
+                        <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">简约清新风格</span>
+                    </div>
+                    <p class="text-gray-600 mb-3 text-sm">白色清新背景，强调简单易用，适合用户教育场景</p>
+                    <div class="space-y-1 text-xs text-gray-500 mb-4">
+                        <div><i class="fas fa-palette text-green-500 mr-2"></i>主题色：绿色系</div>
+                        <div><i class="fas fa-font text-green-500 mr-2"></i>视觉锚点：汉字 "简"</div>
+                        <div><i class="fas fa-star text-green-500 mr-2"></i>特色：悬停动画</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <a href="elick-card-v3-minimal.html" target="_blank"
+                           class="flex-1 bg-green-600 hover:bg-green-700 text-white text-center py-2 px-3 rounded-lg font-medium transition-colors text-sm">
+                            <i class="fas fa-eye mr-1"></i>预览
+                        </a>
+                        <a href="elick-card-v3-minimal.html" download
+                           class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-3 rounded-lg transition-colors text-sm">
+                            <i class="fas fa-download"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 使用指南 -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">使用指南</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-briefcase text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">商务场合</h3>
+                    <p class="text-gray-600 text-sm">选择 v1.0 商务版，专业权威的设计风格</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-cyan-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-microchip text-cyan-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">技术展示</h3>
+                    <p class="text-gray-600 text-sm">选择 v2.0 科技版，突出AI技术特性</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-heart text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="font-bold text-lg mb-2">用户教育</h3>
+                    <p class="text-gray-600 text-sm">选择 v3.0 简约版，强调易用性和亲和力</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文档链接 -->
+        <div class="bg-gray-100 rounded-xl p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">相关文档</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <a href="version-control.md" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors">
+                    <i class="fas fa-code-branch text-blue-500"></i>
+                    <span class="font-medium">版本控制文档</span>
+                </a>
+                <a href="changelog.md" class="flex items-center gap-3 text-gray-700 hover:text-blue-600 transition-colors">
+                    <i class="fas fa-list-alt text-blue-500"></i>
+                    <span class="font-medium">变更日志</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 页脚 -->
+        <footer class="text-center mt-12 pt-8 border-t border-gray-200">
+            <p class="text-gray-500 poppins">&copy; 2025 Elick Product Cards. Designed for maximum impact.</p>
+        </footer>
+    </div>
+</body>
+</html>

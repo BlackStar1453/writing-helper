@@ -1,0 +1,92 @@
+{
+  "boosterOptions": [
+    {
+      "type": "premium",
+      "name": "高级模型入门包",
+      "description": "50次高级模型查询，适合轻度使用",
+      "amount": 50,
+      "stripePrice": 499,
+      "xorpayPrice": 2999,
+      "isPopular": false,
+      "isActive": true,
+      "sortOrder": 1
+    },
+    {
+      "type": "premium",
+      "name": "高级模型加油包",
+      "description": "100次高级模型查询，性价比之选",
+      "amount": 100,
+      "stripePrice": 899,
+      "xorpayPrice": 4999,
+      "isPopular": true,
+      "isActive": true,
+      "sortOrder": 2
+    },
+    {
+      "type": "premium",
+      "name": "高级模型大礼包",
+      "description": "200次高级模型查询，重度用户首选",
+      "amount": 200,
+      "stripePrice": 1599,
+      "xorpayPrice": 8999,
+      "isPopular": false,
+      "isActive": true,
+      "sortOrder": 3
+    },
+    {
+      "type": "premium",
+      "name": "高级模型超值包",
+      "description": "500次高级模型查询，企业级使用",
+      "amount": 500,
+      "stripePrice": 3499,
+      "xorpayPrice": 19999,
+      "isPopular": false,
+      "isActive": true,
+      "sortOrder": 4
+    },
+    {
+      "type": "fast",
+      "name": "基础模型入门包",
+      "description": "500次基础模型查询，新手体验",
+      "amount": 500,
+      "stripePrice": 299,
+      "xorpayPrice": 1999,
+      "isPopular": false,
+      "isActive": true,
+      "sortOrder": 5
+    },
+    {
+      "type": "fast",
+      "name": "基础模型加油包",
+      "description": "1000次基础模型查询，日常使用",
+      "amount": 1000,
+      "stripePrice": 499,
+      "xorpayPrice": 2999,
+      "isPopular": true,
+      "isActive": true,
+      "sortOrder": 6
+    },
+    {
+      "type": "fast",
+      "name": "基础模型大礼包",
+      "description": "2000次基础模型查询，高频使用",
+      "amount": 2000,
+      "stripePrice": 899,
+      "xorpayPrice": 4999,
+      "isPopular": false,
+      "isActive": true,
+      "sortOrder": 7
+    },
+    {
+      "type": "fast",
+      "name": "基础模型超值包",
+      "description": "5000次基础模型查询，无限畅用",
+      "amount": 5000,
+      "stripePrice": 1999,
+      "xorpayPrice": 9999,
+      "isPopular": false,
+      "isActive": true,
+      "sortOrder": 8
+    }
+  ]
+}

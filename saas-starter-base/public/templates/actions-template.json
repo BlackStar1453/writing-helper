@@ -1,0 +1,21 @@
+{
+  "language": "en",
+  "version": "1.0.0",
+  "description": "Actions template for importing custom actions",
+  "actions": [
+    {
+      "name": "Example Action",
+      "groups": ["Custom"],
+      "icon": "MdStar",
+      "rolePrompt": "You are a helpful assistant.",
+      "commandPrompt": "Please help with: \"${selectedText}\"",
+      "mode": "custom",
+      "model": "gpt-4",
+      "outputRenderingFormat": "markdown",
+      "useBackgroundInfo": false,
+      "useLanguageLevelInfo": false,
+      "parentIds": [],
+      "childrenIds": []
+    }
+  ]
+}

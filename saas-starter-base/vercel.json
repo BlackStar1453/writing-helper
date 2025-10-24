@@ -1,0 +1,21 @@
+{
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/daily-maintenance",
+      "schedule": "0 2 * * *"
+    }
+  ],
+  "env": {
+    "PRECACHE_ACTIVE_USERS": "true"
+  },
+  "build": {
+    "env": {
+      "PRECACHE_ACTIVE_USERS": "true"
+    }
+  }
+}

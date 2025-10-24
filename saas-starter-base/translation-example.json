@@ -1,0 +1,22 @@
+[
+  {
+    "locale": "ja",
+    "title": "新機能のタイトル",
+    "description": "この新機能は、ユーザーエクスペリエンスを大幅に向上させる革新的な機能です。直感的なインターフェースと高度な機能を組み合わせて、より効率的な作業環境を提供します。"
+  },
+  {
+    "locale": "ko",
+    "title": "새로운 기능 제목",
+    "description": "이 새로운 기능은 사용자 경험을 크게 향상시키는 혁신적인 기능입니다. 직관적인 인터페이스와 고급 기능을 결합하여 더 효율적인 작업 환경을 제공합니다."
+  },
+  {
+    "locale": "fr",
+    "title": "Titre de la nouvelle fonctionnalité",
+    "description": "Cette nouvelle fonctionnalité est une fonction innovante qui améliore considérablement l'expérience utilisateur. Elle combine une interface intuitive avec des fonctionnalités avancées pour offrir un environnement de travail plus efficace."
+  },
+  {
+    "locale": "de",
+    "title": "Titel der neuen Funktion",
+    "description": "Diese neue Funktion ist eine innovative Funktion, die die Benutzererfahrung erheblich verbessert. Sie kombiniert eine intuitive Benutzeroberfläche mit erweiterten Funktionen, um eine effizientere Arbeitsumgebung zu bieten."
+  }
+]

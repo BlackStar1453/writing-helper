@@ -1,0 +1,611 @@
+{
+    "HomePage": {
+      "mainTitle": "Explain",
+      "title1": "Anything",
+      "title2": "Anywhere",
+      "title3": "With One Click"
+    },
+    "NotFoundPage": {
+      "title": "Page Not Found",
+      "description": "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.",
+      "backToHome": "Back to Home"
+    },
+    "Auth": {
+      "signInTitle": "Sign in to your account",
+      "signUpTitle": "Create a new account",
+      "email": "Email",
+      "password": "Password",
+      "emailPlaceholder": "Enter your email address",
+      "passwordPlaceholder": "Enter your password",
+      "loading": "Loading...",
+      "signIn": "Sign In",
+      "signUp": "Sign Up",
+      "noAccount": "Don't have an account?",
+      "hasAccount": "Already have an account?",
+      "createAccount": "Create new account",
+      "signInToAccount": "Sign in to existing account",
+      "orLoginWith": "Or sign in with",
+      "githubSignIn": "Sign in with GitHub",
+      "githubSignUp": "Sign up with GitHub",
+      "googleSignIn": "Sign in with Google",
+      "googleSignUp": "Sign up with Google",
+      "connectingGitHub": "Connecting to GitHub...",
+      "connectingGoogle": "Connecting to Google...",
+      "turnstileNotice": "Click to complete the bot challenge"
+    },
+    "SetPassword": {
+      "title": "Set Account Password",
+      "subtitle": "To login on desktop, please set a password for your account",
+      "accountLabel": "Account:",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "passwordPlaceholder": "Enter at least 8 characters",
+      "confirmPasswordPlaceholder": "Enter password again",
+      "setPasswordButton": "Set Password",
+      "settingPassword": "Setting...",
+      "successTitle": "Password Set Successfully!",
+      "successSubtitle": "You can now login on desktop using your email and password",
+      "redirecting": "Redirecting to desktop login...",
+      "helpText": "After setting a password, you can login on desktop using your email and password",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "passwordMismatch": "Password confirmation does not match",
+      "sessionExpired": "User session has expired, please login again",
+      "setPasswordFailed": "Failed to set password",
+      "networkError": "An error occurred while setting password, please try again"
+    },
+    "RegistrationSuccess": {
+      "title": "Registration Successful!",
+      "subtitle": "Your account has been created successfully",
+      "description": "Thank you for registering! Your account has been successfully created.",
+      "clientLoginTitle": "Client Login",
+      "clientLoginDescription": "Please use the following account information to login in your desktop client or browser extension:",
+      "emailLabel": "Email Address",
+      "loginInstructions": "Please use the email address above and the password you set to login in the client.",
+      "dashboardButton": "Access Web Dashboard",
+      "dashboardDescription": "You can also access our web dashboard to manage your account and usage.",
+      "quickLoginTitle": "Quick Login",
+      "quickLoginDescription": "You can also directly login to the client from this page:",
+      "tauriLoginButton": "Login to Desktop Client",
+      "extensionLoginButton": "Login to Browser Extension",
+      "loading": "Loading...",
+      "supportTitle": "Need Help?",
+      "supportDescription": "If you encounter any problems during the login process, please contact our customer support team.",
+      "backToHome": "Back to Home"
+    },
+    "Navigation": {
+      "features": "Feature Roadmap",
+      "pricing": "Pricing",
+      "signUp": "Sign Up",
+      "dashboard": "Dashboard",
+      "signOut": "Sign out"
+    },
+    "Features": {
+      "title": "Feature Roadmap",
+      "description": "View upcoming features and completed features. Premium and Lifetime users can vote for features they like to help us prioritize development.",
+      "upcomingFeatures": "Coming Soon",
+      "pendingFeatures": "Pending Features",
+      "completedFeatures": "Completed Features",
+      "completedDescription": "Released features sorted by completion time",
+      "estimatedCompletion": "Estimated Completion",
+      "inDevelopment": "In Development",
+      "planned": "Planned",
+      "completed": "Completed",
+      "version": "Version",
+      "completedAt": "Completed At",
+      "voteForFeature": "Vote for this feature",
+      "premiumOnly": "Premium and Lifetime users only",
+      "upgradeToVote": "Upgrade to Premium or Lifetime to vote",
+      "alreadyVoted": "You have already voted",
+      "voteSuccess": "Vote successful!",
+      "voteError": "Vote failed, please try again later",
+      "likes": "Likes",
+      "noFeatures": "No features available",
+      "roadmapDescription": "Discover completed features and upcoming new capabilities",
+      "status": {
+        "planned": "Planned",
+        "inDevelopment": "In Development",
+        "completed": "Completed"
+      }
+    },
+    "AdminFeatures": {
+      "title": "Feature Management",
+      "description": "Manage feature roadmap, create, edit and delete feature items",
+      "createFeature": "Create Feature",
+      "editFeature": "Edit Feature",
+      "deleteFeature": "Delete Feature",
+      "featureTitle": "Feature Title",
+      "featureDescription": "Feature Description",
+      "featureStatus": "Feature Status",
+      "featurePriority": "Priority",
+      "featureVersion": "Version",
+      "completedDate": "Completed Date",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "confirmDelete": "Confirm to delete this feature? This will also delete all related votes.",
+      "createSuccess": "Feature created successfully",
+      "updateSuccess": "Feature updated successfully",
+      "deleteSuccess": "Feature deleted successfully",
+      "createError": "Failed to create feature",
+      "updateError": "Failed to update feature",
+      "deleteError": "Failed to delete feature",
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "voteManagement": "Vote Management",
+      "viewVotes": "View Votes",
+      "totalVotes": "Total Votes",
+      "likesCount": "Likes",
+      "dislikesCount": "Dislikes",
+      "voterEmail": "Voter Email",
+      "voterPlan": "User Plan",
+      "voteType": "Vote Type",
+      "voteTime": "Vote Time",
+      "deleteVote": "Delete Vote",
+      "editVote": "Edit Vote",
+      "confirmDeleteVote": "Confirm to delete this vote?",
+      "deleteVoteSuccess": "Vote deleted successfully",
+      "deleteVoteError": "Failed to delete vote",
+      "editVoteSuccess": "Vote updated successfully",
+      "editVoteError": "Failed to update vote",
+      "changeToLike": "Change to Like",
+      "changeToDislike": "Change to Dislike",
+      "editVoteCounts": "Edit Vote Counts",
+      "setVoteCounts": "Set Vote Counts",
+      "likesCountInput": "Likes Count",
+      "dislikesCountInput": "Dislikes Count",
+      "updateVoteCounts": "Update Vote Counts",
+      "voteCountsUpdated": "Vote counts updated successfully",
+      "voteCountsUpdateError": "Failed to update vote counts",
+      "invalidVoteCount": "Vote count must be a non-negative integer",
+      "noVotes": "No votes yet",
+      "backToList": "Back to List",
+      "status": {
+        "planned": "Planned",
+        "inDevelopment": "In Development",
+        "completed": "Completed"
+      }
+    },
+    "Pricing": {
+      "title": "Pricing Plans",
+      "description": "Select your payment method first, then choose the plan that best suits your needs",
+      "stripe": "Stripe",
+      "stripeDesc": "Credit Card · International",
+      "wechat": "WeChat",
+      "selectPaymentMethod": "Select Payment Method",
+
+      "wechatDesc": "Scan to Pay · Mainland China",
+      "stripeSuffix": "International (Stripe)",
+      "wechatSuffix": "Mainland China (Scan to Pay)",
+      "notSupported": "Not supported",
+      "notAvailable": "Not available",
+      "wechatNotSupport": "This plan is not supported by this payment method",
+      "currentPlan": "Current Plan",
+      "selectPlan": "Select Plan",
+      "loading": "Loading...",
+      "freePlan": "Free",
+      "premiumPlan": "Premium",
+      "oneTimePlan": "One-Time",
+      "month": "month",
+      "year": "year",
+      "lifetime": "lifetime",
+      "annualSubscription": "Annual Subscription (Save 20%)",
+      "annualBilling": "Annual billing",
+      "save20": "Save 20%",
+      "useOwnApiKey": "Use my own API key",
+      "save40": "Save 40%",
+      "savePerYear": "Save {amount} per year",
+      "perYear": "/ Year",
+      "perMonth": "/Month",
+      "features": {
+        "freeBasic": "50 Basic Models Queries for free",
+        "freeSupport": "Community Support",
+        "freePremium": "No Premium Models",
+        "premiumBasic": "1000 Basic Models Queries",
+        "premiumAdvanced": "100 Premium Models Queries",
+        "lifetimeUnlimited": "No Limit on Models Queries",
+        "lifetimeApiKey": "Use Your Own API Key"
+      },
+      "promotion": "Limited Offer",
+      "off": "OFF",
+      "save": "Save",
+      "expired": "Expired",
+      "days": "d",
+      "hours": "h",
+      "minutes": "m",
+      "seconds": "s",
+      "promotionActive": "Promotion Active",
+      "originalPrice": "Original Price",
+      "discountPrice": "Discount Price",
+      "limitedTime": "Limited Time Offer",
+      "promoCode": {
+        "title": "Promo Code",
+        "placeholder": "Enter promo code",
+        "apply": "Apply",
+        "validating": "Validating...",
+        "applied": "Applied",
+        "remove": "Remove",
+        "invalid": "Invalid promo code",
+        "expired": "Promo code has expired",
+        "notApplicable": "This promo code is not applicable to this plan",
+        "usageLimitReached": "Promo code usage limit reached",
+        "networkError": "Network error, please try again",
+        "notFound": "Promo code does not exist or has been deactivated",
+        "notStarted": "Promo code is not yet active",
+        "paymentMethodNotSupported": "This promo code does not support this payment method",
+        "success": "Promo code applied successfully!",
+        "discount": "Discount",
+        "finalPrice": "Final Price",
+        "youSave": "You Save"
+      }
+    },
+    "LanguageSwitcher": {
+      "switchLanguage": "Switch Language"
+    },
+    "Settings": {
+      "subscription": "Subscription",
+      "currentPlan": "Current Plan",
+      "purchaseBooster": "Get More Usage",
+      "share": "Share to Get",
+      "billedMonthly": "Billed monthly",
+      "trialPeriod": "Trial period",
+      "noActiveSubscription": "No active subscription",
+      "manageSubscription": "Manage Subscription",
+      "usage": "Usage",
+      "last30Days": "Last 30 days",
+      "premiumModels": "Premium models",
+      "basicModels": "Basic models",
+      "free": "Free"
+    },
+    "ElickFeatures": {
+      "tagline": "Explain Everything with One Click",
+      "title": "Elick",
+      "description": "The ultimate evolution of dictionaries: reducing word lookup time from minutes to seconds, improving efficiency by",
+      "aiDescription": "Use AI to help you look up words, skip tedious steps, and get the most accurate meaning of words directly.",
+      "descriptionHighlight": "20-60x",
+      "descriptionEnd": ", and more accurately",
+      "coreFeatures": "Core Features",
+      "featuresDescription": "Elick achieves revolutionary simplification of the word lookup process, making reading experience more fluent and natural",
+      "solvedProblems": "Core Problems Solved",
+      "elickSolution": "Elick's Solution",
+      "macosDownload": "macOS Download",
+      "windowsDownload": "Windows Download",
+      "chromeExtension": "Chrome Extension",
+      "systemRequirements": "Supports macOS 10.14+, Windows 10+ and Chrome browser",
+      "currentVersion": "Current Version",
+      "releaseDate": "Release Date",
+      "hideVersionHistory": "Hide Version History",
+      "viewVersionHistory": "View Version History",
+      "selectVersion": "Select Version",
+      "latestVersion": "Latest Version",
+      "loadingVersions": "Loading version history...",
+      "loadingLatestVersion": "Getting latest version info...",
+      "loading": "Loading...",
+      "detectingSystem": "Detecting system environment...",
+      "features": {
+        "oneClick": {
+          "title": "One-Click Explanation",
+          "description": "Select a word and use hotkey to instantly pop up explanation window nearby"
+        },
+        "autoContext": {
+          "title": "Auto Context Capture",
+          "description": "No need to manually copy sentences, automatically identifies the complete sentence containing the word"
+        },
+        "preciseMeaning": {
+          "title": "Contextual Precise Explanation",
+          "description": "Provides accurate word meaning based on context, not all possible meanings"
+        },
+        "fastQuery": {
+          "title": "Lightning Fast Query",
+          "description": "Entire word lookup process shortened to under 10 seconds, doesn't interrupt reading immersion"
+        },
+        "furtherQuestion": {
+          "title": "Further Questions",
+          "description": "Can continue asking questions if needed, like having a tutor available anytime"
+        },
+        "crossPlatform": {
+          "title": "Works Anywhere",
+          "description": "Works anywhere on your computer, no need to switch to ChatGPT"
+        }
+      },
+      "problems": [
+        "Traditional dictionaries only show all meanings, requiring manual context judgment",
+        "Requires copy-paste and frequent interface switching",
+        "Complex lookup process interrupts reading flow"
+      ],
+      "solutions": [
+        "Select word + hotkey—instant solution",
+        "Auto-captures context, zero manual work",
+        "Direct contextual meaning, not all definitions"
+      ],
+      "viewRoadmap": "View Feature Roadmap",
+      "roadmapDescription": "Discover completed features and upcoming new capabilities",
+      "openSourceNotice": "This project is developed based on OpenAI translator, following the AGPLv3 open source license, source code can be downloaded from",
+      "sourceCodeLink": "here",
+      "downloadText": ".",
+      "viewAllDownloads": "View All Downloads",
+      "demoGif": "/gifs/elick-demo-en.gif",
+      "demoGifAlt": "Elick Demo",
+      "demoGifFallbackTitle": "Elick Demo",
+      "demoGifFallbackDescription": "One-click intelligent word explanation",
+      "scrollDownText": "Scroll down for more",
+      "startFreeTrial": "Start Free Trial",
+      "downloadVersion": "Download version: ",
+      "subtitle": "The Ultimate Word Lookup Solution",
+      "heroSectionTitle": "Elick vs Traditional Word Lookup",
+      "heroSectionDescription": "See how Elick revolutionizes word lookup experience, from tedious multi-step operations to one-click intelligent explanations",
+      "viewMoreFeatures": "View More Features",
+      "mainFeatures": {
+        "convenient": {
+          "title": "More Convenient:",
+          "description": "Select words in ",
+          "highlight": "any area",
+          "descriptionEnd": " (web pages, readers, or video subtitles), one click to get the best explanation"
+        },
+        "faster": {
+          "title": "Faster:",
+          "description": "Reduce word lookup time from minutes to seconds, improving efficiency by",
+          "highlight": "20-60",
+          "suffix": "x"
+        },
+        "accurate": {
+          "title": "More Accurate:",
+          "description": "Explain words based on ",
+          "highlight1": "current context",
+          "descriptionMiddle": ", directly finding ",
+          "highlight2": "the most accurate meaning",
+          "descriptionEnd": ""
+        }
+      },
+      "systemArchitecture": {
+        "macAppleSilicon": "macOS Apple Silicon (M1/M2/M3/M4)",
+        "macIntel": "macOS Intel (x86_64)"
+      },
+      "alerts": {
+        "macNotSupported": "Sorry, the current version does not support your system architecture. Please try again later or contact customer service.",
+        "windowsNotSupported": "Sorry, the current version does not support Windows system. Please try again later or contact customer service.",
+        "mobileNotSupported": "Sorry, Elick currently only supports desktop devices (Windows and macOS). Please visit this page on your computer to download."
+      },
+      "status": {
+        "notSupported": "Not Supported",
+        "currentVersionNotSupported": "The current version does not support your system architecture. Please try again later.",
+        "currentVersionNotSupportedWindows": "The current version does not support Windows system. Please try again later.",
+        "mobileNotSupported": "Mobile devices not supported",
+        "mobileNotSupportedDescription": "Elick is a desktop application that currently only supports Windows and macOS systems. Please visit this page on your computer to download and use.",
+        "otherPlatformNotSupported": "Elick currently only supports Windows and macOS desktop systems. If you are using another operating system, please contact us for support information."
+      },
+      "footer": {
+        "copyright": "© 2025 Elick. All rights reserved.",
+        "privacyPolicy": "Privacy Policy",
+        "contact": "Contact"
+      }
+    },
+    "DictionaryEvolution": {
+      "exampleSentence": "Example sentence:",
+      "queryWord": "Query word:",
+      "bankSentence": "\"The syzygy of the planets last night left even seasoned astronomers in awe.\"",
+      "wordBank": "syzygy",
+      "demoGif": "/gifs/elick-demo-en.gif",
+      "demoGifAlt": "Elick Demo",
+      "usageFlow": "Usage Flow",
+      "aiAdvantages": "AI Advantages",
+      "advancedFlow": "More fluid operation based on ChatGPT",
+      "dictionaries": {
+        "paper": {
+          "title": "Paper Dictionary",
+          "subtitle": "Traditional lookup",
+          "time": "3-10 minutes",
+          "steps": [
+            "Open dictionary to section S based on first letter of 'syzygy'",
+            "Use second letter 'y' to narrow down location",
+            "Locate exact position of 'syzygy'",
+            "Read all meanings of 'syzygy'",
+            "Determine correct meaning from context"
+          ],
+          "problems": [
+            "Time-consuming search",
+            "Inconvenient to carry",
+            "Must determine correct meaning from multiple definitions"
+          ]
+        },
+        "electronic": {
+          "title": "Electronic Dictionary",
+          "subtitle": "Digital lookup",
+          "time": "~1 minute",
+          "inputStep": "Input",
+          "outputStep": "Output (Dictionary Results)",
+          "judgeStep": "Determine which meaning fits the context",
+          "resultWord": "syzygy (astronomical alignment)",
+          "steps": [
+            "Type word to search",
+            "View all meanings",
+            "Determine meaning from context"
+          ],
+          "problems": [
+            "Must sift through many meanings to find the right one",
+            "Cannot combine sentence context for direct explanation",
+            "Outdated entries, often missing slang, internet terms, and abbreviations"
+          ]
+        },
+        "chatgpt": {
+          "title": "ChatGPT",
+          "subtitle": "AI-powered lookup",
+          "time": "~1 minute",
+          "inputQuery": "Input Query",
+          "chatgptReply": "ChatGPT Reply",
+          "queryText": "Please explain what 'syzygy' means in the sentence: 'The syzygy of the planets last night left even seasoned astronomers in awe.'",
+          "replyText": "In this sentence, 'syzygy' refers to the astronomical alignment of celestial bodies. Based on 'planets' and 'astronomers in awe,' it clearly refers to the rare planetary alignment phenomenon.",
+          "steps": [
+            "Copy word and sentence",
+            "Open ChatGPT interface",
+            "Input query",
+            "Get contextualized explanation"
+          ],
+          "advantages": [
+            "Can input both word and sentence, unlike traditional dictionaries",
+            "Skip searching through multiple meanings—get the right one directly",
+            "Ask follow-up questions for better understanding"
+          ],
+          "problems": [
+            "Requires copy-paste",
+            "Frequent interface switching",
+            "Interrupts reading flow"
+          ]
+        },
+        "elick": {
+          "title": "Elick",
+          "subtitle": "One-click smart lookup",
+          "time": "<10 seconds",
+          "selectWord": "Select Word",
+          "useHotkey": "Hotkey",
+          "getExplanation": "Get Explanation",
+          "steps": [
+            "Select unknown word",
+            "Use hotkey or button",
+            "Instantly get explanation"
+          ],
+          "advantages": [
+            "Works anywhere—select any word for instant accurate meaning",
+            "Auto-captures sentence context, no copy-paste needed",
+            "No interface switching, maintains reading flow",
+            "Ask follow-up questions for deeper understanding"
+          ]
+        }
+      },
+      "common": {
+        "demo": "Demo",
+        "estimatedTime": "Estimated time",
+        "usageSteps": "Usage Steps",
+        "mainProblems": "Main Problems",
+        "coreAdvantages": "Core Advantages",
+        "previous": "Previous",
+        "next": "Next",
+        "elickDemo": "Elick Demo",
+        "selectWordInstruction": "Select word → Hotkey → Get explanation",
+        "dictionaryResultLoading": "Dictionary results loading...",
+        "bankDefinitionNote": "Shows complete dictionary entry for 'syzygy' with multiple meanings",
+        "dictionaryImage": "/img/syzygy.png"
+      }
+    },
+    "UsageBooster": {
+      "title": "Purchase Usage Booster",
+      "purchaseBooster": "Purchase Booster",
+      "purchase": "Purchase",
+      "share": "Share to Get",
+      "needUpgrade": "Upgrade Required",
+      "onlyPremium": "Only Premium and Lifetime users can purchase usage boosters",
+      "learnUpgrade": "Learn about upgrade plans",
+      "selectPaymentMethod": "Select Payment Method",
+      "stripe": "Stripe",
+      "creditCard": "Credit Card",
+      "xorpay": "WeChat",
+      "scanCodePayment": "Scan to Pay",
+      "selectBooster": "Select Booster",
+      "quantityAndTotal": "Quantity & Total",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price",
+      "getAmount": "Usage Amount",
+      "total": "Total",
+      "cancel": "Cancel",
+      "buyNow": "Buy Now",
+      "processing": "Processing...",
+      "recommended": "Recommended",
+      "boosterOptions": {
+        "premium-50": {
+          "name": "Premium Model Booster",
+          "description": "50 Premium Model Queries"
+        },
+        "premium-100": {
+          "name": "Premium Model Bundle",
+          "description": "100 Premium Model Queries"
+        },
+        "fast-500": {
+          "name": "Basic Model Booster",
+          "description": "500 Basic Model Queries"
+        },
+        "fast-1000": {
+          "name": "Basic Model Bundle",
+          "description": "1000 Basic Model Queries"
+        }
+      },
+      "shareTab": {
+        "title": "Get Free Usage",
+        "description": "Share our content on social media to get free basic model usage!",
+        "platforms": {
+          "twitter": "X (Twitter)",
+          "xiaohongshu": "Xiaohongshu",
+          "weibo": "Weibo"
+        },
+        "rewardDescription": "Share and like to get {amount} basic model uses",
+        "startShare": "Start Sharing",
+        "completed": "Completed",
+        "verifying": "Verifying",
+        "estimatedTime": "Estimated verification time: {time}",
+        "instructions": {
+          "step1": "Choose a social platform",
+          "step2": "Share our content and like",
+          "step3": "Upload screenshot for verification",
+          "step4": "Get free usage"
+        },
+        "benefits": [
+          "Get 100 basic model uses per platform",
+          "Credits added immediately after verification",
+          "Complete on multiple platforms separately",
+          "Completely free, no payment required"
+        ]
+      }
+    },
+    "XorpayPayment": {
+      "boosterSuccess": "🎉 Booster purchase successful! Updating your quota and redirecting to dashboard...",
+      "success": "🎉 Payment successful! Updating your account and redirecting to dashboard...",
+      "boosterFailed": "❌ Booster purchase failed, please try again",
+      "failed": "❌ Payment failed, please try again",
+      "boosterTimeout": "⏰ Booster purchase timed out, please try again",
+      "timeout": "⏰ Payment timed out, please try again",
+      "boosterPending": "Please use WeChat to scan the QR code to complete booster purchase",
+      "pending": "Please use WeChat to scan the QR code to complete payment",
+      "errorTitle": "Payment Info Error",
+      "errorDesc": "Missing required payment parameters",
+      "backToPricing": "Back to Pricing Page",
+      "scanTip": "Scan the QR code to complete payment",
+      "leftTime": "Time left",
+      "autoRedirect": "You will be redirected automatically after payment",
+      "paidGoDashboard": "Payment completed, go to dashboard",
+      "paidManualTip": "If you have completed payment but not redirected, please use the button above",
+      "retry": "Pay Again",
+      "backToDashboard": "Back to Dashboard",
+      "successActivating": "✅ Payment successful! Activating your service...",
+      "syncToDesktopTip": "If you use the desktop app, click the button above to sync the latest subscription status"
+    },
+    "SubscriptionSuccess": {
+      "title": "Subscription Activated Successfully!",
+      "boosterTitle": "Booster Purchase Successful!",
+      "planActivated": "{planName} plan has been activated",
+      "boosterAdded": "Booster has been added to your account",
+      "syncingStatus": "Syncing latest status to your desktop app...",
+      "generatingLink": "Generating sync link...",
+      "linkGenerated": "Sync link generated, automatically opening desktop app...",
+      "manualSync": "Manually Open Desktop App",
+      "syncFailed": "Sync link generation failed: {error}",
+      "syncFailedRetry": "Please try again later or contact support",
+      "autoOpeningApp": "If the desktop app doesn't open automatically, please click the button above to open it manually"
+    },
+    "SyncButton": {
+      "syncing": "Syncing...",
+      "syncToDesktop": "Sync to Desktop App",
+      "syncFailed": "Sync failed: {error}"
+    }
+,
+    "TauriAuth": {
+      "tipTitle": "Tip: Can't open the desktop app directly?",
+      "tipDescription": "If the deep-link doesn't open the app automatically, please open the desktop app and sign in there with your email and password."
+    },
+    "WritingAssistant": {
+      "apiTokenNotSet": "API Token not set",
+      "apiTokenNotSetMessage": "Please set your API Token in settings to use AI features.",
+      "openSettings": "Open Settings"
+    }
+
+  }

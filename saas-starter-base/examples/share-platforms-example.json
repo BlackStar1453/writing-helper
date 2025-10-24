@@ -1,0 +1,44 @@
+{
+  "sharePlatforms": [
+    {
+      "platformId": "twitter",
+      "name": "Twitter",
+      "description": "转发并点赞获得使用次数",
+      "rewardAmount": 100,
+      "rewardType": "fast",
+      "shareUrl": "https://twitter.com/intent/tweet?text=Check%20out%20this%20amazing%20AI%20tool!",
+      "isActive": true,
+      "sortOrder": 1
+    },
+    {
+      "platformId": "xiaohongshu",
+      "name": "小红书",
+      "description": "转发并点赞获得使用次数",
+      "rewardAmount": 100,
+      "rewardType": "fast",
+      "shareUrl": null,
+      "isActive": true,
+      "sortOrder": 2
+    },
+    {
+      "platformId": "weibo",
+      "name": "微博",
+      "description": "转发并点赞获得使用次数",
+      "rewardAmount": 100,
+      "rewardType": "fast",
+      "shareUrl": "https://service.weibo.com/share/share.php?title=Amazing%20AI%20tool",
+      "isActive": true,
+      "sortOrder": 3
+    },
+    {
+      "platformId": "linkedin",
+      "name": "LinkedIn",
+      "description": "分享到LinkedIn获得奖励",
+      "rewardAmount": 150,
+      "rewardType": "premium",
+      "shareUrl": "https://www.linkedin.com/sharing/share-offsite/?url=https://example.com",
+      "isActive": true,
+      "sortOrder": 4
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "language": "zh-Hans",
+  "version": "1.0.0",
+  "description": "中文Actions示例",
+  "actions": [
+    {
+      "name": "专业邮件写手",
+      "groups": ["商务", "沟通"],
+      "icon": "MdEmail",
+      "rolePrompt": "你是一位专业的商务沟通专家。",
+      "commandPrompt": "请帮我基于以下内容写一封专业邮件：\"${selectedText}\"",
+      "mode": "custom",
+      "outputRenderingFormat": "text",
+      "useBackgroundInfo": true,
+      "useLanguageLevelInfo": false
+    },
+    {
+      "name": "代码审查员",
+      "groups": ["编程", "开发"],
+      "icon": "MdCode",
+      "rolePrompt": "你是一位经验丰富的软件工程师和代码审查员。",
+      "commandPrompt": "请审查这段代码并提供改进建议：\"${selectedText}\"",
+      "mode": "custom",
+      "outputRenderingFormat": "markdown",
+      "useBackgroundInfo": false,
+      "useLanguageLevelInfo": false
+    },
+    {
+      "name": "会议纪要总结器",
+      "groups": ["商务", "效率"],
+      "icon": "MdSummarize",
+      "rolePrompt": "你是一位擅长整理和总结会议内容的专家。",
+      "commandPrompt": "请为这些会议记录创建结构化摘要：\"${selectedText}\"",
+      "mode": "summary",
+      "outputRenderingFormat": "markdown",
+      "useBackgroundInfo": false,
+      "useLanguageLevelInfo": false
+    },
+    {
+      "name": "创意写作助手",
+      "groups": ["写作", "创意"],
+      "icon": "MdCreate",
+      "rolePrompt": "你是一位创意写作教练和故事讲述者。",
+      "commandPrompt": "请帮我改进这段创意写作：\"${selectedText}\"",
+      "mode": "rewrite",
+      "outputRenderingFormat": "text",
+      "useBackgroundInfo": false,
+      "useLanguageLevelInfo": true
+    },
+    {
+      "name": "技术文档撰写员",
+      "groups": ["编程", "文档"],
+      "icon": "MdDescription",
+      "rolePrompt": "你是一位专门撰写清晰、全面文档的技术写作专家。",
+      "commandPrompt": "请为以下内容创建技术文档：\"${selectedText}\"",
+      "mode": "custom",
+      "outputRenderingFormat": "markdown",
+      "useBackgroundInfo": true,
+      "useLanguageLevelInfo": false
+    },
+    {
+      "name": "学术论文助手",
+      "groups": ["学术", "写作"],
+      "icon": "MdSchool",
+      "rolePrompt": "你是一位学术写作专家，擅长帮助改进论文质量。",
+      "commandPrompt": "请帮我改进这段学术文本的表达：\"${selectedText}\"",
+      "mode": "rewrite",
+      "outputRenderingFormat": "text",
+      "useBackgroundInfo": false,
+      "useLanguageLevelInfo": true
+    },
+    {
+      "name": "产品需求分析师",
+      "groups": ["产品", "分析"],
+      "icon": "MdAnalytics",
+      "rolePrompt": "你是一位经验丰富的产品需求分析师。",
+      "commandPrompt": "请分析这个产品需求并提供专业建议：\"${selectedText}\"",
+      "mode": "custom",
+      "outputRenderingFormat": "markdown",
+      "useBackgroundInfo": true,
+      "useLanguageLevelInfo": false
+    }
+  ]
+}

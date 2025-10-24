@@ -1,0 +1,41 @@
+英文翻译生成报告
+==================
+生成时间: 7/27/2025, 7:30:05 PM
+总功能数: 11
+已有翻译: 11
+新增翻译: 0
+
+功能详情:
+--------
+1. Speak功能 (existing)
+   英文: Speak功能
+
+2. YouGlish功能 (existing)
+   英文: YouGlish功能
+
+3. 选取单词直接获取上下文功能 (existing)
+   英文: 选取单词直接获取上下文功能
+
+4. Prompt设置 (existing)
+   英文: Prompt设置
+
+5. 截屏功能 (existing)
+   英文: 截屏功能
+
+6. 翻译功能 (existing)
+   英文: 翻译功能
+
+7. Anki自动制卡功能 (existing)
+   英文: Anki自动制卡功能
+
+8. 思考模型适配 (existing)
+   英文: 思考模型适配
+
+9. 单词本功能 (existing)
+   英文: Word Book
+
+10. 快速搜索功能 (existing)
+   英文: 快速搜索功能
+
+11. Windows支持 (existing)
+   英文: Windows Support

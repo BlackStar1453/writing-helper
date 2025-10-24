@@ -1,0 +1,62 @@
+{
+  "language": "en",
+  "version": "1.0.0",
+  "description": "English Actions Example",
+  "actions": [
+    {
+      "name": "Professional Email Writer",
+      "groups": ["Business", "Communication"],
+      "icon": "MdEmail",
+      "rolePrompt": "You are a professional business communication expert.",
+      "commandPrompt": "Please help me write a professional email based on this context: \"${selectedText}\"",
+      "mode": "custom",
+      "outputRenderingFormat": "text",
+      "useBackgroundInfo": true,
+      "useLanguageLevelInfo": false
+    },
+    {
+      "name": "Code Reviewer",
+      "groups": ["Programming", "Development"],
+      "icon": "MdCode",
+      "rolePrompt": "You are an experienced software engineer and code reviewer.",
+      "commandPrompt": "Please review this code and provide suggestions for improvement: \"${selectedText}\"",
+      "mode": "custom",
+      "outputRenderingFormat": "markdown",
+      "useBackgroundInfo": false,
+      "useLanguageLevelInfo": false
+    },
+    {
+      "name": "Meeting Notes Summarizer",
+      "groups": ["Business", "Productivity"],
+      "icon": "MdSummarize",
+      "rolePrompt": "You are an expert at organizing and summarizing meeting content.",
+      "commandPrompt": "Please create a structured summary of these meeting notes: \"${selectedText}\"",
+      "mode": "summary",
+      "outputRenderingFormat": "markdown",
+      "useBackgroundInfo": false,
+      "useLanguageLevelInfo": false
+    },
+    {
+      "name": "Creative Writing Assistant",
+      "groups": ["Writing", "Creative"],
+      "icon": "MdCreate",
+      "rolePrompt": "You are a creative writing coach and storyteller.",
+      "commandPrompt": "Please help me improve this creative writing piece: \"${selectedText}\"",
+      "mode": "rewrite",
+      "outputRenderingFormat": "text",
+      "useBackgroundInfo": false,
+      "useLanguageLevelInfo": true
+    },
+    {
+      "name": "Technical Documentation Writer",
+      "groups": ["Programming", "Documentation"],
+      "icon": "MdDescription",
+      "rolePrompt": "You are a technical writer specializing in clear, comprehensive documentation.",
+      "commandPrompt": "Please create technical documentation for: \"${selectedText}\"",
+      "mode": "custom",
+      "outputRenderingFormat": "markdown",
+      "useBackgroundInfo": true,
+      "useLanguageLevelInfo": false
+    }
+  ]
+}

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elick - 简单高效的查词工具</title>
+    
+    <!-- CDN 引入 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        .poppins { font-family: 'Poppins', sans-serif; }
+        .soft-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        .gentle-gradient {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+        }
+        .hover-lift {
+            transition: transform 0.2s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="flex flex-col">
+    <!-- 页头 Header -->
+    <header class="bg-white/80 backdrop-blur-sm border-b border-green-100 px-8 py-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-black text-gray-800 mb-1">Elick</h1>
+                    <p class="text-lg font-medium text-green-600 poppins">Simple. Fast. Effective.</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium text-green-600 poppins">v3.2</p>
+                    <p class="text-sm text-gray-500 poppins">Grid Layout</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 Main Body (2x2 网格) -->
+    <main class="flex-1 max-w-7xl mx-auto px-8 py-6">
+        <div class="grid grid-cols-2 gap-6 h-full">
+            <!-- 左上：让查词变得简单 -->
+            <div class="gentle-gradient rounded-2xl p-6 soft-shadow">
+                <div class="grid grid-cols-5 gap-4 h-full items-center">
+                    <!-- 左侧：大标题 -->
+                    <div class="col-span-2">
+                        <h1 class="text-4xl font-black bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent leading-tight">
+                            Elick
+                        </h1>
+                        <h2 class="text-xl font-bold text-gray-700 mt-2">
+                            查询单词的最佳方案
+                        </h2>
+                    </div>
+
+                    <!-- 右侧：特性列表 -->
+                    <div class="col-span-3 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">更方便：</span>
+                                <span class="text-gray-600 text-sm">在任意区域（网页，阅读器或者是视频字幕中）选取单词，</span>
+                                <span class="underline font-semibold text-sm">一键点击即可给出最佳的解释</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">更快：</span>
+                                <span class="text-gray-600 text-sm">将查询单词所需的时间从数分钟缩短到数秒钟，查词效率提升了</span>
+                                <strong class="underline font-bold text-sm">20-60 倍</strong>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">更准确：</span>
+                                <span class="text-gray-600 text-sm">结合当前语境对单词进行解释，</span>
+                                <span class="underline font-semibold text-sm">直接找出单词最准确的含义</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右上：传统方式 vs Elick -->
+            <div class="bbg-white rounded-2xl p-6 soft-shadow">
+                <div class="grid grid-cols-5 gap-4 h-full items-center">
+                    <!-- 左侧：标题 -->
+                    <div class="col-span-2">
+                        <h2 class="text-2xl font-black text-gray-800 leading-tight">
+                            传统方式
+                        </h2>
+                        <h3 class="text-2xl font-black text-green-600 mt-1">
+                            vs Elick
+                        </h3>
+                    </div>
+
+                    <!-- 右侧：对比内容 -->
+                    <div class="col-span-3 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">传统查词方式：</span>
+                                <span class="text-gray-600 text-sm">给出单词的所有含义，</span>
+                                <span class="underline font-semibold text-sm text-gray-800">还需要在多种含义中确定哪一种是最合适的</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">Elick 的优势：</span>
+                                <span class="text-gray-600 text-sm">直接根据单词和单词所在的句子，</span>
+                                <span class="underline font-semibold text-sm text-gray-800">给出单词在这个句子中的正确含义，不需要自己再思考应该选择哪一种</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 左下：不影响阅读体验 -->
+            <div class="bg-white rounded-2xl p-6 soft-shadow">
+                <div class="grid grid-cols-5 gap-4 h-full items-center">
+                    <!-- 左侧：标题 -->
+                    <div class="col-span-2">
+                        <h2 class="text-2xl font-black text-purple-600 leading-tight">
+                            不影响
+                        </h2>
+                        <h3 class="text-2xl font-black text-gray-800 mt-1">
+                            阅读体验
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-2">
+                            保持专注，流畅阅读
+                        </p>
+                    </div>
+
+                    <!-- 右侧：特性列表 -->
+                    <div class="col-span-3 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">无需复制粘贴：</span>
+                                <span class="text-gray-600 text-sm">鼠标双击选中的单词即可查询，</span>
+                                <span class="underline font-semibold text-sm">操作简单直接</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-indigo-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">无需切换窗口：</span>
+                                <span class="text-gray-600 text-sm">随时打开和关闭 Elick，</span>
+                                <span class="underline font-semibold text-sm">不影响阅读体验</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-pink-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">保持专注：</span>
+                                <span class="text-gray-600 text-sm">在当前页面直接显示解释，</span>
+                                <span class="underline font-semibold text-sm">不打断阅读心流</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右下：网站和社交账号 -->
+            <div class="bg-white rounded-2xl p-6 soft-shadow">
+                <div class="grid grid-cols-5 gap-4 h-full items-center">
+                    <!-- 左侧：标题 -->
+                    <div class="col-span-2">
+                        <h2 class="text-2xl font-black text-blue-600 leading-tight">
+                            官方
+                        </h2>
+                        <h3 class="text-2xl font-black text-gray-800 mt-1">
+                            链接
+                        </h3>
+                        <p class="text-sm text-gray-600 mt-2">
+                            获取更多信息
+                        </p>
+                    </div>
+
+                    <!-- 右侧：链接列表 -->
+                    <div class="col-span-3 space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">官方网站：</span>
+                                <a href="https://elick.it.com/" class="text-blue-600 hover:text-blue-700 font-bold text-sm poppins underline">elick.it.com</a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-red-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <span class="font-semibold text-gray-800">社交媒体：</span>
+                                <span class="text-gray-600 text-sm">X 账号、小红书账号</span>
+                                <span class="text-gray-500 text-xs">（即将开通）</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 深色页脚 Dark Footer -->
+    <footer class="bg-gray-800 text-white py-3">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <span class="text-green-400 font-bold text-lg">Elick</span>
+                    <span class="text-gray-400 text-sm">让查词变得简单高效</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-envelope text-gray-400 text-sm"></i>
+                        <span class="poppins text-sm text-gray-300">support@elick.it.com</span>
+                    </div>
+                    <p class="text-gray-400 text-xs">&copy; 2025 Elick. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

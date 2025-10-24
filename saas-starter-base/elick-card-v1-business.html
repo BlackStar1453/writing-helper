@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elick - 一键智能查词解决方案</title>
+    
+    <!-- CDN 引入 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Noto Serif SC', serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        .poppins { font-family: 'Poppins', sans-serif; }
+        .visual-anchor {
+            font-size: 12rem;
+            line-height: 0.8;
+            color: transparent;
+            -webkit-text-stroke: 3px #3b82f6;
+            text-stroke: 3px #3b82f6;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%);
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- 页头 Header -->
+    <header class="bg-white border-b-2 border-blue-100 px-8 py-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-black text-gray-900 mb-2">Elick 产品介绍</h1>
+                    <p class="text-lg font-medium text-blue-600 poppins">Explain Everything with One Click</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-sm font-medium text-gray-600 poppins">Version 1.0</p>
+                    <p class="text-sm text-gray-500 poppins">Business Edition</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 Main Body (4+8 网格) -->
+    <main class="max-w-7xl mx-auto px-8 py-12">
+        <div class="grid grid-cols-12 gap-8">
+            <!-- 视觉锚点区 (4列) -->
+            <div class="col-span-4 flex items-center justify-center">
+                <div class="text-center">
+                    <div class="visual-anchor font-black">E</div>
+                    <p class="text-xl font-bold text-blue-600 mt-4 poppins">EFFICIENCY</p>
+                </div>
+            </div>
+            
+            <!-- 核心信息区 (8列) -->
+            <div class="col-span-8 space-y-6">
+                <!-- 产品核心价值 -->
+                <div class="gradient-bg rounded-xl p-6 card-shadow">
+                    <h2 class="text-3xl font-black text-gray-900 mb-4">革命性查词体验</h2>
+                    <p class="text-xl font-semibold text-gray-800 leading-relaxed mb-4">
+                        将查词时间从<span class="text-red-600 font-black">数分钟</span>缩短到<span class="text-green-600 font-black">数秒钟</span>，
+                        效率提升<span class="text-blue-600 font-black text-2xl">20-60倍</span>
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white rounded-lg p-4">
+                            <i class="fas fa-mouse-pointer text-blue-600 text-xl mb-2"></i>
+                            <h3 class="font-bold text-lg mb-1">一键解释</h3>
+                            <p class="text-gray-600 text-sm">选中单词+快捷键，立即获得解释</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-4">
+                            <i class="fas fa-brain text-blue-600 text-xl mb-2"></i>
+                            <h3 class="font-bold text-lg mb-1">语境精准</h3>
+                            <p class="text-gray-600 text-sm">基于上下文给出准确含义</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 核心功能特性 -->
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <h3 class="text-2xl font-black text-gray-900 mb-4">核心功能特性</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            <span class="font-semibold text-lg">自动获取上下文，无需手动复制句子</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            <span class="font-semibold text-lg">极速查询，整个流程不超过10秒</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            <span class="font-semibold text-lg">跨平台支持，任意区域都可使用</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            <span class="font-semibold text-lg">支持进一步追问，深度理解</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 中段分隔区 Mid-Breaker -->
+    <section class="bg-gradient-to-r from-blue-50 to-indigo-50 py-12">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="grid grid-cols-3 gap-8 text-center">
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <h4 class="text-lg font-bold text-red-600 mb-2">传统词典</h4>
+                    <p class="text-3xl font-black text-red-600 mb-2">3-10分钟</p>
+                    <p class="text-sm text-gray-600">查找耗时长，携带不便</p>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <h4 class="text-lg font-bold text-orange-600 mb-2">ChatGPT</h4>
+                    <p class="text-3xl font-black text-orange-600 mb-2">~1分钟</p>
+                    <p class="text-sm text-gray-600">需要复制粘贴，切换界面</p>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow border-2 border-blue-500">
+                    <h4 class="text-lg font-bold text-blue-600 mb-2">Elick</h4>
+                    <p class="text-3xl font-black text-blue-600 mb-2">&lt;10秒</p>
+                    <p class="text-sm text-gray-600">一键解释，不打断阅读</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 深色页脚 Dark Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-8">
+            <div class="grid grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-2xl font-black mb-4">立即体验 Elick</h3>
+                    <p class="text-lg font-medium mb-6">让查词变得前所未有的简单高效</p>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-globe text-blue-400"></i>
+                            <a href="https://elick.it.com/" class="text-blue-400 hover:text-blue-300 font-medium poppins">elick.it.com</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fab fa-github text-blue-400"></i>
+                            <a href="https://github.com/BlackStar1453/Elick-public" class="text-blue-400 hover:text-blue-300 font-medium poppins">GitHub</a>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-xl font-bold mb-4">联系我们</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-envelope text-gray-400"></i>
+                            <span class="poppins">support@elick.it.com</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fab fa-twitter text-gray-400"></i>
+                            <span class="text-gray-400">官方 X 账号（即将开通）</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-book text-gray-400"></i>
+                            <span class="text-gray-400">小红书账号（即将开通）</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-6 text-center">
+                <p class="text-gray-400 poppins">&copy; 2025 Elick. All rights reserved. | 让每一次查词都成为学习的契机</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

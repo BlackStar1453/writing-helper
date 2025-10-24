@@ -1,0 +1,70 @@
+{
+  "locale": "en",
+  "translations": [
+    {
+      "featureId": "dc9fac88-463d-4724-833c-7cea7507544b",
+      "title": "Text-to-Speech Feature",
+      "description": "Use TTS for pronunciation with customizable speech rate and different accents. Supports multiple languages and natural voice synthesis."
+    },
+    {
+      "featureId": "6af2c7bf-5c6c-4c07-9251-1163a375a99d",
+      "title": "YouGlish Integration",
+      "description": "Find real human pronunciation directly from YouTube videos. Learn correct pronunciation and usage context through authentic video content."
+    },
+    {
+      "featureId": "42e6d36a-79bc-4136-b536-6bf630b728be",
+      "title": "Word Selection Context Feature",
+      "description": "Select words in any area to directly get the sentence context. Intelligently recognizes context for more accurate understanding."
+    },
+    {
+      "featureId": "187d6895-226a-42e3-8478-884a5594172d",
+      "title": "Prompt Templates",
+      "description": "Save commonly used AI prompts as reusable templates. Create functions like 'Translate to Chinese' for one-click access without repetitive input."
+    },
+    {
+      "featureId": "990ba9ab-c110-45ca-a011-172030092377",
+      "title": "Screenshot Feature",
+      "description": "Capture screenshots in any area, and the system will automatically get the context of the screenshot area. Useful when you cannot select words (e.g., in videos)."
+    },
+    {
+      "featureId": "9e972756-4b97-4ff4-8b90-3ebd4b3613d8",
+      "title": "Translation Feature",
+      "description": "Use AI to translate after selecting any area and clicking the built-in translation button. You can freely configure translation settings and target languages in the feature manager."
+    },
+    {
+      "featureId": "40df4573-65f7-4e66-8823-9ea9a9f9b1c8",
+      "title": "Anki Auto Card Creation",
+      "description": "Automatically create appropriately formatted cards from your selected content and add them to Anki. Monitors Anki settings, supports both automatic and manual adding modes, with configurable target deck."
+    },
+    {
+      "featureId": "967d0e00-6896-40e7-97c6-f3820b1f298d",
+      "title": "Reasoning Model Adaptation",
+      "description": "Adapt to reasoning models for handling multiple related contexts simultaneously. Use reasoning models for complex problems, selecting multiple relevant contexts for deep analysis."
+    },
+    {
+      "featureId": "5f9c5fc3-2290-4720-9bab-ff8ab917c452",
+      "title": "Word Book",
+      "description": "Add words or any content that needs learning and review to your word book for organized study and practice."
+    },
+    {
+      "featureId": "db18c35f-c7eb-4617-89ef-3f10a192d739",
+      "title": "Quick Search Feature",
+      "description": "When you have created many features, you might not be able to find the needed feature quickly. This search function allows you to quickly find and invoke features, such as typing 'translate' to quickly call the translation feature."
+    },
+    {
+      "featureId": "19488584-240e-4989-815b-71e1673f2c0d",
+      "title": "Windows Support",
+      "description": "Comprehensive Windows operating system support with native integration and optimized performance for Windows users."
+    },
+    {
+      "featureId": "a1b2c3d4-e5f6-4890-b234-567890abcdef",
+      "title": "Local Model Support",
+      "description": "Add support for local AI models, allowing users to run AI features locally on their devices. With local models, no internet connection or payment is required for completely offline usage and enhanced privacy protection. However, higher local computer specifications may be needed to ensure smooth performance."
+    },
+    {
+      "featureId": "b2c3d4e5-f6a7-4901-a345-678901bcdef0",
+      "title": "Image Processing Feature",
+      "description": "Support for capturing images from clipboard and uploading local image files. Provides AI-powered image processing including OCR text recognition, image content analysis, and image translation, offering intelligent analysis capabilities for multimedia content."
+    }
+  ]
+}
