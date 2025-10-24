@@ -2,10 +2,23 @@
  * 小说创作工具 - 类型定义
  */
 
+// ========== 小说项目 ==========
+
+export interface Novel {
+  id: string;
+  title: string;              // 小说标题
+  description?: string;        // 小说简介
+  globalPrompt?: string;       // 全局写作Prompt
+  coverImage?: string;         // 封面图片
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // ========== 人物相关类型 ==========
 
 export interface Character {
   id: string;
+  novelId: string;            // 所属小说项目ID
   name: string;
   avatar?: string;
   basicInfo: CharacterBasicInfo;
@@ -45,6 +58,7 @@ export interface CharacterRelationship {
 
 export interface Location {
   id: string;
+  novelId: string;            // 所属小说项目ID
   name: string;
   image?: string;
   description?: string;
@@ -69,6 +83,7 @@ export interface Reference {
 
 export interface WorldTimelineEvent {
   id: string;
+  novelId: string;            // 所属小说项目ID
   date: string; // 精确日期或灵活描述
   title: string;
   description?: string;
@@ -87,6 +102,7 @@ export interface ChapterTimelineItem {
 
 export interface Chapter {
   id: string;
+  novelId: string;            // 所属小说项目ID
   volumeId: string; // 卷ID
   chapterId: string; // 章ID
   sectionId: string; // 节ID
@@ -122,7 +138,7 @@ export interface NovelContext {
 export interface StorageAdapter {
   /**
    * 创建数据
-   * @param collection 集合名称 (characters, locations, worldTimeline, chapters, novelSettings)
+   * @param collection 集合名称 (characters, locations, worldTimeline, chapters, novelSettings, novels)
    * @param data 数据对象
    * @returns 创建的数据ID
    */
@@ -157,5 +173,13 @@ export interface StorageAdapter {
    * @returns 数据数组
    */
   list(collection: string): Promise<any[]>;
+
+  /**
+   * 按novelId过滤列表数据
+   * @param collection 集合名称
+   * @param novelId 小说项目ID
+   * @returns 数据数组
+   */
+  listByNovelId?(collection: string, novelId: string): Promise<any[]>;
 }
 
