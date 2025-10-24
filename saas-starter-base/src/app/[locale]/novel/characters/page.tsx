@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
+import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { CharacterCard } from '@/components/novel/CharacterCard';
 import { CharacterDialog } from '@/components/novel/CharacterDialog';
 import { NovelNav } from '@/components/novel/NovelNav';
@@ -14,6 +15,7 @@ import { Character } from '@/lib/novel/types';
 import { Plus, Loader2 } from 'lucide-react';
 
 export default function CharactersPage() {
+  const { currentNovelId } = useNovels();
   const {
     characters,
     loading,
@@ -21,7 +23,7 @@ export default function CharactersPage() {
     createCharacter,
     updateCharacter,
     deleteCharacter
-  } = useCharacters();
+  } = useCharacters(currentNovelId);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);

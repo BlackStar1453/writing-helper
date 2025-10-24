@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useWorldTimeline } from '@/lib/novel/hooks/use-world-timeline';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
+import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { WorldTimelineEvent, Character } from '@/lib/novel/types';
 import { NovelNav } from '@/components/novel/NovelNav';
 import { Button } from '@/components/ui/button';
@@ -14,8 +15,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function TimelinePage() {
-  const { events, loading: eventsLoading, createEvent, updateEvent, deleteEvent } = useWorldTimeline();
-  const { characters, loading: charactersLoading } = useCharacters();
+  const { currentNovelId } = useNovels();
+  const { events, loading: eventsLoading, createEvent, updateEvent, deleteEvent } = useWorldTimeline(currentNovelId);
+  const { characters, loading: charactersLoading } = useCharacters(currentNovelId);
   
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([]);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);

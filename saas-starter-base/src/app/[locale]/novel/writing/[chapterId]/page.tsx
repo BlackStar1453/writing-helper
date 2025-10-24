@@ -11,6 +11,7 @@ import { WritingModal } from '@/components/WritingModal';
 import { useChapters } from '@/lib/novel/hooks/use-chapters';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
 import { useLocations } from '@/lib/novel/hooks/use-locations';
+import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { NovelContext, Chapter, ChapterTimelineItem } from '@/lib/novel/types';
 import { getSettings } from '@/lib/db-utils';
 import { GenerateDraftSettingsModal, GenerateDraftSettings } from '@/components/novel/GenerateDraftSettingsModal';
@@ -22,9 +23,10 @@ export default function ChapterWritingPage() {
   const router = useRouter();
   const chapterId = params.chapterId as string;
 
-  const { chapters, getChapterById, updateChapter } = useChapters();
-  const { characters } = useCharacters();
-  const { locations } = useLocations();
+  const { currentNovelId } = useNovels();
+  const { chapters, getChapterById, updateChapter } = useChapters(currentNovelId);
+  const { characters } = useCharacters(currentNovelId);
+  const { locations } = useLocations(currentNovelId);
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);

@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import { useLocations } from '@/lib/novel/hooks/use-locations';
+import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { LocationCard } from '@/components/novel/LocationCard';
 import { LocationDialog } from '@/components/novel/LocationDialog';
 import { NovelNav } from '@/components/novel/NovelNav';
@@ -14,6 +15,7 @@ import { Location } from '@/lib/novel/types';
 import { Plus, Loader2 } from 'lucide-react';
 
 export default function LocationsPage() {
+  const { currentNovelId } = useNovels();
   const {
     locations,
     loading,
@@ -21,7 +23,7 @@ export default function LocationsPage() {
     createLocation,
     updateLocation,
     deleteLocation
-  } = useLocations();
+  } = useLocations(currentNovelId);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingLocation, setEditingLocation] = useState<Location | null>(null);

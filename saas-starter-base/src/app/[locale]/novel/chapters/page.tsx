@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { NovelNav } from '@/components/novel/NovelNav';
 import { useChapters } from '@/lib/novel/hooks/use-chapters';
+import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -15,7 +16,8 @@ import { Input } from '@/components/ui/input';
 
 export default function ChapterListPage() {
   const router = useRouter();
-  const { chapters, createChapter, deleteChapter } = useChapters();
+  const { currentNovelId } = useNovels();
+  const { chapters, createChapter, deleteChapter } = useChapters(currentNovelId);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
     volumeId: '',
