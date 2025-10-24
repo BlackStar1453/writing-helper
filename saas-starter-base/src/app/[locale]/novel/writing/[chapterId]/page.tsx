@@ -17,6 +17,7 @@ import { getSettings } from '@/lib/db-utils';
 import { GenerateDraftSettingsModal, GenerateDraftSettings } from '@/components/novel/GenerateDraftSettingsModal';
 import { insertContentAtTimelinePosition, cleanContentForDisplay } from '@/lib/novel/content-utils';
 import { CandidateVersions, ContentVersion } from '@/components/novel/TimelinePanel';
+import { toast } from 'sonner';
 
 export default function ChapterWritingPage() {
   const params = useParams();
@@ -107,7 +108,7 @@ export default function ChapterWritingPage() {
 
       // 检查API Token
       if (!apiSettings.apiToken) {
-        alert('请先在设置中配置API Token');
+        toast.error('请先在设置中配置API Token');
         return;
       }
 
@@ -152,7 +153,7 @@ export default function ChapterWritingPage() {
       }
     } catch (err) {
       console.error('Failed to generate timeline:', err);
-      alert('生成Timeline失败: ' + (err instanceof Error ? err.message : '未知错误'));
+      toast.error('生成Timeline失败: ' + (err instanceof Error ? err.message : '未知错误'));
     } finally {
       setIsGeneratingTimeline(false);
     }
@@ -168,7 +169,7 @@ export default function ChapterWritingPage() {
 
       // 检查API Token
       if (!apiSettings || !apiSettings.apiToken) {
-        alert('请先在设置中配置API Token');
+        toast.error('请先在设置中配置API Token');
         return;
       }
 
@@ -226,7 +227,7 @@ export default function ChapterWritingPage() {
       }
     } catch (err) {
       console.error('Failed to generate draft:', err);
-      alert('生成初稿失败: ' + (err instanceof Error ? err.message : '未知错误'));
+      toast.error('生成初稿失败: ' + (err instanceof Error ? err.message : '未知错误'));
     } finally {
       setIsGeneratingDraft(false);
     }
@@ -264,7 +265,7 @@ export default function ChapterWritingPage() {
 
       // 检查API Token
       if (!apiSettings.apiToken) {
-        alert('请先在设置中配置API Token');
+        toast.error('请先在设置中配置API Token');
         return;
       }
 
@@ -303,7 +304,7 @@ export default function ChapterWritingPage() {
       // 不再自动插入,等待用户选择
     } catch (err) {
       console.error('Failed to generate timeline content:', err);
-      alert('生成内容失败: ' + (err instanceof Error ? err.message : '未知错误'));
+      toast.error('生成内容失败: ' + (err instanceof Error ? err.message : '未知错误'));
     } finally {
       setGeneratingTimelineItemId(null);
     }
@@ -341,10 +342,10 @@ export default function ChapterWritingPage() {
       // 重新加载章节
       await loadChapter();
 
-      alert('内容应用成功！');
+      toast.success('内容应用成功！');
     } catch (err) {
       console.error('Failed to apply version:', err);
-      alert('应用失败: ' + (err instanceof Error ? err.message : '未知错误'));
+      toast.error('应用失败: ' + (err instanceof Error ? err.message : '未知错误'));
     }
   };
 
@@ -371,10 +372,10 @@ export default function ChapterWritingPage() {
         chapterPrompt: novelContext.chapterPrompt,
       });
 
-      alert('保存成功！');
+      toast.success('保存成功！');
     } catch (err) {
       console.error('Failed to save chapter:', err);
-      alert('保存失败: ' + (err instanceof Error ? err.message : '未知错误'));
+      toast.error('保存失败: ' + (err instanceof Error ? err.message : '未知错误'));
     }
   };
 
