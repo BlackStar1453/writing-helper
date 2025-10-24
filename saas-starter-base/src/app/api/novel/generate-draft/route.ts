@@ -236,6 +236,20 @@ function buildNovelPrompt(context: any): string {
     });
   }
 
+  // Prompt卡片
+  if (context.selectedPrompts && context.selectedPrompts.length > 0) {
+    parts.push(`## 写作风格要求`);
+    context.selectedPrompts.forEach((prompt: any) => {
+      parts.push(`### ${prompt.name}`);
+      parts.push(`**要求:** ${prompt.description}`);
+      if (prompt.exampleBefore) {
+        parts.push(`**示例文本:**`);
+        parts.push(prompt.exampleBefore);
+      }
+      parts.push('');
+    });
+  }
+
   // 情节概括
   if (context.plotSummary) {
     parts.push(`## 情节概括`);

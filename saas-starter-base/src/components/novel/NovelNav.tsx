@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { User, MapPin, Clock, BookOpen, FileText, FolderOpen, ChevronDown } from 'lucide-react';
+import { User, MapPin, Clock, BookOpen, FileText, FolderOpen, ChevronDown, Sparkles } from 'lucide-react';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,6 +40,11 @@ const navItems: NavItem[] = [
     name: '时间线',
     href: '/novel/timeline',
     icon: <Clock className="h-5 w-5" />
+  },
+  {
+    name: 'Prompt',
+    href: '/novel/prompts',
+    icon: <Sparkles className="h-5 w-5" />
   }
 ];
 

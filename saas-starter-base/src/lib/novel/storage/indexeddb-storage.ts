@@ -7,7 +7,7 @@ import { generateUUID } from '../platform-utils';
 
 export class IndexedDBStorage implements StorageAdapter {
   private dbName = 'NovelWritingDB';
-  private version = 2; // 升级版本以添加novels集合和novelId索引
+  private version = 3; // 升级版本以添加prompts集合
   private db: IDBDatabase | null = null;
 
   /**
@@ -57,6 +57,10 @@ export class IndexedDBStorage implements StorageAdapter {
         }
         if (!db.objectStoreNames.contains('novels')) {
           db.createObjectStore('novels', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('prompts')) {
+          const promptsStore = db.createObjectStore('prompts', { keyPath: 'id' });
+          promptsStore.createIndex('novelId', 'novelId', { unique: false });
         }
 
         // 数据迁移: 从版本1升级到版本2

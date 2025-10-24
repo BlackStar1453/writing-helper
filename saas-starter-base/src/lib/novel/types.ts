@@ -79,6 +79,19 @@ export interface Reference {
   createdAt: Date;
 }
 
+// ========== Prompt卡片 ==========
+
+export interface PromptCard {
+  id: string;
+  novelId: string;            // 所属小说项目ID
+  name: string;               // Prompt卡片名称,如"简洁语言风格"
+  description: string;        // 具体的操作描述,如"使用更简单的语言,避免复杂句式"
+  exampleBefore: string;      // 示例文本(1):演示怎样是符合描述的文本
+  exampleAfter: string;       // 示例文本(2):按照上述示例和操作描述生成的文本
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // ========== 世界时间线 ==========
 
 export interface WorldTimelineEvent {
@@ -128,6 +141,7 @@ export interface NovelContext {
   };
   selectedCharacters?: Character[];
   selectedLocations?: Location[];
+  selectedPrompts?: PromptCard[];
   plotSummary?: string;
   globalPrompt?: string;
   chapterPrompt?: string;
