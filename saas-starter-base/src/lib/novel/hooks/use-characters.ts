@@ -9,7 +9,7 @@ import { Character, CharacterRelationship, CharacterTimelineEvent, Reference, St
 import { getStorageAdapter } from '../platform-utils';
 import { generateUUID } from '../platform-utils';
 
-export function useCharacters() {
+export function useCharacters(novelId?: string | null) {
   const [characters, setCharacters] = useState<Character[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,10 +21,10 @@ export function useCharacters() {
       storageRef.current = adapter;
       loadCharacters();
     });
-  }, []);
+  }, [novelId]); // 当novelId变化时重新加载
 
   /**
-   * 加载所有人物
+   * 加载所有人物(支持按novelId过滤)
    */
   const loadCharacters = async () => {
     if (!storageRef.current) return;
@@ -32,7 +32,16 @@ export function useCharacters() {
     try {
       setLoading(true);
       setError(null);
-      const list = await storageRef.current.list('characters');
+
+      let list: Character[];
+      if (novelId && storageRef.current.listByNovelId) {
+        // 如果提供了novelId,按novelId过滤
+        list = await storageRef.current.listByNovelId('characters', novelId);
+      } else {
+        // 否则加载所有人物
+        list = await storageRef.current.list('characters');
+      }
+
       setCharacters(list);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load characters');
@@ -47,10 +56,12 @@ export function useCharacters() {
    */
   const createCharacter = async (data: Partial<Character>): Promise<string> => {
     if (!storageRef.current) throw new Error('Storage not initialized');
+    if (!novelId) throw new Error('novelId is required to create a character');
 
     try {
       const newCharacter = {
         ...data,
+        novelId, // 添加novelId
         basicInfo: data.basicInfo || {},
         timeline: [],
         relationships: [],

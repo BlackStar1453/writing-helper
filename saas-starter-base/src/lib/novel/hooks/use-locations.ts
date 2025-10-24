@@ -8,7 +8,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Location, Reference, StorageAdapter } from '../types';
 import { getStorageAdapter, generateUUID } from '../platform-utils';
 
-export function useLocations() {
+export function useLocations(novelId?: string | null) {
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -20,10 +20,10 @@ export function useLocations() {
       storageRef.current = adapter;
       loadLocations();
     });
-  }, []);
+  }, [novelId]);
 
   /**
-   * 加载所有地点
+   * 加载所有地点(支持按novelId过滤)
    */
   const loadLocations = async () => {
     if (!storageRef.current) return;
@@ -31,7 +31,14 @@ export function useLocations() {
     try {
       setLoading(true);
       setError(null);
-      const list = await storageRef.current.list('locations');
+
+      let list: Location[];
+      if (novelId && storageRef.current.listByNovelId) {
+        list = await storageRef.current.listByNovelId('locations', novelId);
+      } else {
+        list = await storageRef.current.list('locations');
+      }
+
       setLocations(list);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load locations');
@@ -46,10 +53,12 @@ export function useLocations() {
    */
   const createLocation = async (data: Partial<Location>): Promise<string> => {
     if (!storageRef.current) throw new Error('Storage not initialized');
+    if (!novelId) throw new Error('novelId is required to create a location');
 
     try {
       const newLocation = {
         ...data,
+        novelId,
         relatedCharacters: data.relatedCharacters || [],
         relatedEvents: data.relatedEvents || [],
         references: []

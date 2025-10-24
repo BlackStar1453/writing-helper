@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { Chapter } from '../types';
 import { getStorageAdapter } from '../storage';
 
-export function useChapters() {
+export function useChapters(novelId?: string | null) {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -16,7 +16,7 @@ export function useChapters() {
   // 加载所有章节
   useEffect(() => {
     loadChapters();
-  }, []);
+  }, [novelId]);
 
   const loadChapters = async () => {
     // 只在客户端执行
@@ -28,9 +28,16 @@ export function useChapters() {
     try {
       setLoading(true);
       const storage = getStorageAdapter();
-      const data = await storage.list('chapters');
+
+      let data: Chapter[];
+      if (novelId && storage.listByNovelId) {
+        data = await storage.listByNovelId('chapters', novelId) as Chapter[];
+      } else {
+        data = await storage.list('chapters') as Chapter[];
+      }
+
       console.log('Loaded chapters:', data);
-      setChapters(data as Chapter[]);
+      setChapters(data);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Failed to load chapters'));
@@ -41,9 +48,12 @@ export function useChapters() {
   };
 
   // 创建章节
-  const createChapter = async (chapterData: Omit<Chapter, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
+  const createChapter = async (chapterData: Omit<Chapter, 'id' | 'createdAt' | 'updatedAt' | 'novelId'>): Promise<string> => {
     if (typeof window === 'undefined') {
       throw new Error('Cannot create chapter on server side');
+    }
+    if (!novelId) {
+      throw new Error('novelId is required to create a chapter');
     }
 
     try {
@@ -51,6 +61,7 @@ export function useChapters() {
       const now = new Date();
       const newChapter: Chapter = {
         ...chapterData,
+        novelId,
         id: crypto.randomUUID(),
         createdAt: now,
         updatedAt: now,

@@ -9,7 +9,7 @@ import { WorldTimelineEvent, StorageAdapter } from '../types';
 import { getStorageAdapter } from '../platform-utils';
 import { generateUUID } from '../platform-utils';
 
-export function useWorldTimeline() {
+export function useWorldTimeline(novelId?: string | null) {
   const [events, setEvents] = useState<WorldTimelineEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,18 +21,25 @@ export function useWorldTimeline() {
       storageRef.current = adapter;
       loadEvents();
     });
-  }, []);
+  }, [novelId]);
 
   /**
-   * 加载所有世界事件
+   * 加载所有世界事件(支持按novelId过滤)
    */
   const loadEvents = async () => {
     if (!storageRef.current) return;
-    
+
     try {
       setLoading(true);
       setError(null);
-      const list = await storageRef.current.list('worldTimeline');
+
+      let list: WorldTimelineEvent[];
+      if (novelId && storageRef.current.listByNovelId) {
+        list = await storageRef.current.listByNovelId('worldTimeline', novelId);
+      } else {
+        list = await storageRef.current.list('worldTimeline');
+      }
+
       // 按日期排序
       const sorted = list.sort((a, b) => {
         return compareDates(a.date, b.date);
@@ -51,10 +58,12 @@ export function useWorldTimeline() {
    */
   const createEvent = async (data: Partial<WorldTimelineEvent>): Promise<string> => {
     if (!storageRef.current) throw new Error('Storage not initialized');
-    
+    if (!novelId) throw new Error('novelId is required to create an event');
+
     try {
       const newEvent = {
         ...data,
+        novelId,
         relatedCharacters: data.relatedCharacters || [],
         relatedLocations: data.relatedLocations || []
       };
