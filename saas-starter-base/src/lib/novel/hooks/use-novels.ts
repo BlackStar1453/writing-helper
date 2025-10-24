@@ -11,7 +11,13 @@ import { generateUUID } from '../platform-utils';
 
 export function useNovels() {
   const [novels, setNovels] = useState<Novel[]>([]);
-  const [currentNovelId, setCurrentNovelId] = useState<string | null>(null);
+  const [currentNovelId, setCurrentNovelId] = useState<string | null>(() => {
+    // 从localStorage初始化currentNovelId
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('currentNovelId');
+    }
+    return null;
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const storageRef = useRef<StorageAdapter | null>(null);
