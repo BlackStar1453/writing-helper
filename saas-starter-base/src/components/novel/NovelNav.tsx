@@ -57,8 +57,8 @@ export function NovelNav({ children }: { children?: React.ReactNode }) {
 
   const handleSwitchNovel = (novelId: string) => {
     switchNovel(novelId);
-    // 切换项目后刷新当前页面
-    router.refresh();
+    // 切换项目后重新加载页面以刷新所有数据
+    window.location.reload();
   };
 
   return (
