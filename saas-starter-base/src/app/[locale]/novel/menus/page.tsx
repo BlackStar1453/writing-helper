@@ -97,24 +97,29 @@ export default function MenusPage() {
   return (
     <>
       <NovelNav />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">Menu卡片管理</h1>
-            <p className="text-gray-500 mt-2">自定义选择文本后的菜单选项</p>
-          </div>
-          <Button onClick={handleCreate}>
-            <Plus className="h-4 w-4 mr-2" />
-            创建Menu卡片
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-12">
+          <h1 className="text-3xl font-light text-gray-900 dark:text-white">Menu管理</h1>
+          <Button
+            onClick={handleCreate}
+            variant="outline"
+            className="border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+          >
+            创建Menu
           </Button>
         </div>
 
         {menus.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">还没有创建任何Menu卡片</p>
-            <Button onClick={handleCreate}>
-              <Plus className="h-4 w-4 mr-2" />
-              创建第一个Menu卡片
+          <div className="text-center py-20">
+            <p className="text-gray-400 dark:text-gray-600 font-light mb-4">
+              暂无Menu
+            </p>
+            <Button
+              onClick={handleCreate}
+              variant="outline"
+              className="border-gray-200 dark:border-gray-700"
+            >
+              创建第一个Menu
             </Button>
           </div>
         ) : (

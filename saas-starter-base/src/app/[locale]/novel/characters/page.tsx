@@ -74,45 +74,50 @@ export default function CharactersPage() {
   return (
     <>
       <NovelNav />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">人物管理</h1>
-            <p className="text-gray-500 mt-2">管理你的小说人物</p>
-          </div>
-          <Button onClick={handleCreate}>
-            <Plus className="h-4 w-4 mr-2" />
-          创建人物
-        </Button>
-      </div>
-
-      {characters.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">还没有创建任何人物</p>
-          <Button onClick={handleCreate}>
-            <Plus className="h-4 w-4 mr-2" />
-            创建第一个人物
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-12">
+          <h1 className="text-3xl font-light text-gray-900 dark:text-white">人物管理</h1>
+          <Button
+            onClick={handleCreate}
+            variant="outline"
+            className="border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+          >
+            创建人物
           </Button>
         </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {characters.map((character) => (
-            <CharacterCard
-              key={character.id}
-              character={character}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          ))}
-        </div>
-      )}
 
-      <CharacterDialog
-        open={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onSave={handleSave}
-        character={editingCharacter}
-      />
+        {characters.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-gray-400 dark:text-gray-600 font-light mb-4">
+              暂无人物
+            </p>
+            <Button
+              onClick={handleCreate}
+              variant="outline"
+              className="border-gray-200 dark:border-gray-700"
+            >
+              创建第一个人物
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {characters.map((character) => (
+              <CharacterCard
+                key={character.id}
+                character={character}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
+
+        <CharacterDialog
+          open={isDialogOpen}
+          onClose={() => setIsDialogOpen(false)}
+          onSave={handleSave}
+          character={editingCharacter}
+        />
       </div>
     </>
   );

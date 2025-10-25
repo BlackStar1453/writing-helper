@@ -97,24 +97,29 @@ export default function SettingsPage() {
   return (
     <>
       <NovelNav />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">设定卡片管理</h1>
-            <p className="text-gray-500 mt-2">管理小说的世界设定、背景设定、功能设定等</p>
-          </div>
-          <Button onClick={handleCreate}>
-            <Plus className="h-4 w-4 mr-2" />
-            创建设定卡片
+      <div className="max-w-6xl mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-12">
+          <h1 className="text-3xl font-light text-gray-900 dark:text-white">设定管理</h1>
+          <Button
+            onClick={handleCreate}
+            variant="outline"
+            className="border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+          >
+            创建设定
           </Button>
         </div>
 
         {settings.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">还没有创建任何设定卡片</p>
-            <Button onClick={handleCreate}>
-              <Plus className="h-4 w-4 mr-2" />
-              创建第一个设定卡片
+          <div className="text-center py-20">
+            <p className="text-gray-400 dark:text-gray-600 font-light mb-4">
+              暂无设定
+            </p>
+            <Button
+              onClick={handleCreate}
+              variant="outline"
+              className="border-gray-200 dark:border-gray-700"
+            >
+              创建第一个设定
             </Button>
           </div>
         ) : (
