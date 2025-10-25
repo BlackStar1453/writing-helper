@@ -5,16 +5,17 @@
 'use client';
 
 import React from 'react';
-import { NovelContext, Character, Location, PromptCard, SettingCard } from '@/lib/novel/types';
+import { NovelContext, Character, Location, PromptCard, SettingCard, EventCard } from '@/lib/novel/types';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
 import { useLocations } from '@/lib/novel/hooks/use-locations';
 import { usePrompts } from '@/lib/novel/hooks/use-prompts';
 import { useSettings } from '@/lib/novel/hooks/use-settings';
+import { useEvents } from '@/lib/novel/hooks/use-events';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { X, User, MapPin, Sparkles, Settings } from 'lucide-react';
+import { X, User, MapPin, Sparkles, Settings, Calendar } from 'lucide-react';
 
 interface NovelContextPanelProps {
   context: NovelContext;
@@ -27,16 +28,19 @@ export function NovelContextPanel({ context, onChange }: NovelContextPanelProps)
   const { locations } = useLocations(currentNovelId);
   const { prompts } = usePrompts(currentNovelId);
   const { settings } = useSettings(currentNovelId);
+  const { events } = useEvents(currentNovelId);
 
   const [showCharacterSelect, setShowCharacterSelect] = React.useState(false);
   const [showLocationSelect, setShowLocationSelect] = React.useState(false);
   const [showPromptSelect, setShowPromptSelect] = React.useState(false);
   const [showSettingSelect, setShowSettingSelect] = React.useState(false);
+  const [showEventSelect, setShowEventSelect] = React.useState(false);
 
   const selectedCharacterIds = context.selectedCharacters?.map(c => c.id) || [];
   const selectedLocationIds = context.selectedLocations?.map(l => l.id) || [];
   const selectedPromptIds = context.selectedPrompts?.map(p => p.id) || [];
   const selectedSettingIds = context.selectedSettings?.map(s => s.id) || [];
+  const selectedEventIds = context.selectedEvents?.map(e => e.id) || [];
 
   const handleAddCharacter = (character: Character) => {
     if (!selectedCharacterIds.includes(character.id)) {
@@ -103,6 +107,23 @@ export function NovelContextPanel({ context, onChange }: NovelContextPanelProps)
     onChange({
       ...context,
       selectedSettings: context.selectedSettings?.filter(s => s.id !== settingId)
+    });
+  };
+
+  const handleAddEvent = (event: EventCard) => {
+    if (!selectedEventIds.includes(event.id)) {
+      onChange({
+        ...context,
+        selectedEvents: [...(context.selectedEvents || []), event]
+      });
+    }
+    setShowEventSelect(false);
+  };
+
+  const handleRemoveEvent = (eventId: string) => {
+    onChange({
+      ...context,
+      selectedEvents: context.selectedEvents?.filter(e => e.id !== eventId)
     });
   };
 
@@ -316,6 +337,150 @@ export function NovelContextPanel({ context, onChange }: NovelContextPanelProps)
           ))}
           {(!context.selectedPrompts || context.selectedPrompts.length === 0) && (
             <p className="text-sm text-gray-500">未选择Prompt卡片</p>
+          )}
+        </div>
+      </div>
+
+      {/* 关联设定卡片 */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <Label className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            设定卡片
+          </Label>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowSettingSelect(!showSettingSelect)}
+          >
+            添加
+          </Button>
+        </div>
+
+        {showSettingSelect && (
+          <div className="mb-3 p-2 border rounded-lg max-h-48 overflow-y-auto">
+            {settings.filter(s => !selectedSettingIds.includes(s.id)).map(setting => (
+              <button
+                key={setting.id}
+                onClick={() => handleAddSetting(setting)}
+                className="w-full text-left p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-sm">{setting.name}</span>
+                  <span className="text-xs px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded">
+                    {setting.category}
+                  </span>
+                </div>
+                {setting.description && (
+                  <div className="text-xs text-gray-500 line-clamp-1 mt-1">
+                    {setting.description}
+                  </div>
+                )}
+              </button>
+            ))}
+            {settings.filter(s => !selectedSettingIds.includes(s.id)).length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-2">没有更多设定卡片</p>
+            )}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          {context.selectedSettings?.map(setting => (
+            <div
+              key={setting.id}
+              className="flex items-start justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium text-sm">{setting.name}</span>
+                  <span className="text-xs px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded">
+                    {setting.category}
+                  </span>
+                </div>
+                {setting.description && (
+                  <div className="text-xs text-gray-500 line-clamp-2 mt-1">
+                    {setting.description}
+                  </div>
+                )}
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => handleRemoveSetting(setting.id)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          {(!context.selectedSettings || context.selectedSettings.length === 0) && (
+            <p className="text-sm text-gray-500">未选择设定卡片</p>
+          )}
+        </div>
+      </div>
+
+      {/* 事件卡片 */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <Label className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            事件卡片
+          </Label>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setShowEventSelect(!showEventSelect)}
+          >
+            添加
+          </Button>
+        </div>
+
+        {showEventSelect && (
+          <div className="mb-3 p-2 border rounded-lg max-h-48 overflow-y-auto">
+            {events.filter(e => !selectedEventIds.includes(e.id)).map(event => (
+              <button
+                key={event.id}
+                onClick={() => handleAddEvent(event)}
+                className="w-full text-left p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+              >
+                <div className="font-medium text-sm">{event.name}</div>
+                {event.outline && (
+                  <div className="text-xs text-gray-500 line-clamp-1 mt-1">
+                    {event.outline}
+                  </div>
+                )}
+              </button>
+            ))}
+            {events.filter(e => !selectedEventIds.includes(e.id)).length === 0 && (
+              <p className="text-sm text-gray-500 text-center py-2">没有更多事件卡片</p>
+            )}
+          </div>
+        )}
+
+        <div className="space-y-2">
+          {context.selectedEvents?.map(event => (
+            <div
+              key={event.id}
+              className="flex items-start justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded"
+            >
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm">{event.name}</div>
+                {event.outline && (
+                  <div className="text-xs text-gray-500 line-clamp-2 mt-1">
+                    {event.outline}
+                  </div>
+                )}
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => handleRemoveEvent(event.id)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+          {(!context.selectedEvents || context.selectedEvents.length === 0) && (
+            <p className="text-sm text-gray-500">未选择事件卡片</p>
           )}
         </div>
       </div>

@@ -12,6 +12,7 @@ import { useChapters } from '@/lib/novel/hooks/use-chapters';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
 import { useLocations } from '@/lib/novel/hooks/use-locations';
 import { useSettings } from '@/lib/novel/hooks/use-settings';
+import { useEvents } from '@/lib/novel/hooks/use-events';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { NovelContext, Chapter, ChapterTimelineItem } from '@/lib/novel/types';
 import { getSettings } from '@/lib/db-utils';
@@ -32,6 +33,7 @@ export default function ChapterWritingPage() {
   const { characters } = useCharacters(currentNovelId);
   const { locations } = useLocations(currentNovelId);
   const { settings } = useSettings(currentNovelId);
+  const { events } = useEvents(currentNovelId);
   const { prompts } = usePrompts(currentNovelId);
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
@@ -277,6 +279,7 @@ export default function ChapterWritingPage() {
     selectedLocationIds: string[];
     selectedPromptIds: string[];
     selectedSettingIds: string[];
+    selectedEventIds: string[];
   }) => {
     try {
       if (!chapter || !selectedTimelineItem) return;
@@ -298,6 +301,7 @@ export default function ChapterWritingPage() {
       const selectedLocations = locations.filter(l => genSettings.selectedLocationIds.includes(l.id));
       const selectedPrompts = prompts.filter(p => genSettings.selectedPromptIds.includes(p.id));
       const selectedSettings = settings.filter(s => genSettings.selectedSettingIds.includes(s.id));
+      const selectedEvents = events.filter(e => genSettings.selectedEventIds.includes(e.id));
 
       const context = {
         ...novelContext,
@@ -305,6 +309,7 @@ export default function ChapterWritingPage() {
         selectedLocations,
         selectedPrompts,
         selectedSettings,
+        selectedEvents,
       };
 
       // 构建请求数据
@@ -504,11 +509,13 @@ export default function ChapterWritingPage() {
           allCharacters={characters}
           allLocations={locations}
           allSettings={settings}
+          allEvents={events}
           currentChapterId={chapterId}
           initialSettings={{
             selectedCharacters: novelContext.selectedCharacters,
             selectedLocations: novelContext.selectedLocations,
             selectedSettings: novelContext.selectedSettings,
+            selectedEvents: novelContext.selectedEvents,
             plotSummary: novelContext.plotSummary || '',
             chapterPrompt: novelContext.chapterPrompt || '',
             globalPrompt: novelContext.globalPrompt || '',
@@ -528,6 +535,7 @@ export default function ChapterWritingPage() {
           allLocations={locations}
           allPrompts={prompts}
           allSettings={settings}
+          allEvents={events}
         />
       </div>
     </NovelNav>

@@ -5,14 +5,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Character, Location, PromptCard, SettingCard, ChapterTimelineItem } from '@/lib/novel/types';
-import { User, MapPin, Sparkles, Settings } from 'lucide-react';
+import { Character, Location, PromptCard, SettingCard, EventCard, ChapterTimelineItem } from '@/lib/novel/types';
+import { User, MapPin, Sparkles, Settings, Calendar } from 'lucide-react';
 
 interface GenerateTimelineContentSettings {
   selectedCharacterIds: string[];
   selectedLocationIds: string[];
   selectedPromptIds: string[];
   selectedSettingIds: string[];
+  selectedEventIds: string[];
 }
 
 interface GenerateTimelineContentModalProps {
@@ -24,6 +25,7 @@ interface GenerateTimelineContentModalProps {
   allLocations: Location[];
   allPrompts: PromptCard[];
   allSettings: SettingCard[];
+  allEvents: EventCard[];
 }
 
 export function GenerateTimelineContentModal({
@@ -35,11 +37,13 @@ export function GenerateTimelineContentModal({
   allLocations,
   allPrompts,
   allSettings,
+  allEvents,
 }: GenerateTimelineContentModalProps) {
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([]);
   const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
   const [selectedPromptIds, setSelectedPromptIds] = useState<string[]>([]);
   const [selectedSettingIds, setSelectedSettingIds] = useState<string[]>([]);
+  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
 
   // 重置状态
   useEffect(() => {
@@ -48,6 +52,7 @@ export function GenerateTimelineContentModal({
       setSelectedLocationIds([]);
       setSelectedPromptIds([]);
       setSelectedSettingIds([]);
+      setSelectedEventIds([]);
     }
   }, [isOpen]);
 
@@ -75,12 +80,19 @@ export function GenerateTimelineContentModal({
     );
   };
 
+  const toggleEvent = (id: string) => {
+    setSelectedEventIds(prev =>
+      prev.includes(id) ? prev.filter(eid => eid !== id) : [...prev, id]
+    );
+  };
+
   const handleConfirm = () => {
     onConfirm({
       selectedCharacterIds,
       selectedLocationIds,
       selectedPromptIds,
       selectedSettingIds,
+      selectedEventIds,
     });
   };
 
@@ -212,6 +224,36 @@ export function GenerateTimelineContentModal({
               ))}
               {allSettings.length === 0 && (
                 <p className="text-sm text-gray-500 text-center py-2">暂无设定卡片</p>
+              )}
+            </div>
+          </div>
+
+          {/* 事件卡片 */}
+          <div>
+            <Label className="flex items-center gap-2 mb-2">
+              <Calendar className="h-4 w-4" />
+              事件卡片
+            </Label>
+            <div className="space-y-2 max-h-40 overflow-y-auto border rounded-md p-2">
+              {allEvents.map(event => (
+                <div key={event.id} className="flex items-start space-x-2">
+                  <Checkbox
+                    id={`event-${event.id}`}
+                    checked={selectedEventIds.includes(event.id)}
+                    onCheckedChange={() => toggleEvent(event.id)}
+                    className="mt-1"
+                  />
+                  <label
+                    htmlFor={`event-${event.id}`}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer flex-1"
+                  >
+                    <div>{event.name}</div>
+                    <div className="text-xs text-gray-500 mt-1">{event.outline}</div>
+                  </label>
+                </div>
+              ))}
+              {allEvents.length === 0 && (
+                <p className="text-sm text-gray-500 text-center py-2">暂无事件卡片</p>
               )}
             </div>
           </div>

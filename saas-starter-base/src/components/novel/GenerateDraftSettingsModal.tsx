@@ -8,13 +8,14 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Chapter, Character, Location, SettingCard } from '@/lib/novel/types';
+import { Chapter, Character, Location, SettingCard, EventCard } from '@/lib/novel/types';
 
 export interface GenerateDraftSettings {
   referenceChapters: Chapter[]; // 参考章节
   selectedCharacters: Character[]; // 选中的人物
   selectedLocations: Location[]; // 选中的地点
   selectedSettings: SettingCard[]; // 选中的设定卡片
+  selectedEvents: EventCard[]; // 选中的事件卡片
   plotSummary: string; // 情节概括
   chapterPrompt: string; // 章节Prompt
   globalPrompt: string; // 全局Prompt
@@ -27,6 +28,7 @@ interface GenerateDraftSettingsModalProps {
   allCharacters: Character[]; // 所有人物
   allLocations: Location[]; // 所有地点
   allSettings: SettingCard[]; // 所有设定卡片
+  allEvents: EventCard[]; // 所有事件卡片
   currentChapterId: string; // 当前章节ID
   initialSettings?: Partial<GenerateDraftSettings>; // 初始设置
   onConfirm: (settings: GenerateDraftSettings) => void; // 确认生成初稿回调
@@ -41,6 +43,7 @@ export function GenerateDraftSettingsModal({
   allCharacters,
   allLocations,
   allSettings,
+  allEvents,
   currentChapterId,
   initialSettings,
   onConfirm,
@@ -51,6 +54,7 @@ export function GenerateDraftSettingsModal({
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([]);
   const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
   const [selectedSettingIds, setSelectedSettingIds] = useState<string[]>([]);
+  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [plotSummary, setPlotSummary] = useState('');
   const [chapterPrompt, setChapterPrompt] = useState('');
   const [globalPrompt, setGlobalPrompt] = useState('');
@@ -62,6 +66,7 @@ export function GenerateDraftSettingsModal({
       setSelectedCharacterIds(initialSettings.selectedCharacters?.map(c => c.id) || []);
       setSelectedLocationIds(initialSettings.selectedLocations?.map(l => l.id) || []);
       setSelectedSettingIds(initialSettings.selectedSettings?.map(s => s.id) || []);
+      setSelectedEventIds(initialSettings.selectedEvents?.map(e => e.id) || []);
       setPlotSummary(initialSettings.plotSummary || '');
       setChapterPrompt(initialSettings.chapterPrompt || '');
       setGlobalPrompt(initialSettings.globalPrompt || '');
@@ -107,6 +112,15 @@ export function GenerateDraftSettingsModal({
     );
   };
 
+  // 切换事件选择
+  const toggleEvent = (eventId: string) => {
+    setSelectedEventIds(prev =>
+      prev.includes(eventId)
+        ? prev.filter(id => id !== eventId)
+        : [...prev, eventId]
+    );
+  };
+
   // 构建设置对象
   const buildSettings = (): GenerateDraftSettings => {
     return {
@@ -114,6 +128,7 @@ export function GenerateDraftSettingsModal({
       selectedCharacters: allCharacters.filter(c => selectedCharacterIds.includes(c.id)),
       selectedLocations: allLocations.filter(l => selectedLocationIds.includes(l.id)),
       selectedSettings: allSettings.filter(s => selectedSettingIds.includes(s.id)),
+      selectedEvents: allEvents.filter(e => selectedEventIds.includes(e.id)),
       plotSummary,
       chapterPrompt,
       globalPrompt,
@@ -263,6 +278,38 @@ export function GenerateDraftSettingsModal({
                         <span className="text-xs text-gray-500 block mt-1">
                           {setting.description.substring(0, 80)}
                           {setting.description.length > 80 ? '...' : ''}
+                        </span>
+                      )}
+                    </div>
+                  </label>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* 事件卡片 */}
+          <div>
+            <Label className="text-lg font-semibold mb-2 block">事件卡片</Label>
+            <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-2">
+              {allEvents.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-4">暂无事件卡片</p>
+              ) : (
+                allEvents.map((event) => (
+                  <label
+                    key={event.id}
+                    className="flex items-start gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedEventIds.includes(event.id)}
+                      onChange={() => toggleEvent(event.id)}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{event.name}</div>
+                      {event.outline && (
+                        <span className="text-xs text-gray-500 line-clamp-1">
+                          {event.outline}
                         </span>
                       )}
                     </div>

@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { User, MapPin, Clock, BookOpen, FileText, FolderOpen, ChevronDown, Sparkles, Menu, Settings } from 'lucide-react';
+import { User, MapPin, Clock, BookOpen, FileText, FolderOpen, ChevronDown, Sparkles, Menu, Settings, Calendar } from 'lucide-react';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { Button } from '@/components/ui/button';
 import {
@@ -55,6 +55,11 @@ const navItems: NavItem[] = [
     name: '设定',
     href: '/novel/settings',
     icon: <Settings className="h-5 w-5" />
+  },
+  {
+    name: '事件',
+    href: '/novel/events',
+    icon: <Calendar className="h-5 w-5" />
   }
 ];
 

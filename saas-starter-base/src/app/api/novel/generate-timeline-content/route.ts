@@ -30,6 +30,7 @@ interface GenerateTimelineContentRequest {
     selectedLocations?: any[];
     selectedPrompts?: any[];
     selectedSettings?: any[];
+    selectedEvents?: any[];
     plotSummary?: string;
     globalPrompt?: string;
     chapterPrompt?: string;
@@ -98,6 +99,22 @@ function buildPrompt(request: GenerateTimelineContentRequest): string {
       request.context.selectedSettings.forEach((setting: any) => {
         parts.push(`### ${setting.name} (${setting.category})`);
         parts.push(setting.description);
+        parts.push('');
+      });
+    }
+
+    // 事件卡片
+    if (request.context.selectedEvents && request.context.selectedEvents.length > 0) {
+      parts.push(`## 相关事件`);
+      request.context.selectedEvents.forEach((event: any) => {
+        parts.push(`### ${event.name}`);
+        parts.push(`**事件大纲:** ${event.outline}`);
+        if (event.process && event.process.length > 0) {
+          parts.push(`\n**事件流程:**`);
+          event.process.forEach((step: any, index: number) => {
+            parts.push(`${index + 1}. ${step.description}`);
+          });
+        }
         parts.push('');
       });
     }

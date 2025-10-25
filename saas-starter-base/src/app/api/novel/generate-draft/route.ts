@@ -260,6 +260,22 @@ function buildNovelPrompt(context: any): string {
     });
   }
 
+  // 事件卡片
+  if (context.selectedEvents && context.selectedEvents.length > 0) {
+    parts.push(`## 相关事件`);
+    context.selectedEvents.forEach((event: any) => {
+      parts.push(`### ${event.name}`);
+      parts.push(`**事件大纲:** ${event.outline}`);
+      if (event.process && event.process.length > 0) {
+        parts.push(`\n**事件流程:**`);
+        event.process.forEach((step: any, index: number) => {
+          parts.push(`${index + 1}. ${step.description}`);
+        });
+      }
+      parts.push('');
+    });
+  }
+
   // 情节概括
   if (context.plotSummary) {
     parts.push(`## 情节概括`);

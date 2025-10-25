@@ -104,6 +104,26 @@ export interface SettingCard {
   updatedAt: Date;
 }
 
+// ========== 事件卡片 ==========
+
+export interface EventCard {
+  id: string;
+  novelId: string;            // 所属小说项目ID
+  name: string;               // 事件名称,如"真心话游戏开始"
+  outline: string;            // 事件大纲/概述
+  process: EventProcess[];    // 事件流程(前因后果)
+  relatedCharacterIds: string[]; // 参与的人物ID列表
+  relatedLocationIds: string[];  // 发生的地点ID列表
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface EventProcess {
+  id: string;
+  order: number;              // 顺序
+  description: string;        // 该步骤的描述
+}
+
 // ========== Menu卡片 ==========
 
 export interface MenuCard {
@@ -172,6 +192,7 @@ export interface NovelContext {
   selectedLocations?: Location[];
   selectedPrompts?: PromptCard[];
   selectedSettings?: SettingCard[];  // 选中的设定卡片
+  selectedEvents?: EventCard[];      // 选中的事件卡片
   plotSummary?: string;
   globalPrompt?: string;
   chapterPrompt?: string;
