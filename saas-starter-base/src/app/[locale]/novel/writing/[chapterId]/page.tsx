@@ -69,6 +69,7 @@ export default function ChapterWritingPage() {
       const selectedLocs = locations.filter(l => data.selectedLocations?.includes(l.id));
 
       setNovelContext({
+        novelId: currentNovelId || undefined,
         chapterInfo: {
           volume: data.volumeId,
           chapter: data.chapterId,

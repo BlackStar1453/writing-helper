@@ -17,6 +17,9 @@ import { NovelContext, ChapterTimelineItem } from '@/lib/novel/types';
 import { NovelContextPanel } from './novel/NovelContextPanel';
 import { TimelinePanel, CandidateVersions, ContentVersion } from './novel/TimelinePanel';
 import { cleanContentForDisplay } from '@/lib/novel/content-utils';
+import { useMenus } from '@/lib/novel/hooks/use-menus';
+import { usePrompts } from '@/lib/novel/hooks/use-prompts';
+import { useCharacters } from '@/lib/novel/hooks/use-characters';
 
 interface WritingModalProps {
   isOpen: boolean;
@@ -113,6 +116,13 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     onClearCandidates,
     onJumpToTimelineContent
   } = props;
+
+  // 加载Menu卡片
+  const { menus, getEnabledMenus } = useMenus(novelContext?.novelId || '');
+  const enabledMenus = getEnabledMenus ? getEnabledMenus() : menus.filter(m => m.enabled);
+  const { prompts } = usePrompts(novelContext?.novelId || '');
+  const { characters } = useCharacters(novelContext?.novelId || '');
+
   // 清理Timeline标记用于显示
   const [text, setText] = useState(cleanContentForDisplay(initialText));
 
@@ -508,36 +518,46 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
   };
 
   // 处理selection popup的action
-  const handleSelectionAction = (actionType: string) => {
+  const handleSelectionAction = (menuId: string) => {
     const { selectedText, context } = selectionPopup;
-    let question = '';
 
-    switch (actionType) {
-      case 'better-word':
-        question = `请根据上下文【${context}】将【${selectedText}】替换为更合适的表达`;
-        break;
-      case 'explain':
-        question = `请解释【${selectedText}】在上下文【${context}】中的含义`;
-        break;
-      case 'simplify':
-        question = `请将【${selectedText}】简化为更简单的表达,上下文是【${context}】`;
-        break;
-      case 'expand':
-        question = `请将【${selectedText}】扩展为更详细的表达,上下文是【${context}】`;
-        break;
-      case 'formal':
-        question = `请将【${selectedText}】改写为更正式的表达,上下文是【${context}】`;
-        break;
-      case 'casual':
-        question = `请将【${selectedText}】改写为更口语化的表达,上下文是【${context}】`;
-        break;
-      default:
-        return;
+    // 查找对应的Menu卡片
+    const menu = enabledMenus.find(m => m.id === menuId && m.enabled);
+    if (!menu) {
+      console.error('Menu not found:', menuId);
+      return;
+    }
+
+    // 替换占位符
+    let question = menu.promptTemplate
+      .replace(/\{\{selectedText\}\}/g, selectedText)
+      .replace(/\{\{context\}\}/g, context);
+
+    // 如果Menu关联了Prompt卡片,添加Prompt上下文
+    if (menu.promptCardIds && menu.promptCardIds.length > 0) {
+      const relatedPrompts = prompts.filter(p => menu.promptCardIds!.includes(p.id));
+      if (relatedPrompts.length > 0) {
+        const promptContext = relatedPrompts.map(p =>
+          `【Prompt: ${p.name}】\n描述: ${p.description}\n示例前: ${p.exampleBefore}\n示例后: ${p.exampleAfter}`
+        ).join('\n\n');
+        question = `${promptContext}\n\n${question}`;
+      }
+    }
+
+    // 如果Menu关联了人物卡片,添加人物上下文
+    if (menu.characterIds && menu.characterIds.length > 0) {
+      const relatedCharacters = characters.filter(c => menu.characterIds!.includes(c.id));
+      if (relatedCharacters.length > 0) {
+        const characterContext = relatedCharacters.map(c =>
+          `【人物: ${c.name}】\n描述: ${c.description}\n性格: ${c.personality}\n背景: ${c.background}`
+        ).join('\n\n');
+        question = `${characterContext}\n\n${question}`;
+      }
     }
 
     // 发送到Agent Chat,并创建新的chat会话
     if (onAgentSendMessage) {
-      onAgentSendMessage(question, actionType);
+      onAgentSendMessage(question, menu.name);
       setRightPanelView('agent');
     }
 
@@ -1334,42 +1354,21 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
               "{selectionPopup.selectedText}"
             </div>
             <div className="flex flex-col gap-1">
-              <button
-                onClick={() => handleSelectionAction('better-word')}
-                className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-              >
-                使用更好的词汇
-              </button>
-              <button
-                onClick={() => handleSelectionAction('explain')}
-                className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-              >
-                解释含义
-              </button>
-              <button
-                onClick={() => handleSelectionAction('simplify')}
-                className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-              >
-                简化表达
-              </button>
-              <button
-                onClick={() => handleSelectionAction('expand')}
-                className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-              >
-                扩展表达
-              </button>
-              <button
-                onClick={() => handleSelectionAction('formal')}
-                className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-              >
-                更正式
-              </button>
-              <button
-                onClick={() => handleSelectionAction('casual')}
-                className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-              >
-                更口语化
-              </button>
+              {enabledMenus.filter(m => m.enabled).sort((a, b) => a.order - b.order).map(menu => (
+                <button
+                  key={menu.id}
+                  onClick={() => handleSelectionAction(menu.id)}
+                  className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                  title={menu.description}
+                >
+                  {menu.name}
+                </button>
+              ))}
+              {enabledMenus.filter(m => m.enabled).length === 0 && (
+                <div className="px-3 py-2 text-sm text-gray-500">
+                  暂无可用菜单项,请在Menu管理页面创建
+                </div>
+              )}
             </div>
           </div>
         )}

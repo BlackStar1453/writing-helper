@@ -106,6 +106,19 @@ export function DialogDescription({ children, className = '' }: DialogDescriptio
   );
 }
 
+interface DialogFooterProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export function DialogFooter({ children, className = '' }: DialogFooterProps) {
+  return (
+    <div className={`mt-6 pt-4 border-t flex items-center justify-end gap-2 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
 interface DialogTriggerProps {
   children: ReactNode;
   asChild?: boolean;
