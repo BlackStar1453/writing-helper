@@ -70,16 +70,43 @@ export function CharacterCard({ character, onEdit, onDelete, onCharacterClick }:
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* 人物信息 - 合并显示所有字段 */}
-        {(character.basicInfo.description || character.basicInfo.appearance || character.basicInfo.personality || character.basicInfo.characterArc) && (
+        {/* 基础信息 */}
+        {character.basicInfo.description && (
           <div className="space-y-2">
-            <div className="text-xs font-medium text-gray-500">信息</div>
-            <div className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap space-y-1">
-              {character.basicInfo.description && <div>{character.basicInfo.description}</div>}
-              {character.basicInfo.appearance && <div>{character.basicInfo.appearance}</div>}
-              {character.basicInfo.personality && <div>{character.basicInfo.personality}</div>}
-              {character.basicInfo.characterArc && <div>{character.basicInfo.characterArc}</div>}
-            </div>
+            <div className="text-xs font-medium text-gray-500">基本信息</div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+              {character.basicInfo.description}
+            </p>
+          </div>
+        )}
+
+        {/* 外貌描述 */}
+        {character.basicInfo.appearance && (
+          <div className="space-y-2">
+            <div className="text-xs font-medium text-gray-500">外貌</div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+              {character.basicInfo.appearance}
+            </p>
+          </div>
+        )}
+
+        {/* 性格描述 */}
+        {character.basicInfo.personality && (
+          <div className="space-y-2">
+            <div className="text-xs font-medium text-gray-500">性格</div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+              {character.basicInfo.personality}
+            </p>
+          </div>
+        )}
+
+        {/* 人物弧光 */}
+        {character.basicInfo.characterArc && (
+          <div className="space-y-2">
+            <div className="text-xs font-medium text-gray-500">人物弧光</div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+              {character.basicInfo.characterArc}
+            </p>
           </div>
         )}
 
