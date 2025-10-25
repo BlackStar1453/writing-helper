@@ -30,10 +30,10 @@ export interface Character {
 }
 
 export interface CharacterBasicInfo {
-  age?: number;
-  gender?: string;
-  occupation?: string;
-  description?: string;
+  description?: string;  // 包含年龄、性别、职业、外貌、性格等所有描述
+  appearance?: string;   // 外貌描述
+  personality?: string;  // 性格描述
+  characterArc?: string; // 人物弧光
 }
 
 export interface CharacterTimelineEvent {

@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 1. 你必须严格按照用户指定的格式输出
 2. 输出必须包含两个部分: "### 事件流程" 和 "### 涉及人物"
 3. 不要添加任何额外的说明文字或总结
-4. 人物信息必须包含: 名字、外貌、性格三个字段
+4. 人物信息必须包含: 名字、基本信息、外貌、性格、人物弧光五个字段
 5. 使用markdown格式输出`
           },
           {
@@ -131,13 +131,15 @@ function buildEventProcessPrompt(
   parts.push(`### 人物信息要求:`);
   parts.push(`1. 列出事件中涉及的主要人物(2-5个)`);
   if (existingCharacters.length > 0) {
-    parts.push(`2. 对于已关联的人物,可以补充更详细的外貌和性格描写`);
+    parts.push(`2. 对于已关联的人物,可以补充更详细的信息`);
     parts.push(`3. 如果需要新人物,请创建新的人物信息`);
   } else {
-    parts.push(`2. 为每个人物提供名字、外貌描写、性格描写`);
+    parts.push(`2. 为每个人物提供完整的人物侧写`);
   }
-  parts.push(`3. 外貌描写应该具体生动,包含身高、体型、发型、穿着等特征`);
-  parts.push(`4. 性格描写应该体现人物的性格特点、行为习惯、说话方式等`);
+  parts.push(`3. 基本信息应包含: 年龄、性别、职业等`);
+  parts.push(`4. 外貌描写应该具体生动,包含身高、体型、发型、穿着等特征`);
+  parts.push(`5. 性格描写应该体现人物的性格特点、行为习惯、说话方式等`);
+  parts.push(`6. 人物弧光应该描述人物在事件中的成长轨迹和变化`);
   parts.push('');
 
   parts.push(`## 输出格式`);
@@ -152,13 +154,17 @@ function buildEventProcessPrompt(
   parts.push(`### 涉及人物`);
   parts.push(`**人物1**`);
   parts.push(`- 名字: [人物名字]`);
+  parts.push(`- 基本信息: [年龄、性别、职业等]`);
   parts.push(`- 外貌: [外貌描写]`);
   parts.push(`- 性格: [性格描写]`);
+  parts.push(`- 人物弧光: [人物成长轨迹和变化]`);
   parts.push('');
   parts.push(`**人物2**`);
   parts.push(`- 名字: [人物名字]`);
+  parts.push(`- 基本信息: [年龄、性别、职业等]`);
   parts.push(`- 外貌: [外貌描写]`);
   parts.push(`- 性格: [性格描写]`);
+  parts.push(`- 人物弧光: [人物成长轨迹和变化]`);
   parts.push('');
   parts.push(`注意:只输出以上格式的内容,不要添加其他说明文字。`);
 
@@ -170,14 +176,32 @@ function buildEventProcessPrompt(
  */
 function parseEventProcessAndCharacters(rawContent: string): {
   process: Array<{ description: string }>;
-  characters: Array<{ name: string; appearance: string; personality: string }>;
+  characters: Array<{
+    name: string;
+    description: string;
+    appearance: string;
+    personality: string;
+    characterArc: string;
+  }>;
 } {
   const process: Array<{ description: string }> = [];
-  const characters: Array<{ name: string; appearance: string; personality: string }> = [];
+  const characters: Array<{
+    name: string;
+    description: string;
+    appearance: string;
+    personality: string;
+    characterArc: string;
+  }> = [];
 
   const lines = rawContent.split('\n');
   let currentSection: 'process' | 'characters' | null = null;
-  let currentCharacter: { name?: string; appearance?: string; personality?: string } | null = null;
+  let currentCharacter: {
+    name?: string;
+    description?: string;
+    appearance?: string;
+    personality?: string;
+    characterArc?: string;
+  } | null = null;
 
   lines.forEach((line) => {
     const trimmedLine = line.trim();
@@ -193,8 +217,10 @@ function parseEventProcessAndCharacters(rawContent: string): {
       if (currentCharacter && currentCharacter.name) {
         characters.push({
           name: currentCharacter.name,
+          description: currentCharacter.description || '',
           appearance: currentCharacter.appearance || '',
-          personality: currentCharacter.personality || ''
+          personality: currentCharacter.personality || '',
+          characterArc: currentCharacter.characterArc || ''
         });
         currentCharacter = null;
       }
@@ -219,8 +245,10 @@ function parseEventProcessAndCharacters(rawContent: string): {
         if (currentCharacter && currentCharacter.name) {
           characters.push({
             name: currentCharacter.name,
+            description: currentCharacter.description || '',
             appearance: currentCharacter.appearance || '',
-            personality: currentCharacter.personality || ''
+            personality: currentCharacter.personality || '',
+            characterArc: currentCharacter.characterArc || ''
           });
         }
         currentCharacter = {};
@@ -231,6 +259,12 @@ function parseEventProcessAndCharacters(rawContent: string): {
       const nameMatch = trimmedLine.match(/^[-*]?\s*名字[:：]\s*(.+)$/);
       if (nameMatch && currentCharacter) {
         currentCharacter.name = nameMatch[1].trim();
+        return;
+      }
+
+      const descriptionMatch = trimmedLine.match(/^[-*]?\s*基本信息[:：]\s*(.+)$/);
+      if (descriptionMatch && currentCharacter) {
+        currentCharacter.description = descriptionMatch[1].trim();
         return;
       }
 
@@ -245,6 +279,12 @@ function parseEventProcessAndCharacters(rawContent: string): {
         currentCharacter.personality = personalityMatch[1].trim();
         return;
       }
+
+      const characterArcMatch = trimmedLine.match(/^[-*]?\s*人物弧光[:：]\s*(.+)$/);
+      if (characterArcMatch && currentCharacter) {
+        currentCharacter.characterArc = characterArcMatch[1].trim();
+        return;
+      }
     }
   });
 
@@ -252,8 +292,10 @@ function parseEventProcessAndCharacters(rawContent: string): {
   if (currentCharacter && currentCharacter.name) {
     characters.push({
       name: currentCharacter.name,
+      description: currentCharacter.description || '',
       appearance: currentCharacter.appearance || '',
-      personality: currentCharacter.personality || ''
+      personality: currentCharacter.personality || '',
+      characterArc: currentCharacter.characterArc || ''
     });
   }
 

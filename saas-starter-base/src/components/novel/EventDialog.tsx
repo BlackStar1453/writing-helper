@@ -290,7 +290,10 @@ export function EventDialog({
           const characterId = await onCreateCharacter({
             name: charData.name,
             basicInfo: {
-              description: `外貌: ${charData.appearance}\n性格: ${charData.personality}`
+              description: charData.description || '',
+              appearance: charData.appearance || '',
+              personality: charData.personality || '',
+              characterArc: charData.characterArc || ''
             },
             timeline: [],
             relationships: [],

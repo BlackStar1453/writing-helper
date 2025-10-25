@@ -23,10 +23,10 @@ export function CharacterDialog({ open, onClose, onSave, character }: CharacterD
   const [formData, setFormData] = useState({
     name: '',
     avatar: '',
-    age: '',
-    gender: '',
-    occupation: '',
-    description: ''
+    description: '',
+    appearance: '',
+    personality: '',
+    characterArc: ''
   });
   const [saving, setSaving] = useState(false);
 
@@ -35,19 +35,19 @@ export function CharacterDialog({ open, onClose, onSave, character }: CharacterD
       setFormData({
         name: character.name || '',
         avatar: character.avatar || '',
-        age: character.basicInfo.age?.toString() || '',
-        gender: character.basicInfo.gender || '',
-        occupation: character.basicInfo.occupation || '',
-        description: character.basicInfo.description || ''
+        description: character.basicInfo.description || '',
+        appearance: character.basicInfo.appearance || '',
+        personality: character.basicInfo.personality || '',
+        characterArc: character.basicInfo.characterArc || ''
       });
     } else {
       setFormData({
         name: '',
         avatar: '',
-        age: '',
-        gender: '',
-        occupation: '',
-        description: ''
+        description: '',
+        appearance: '',
+        personality: '',
+        characterArc: ''
       });
     }
   }, [character, open]);
@@ -61,10 +61,10 @@ export function CharacterDialog({ open, onClose, onSave, character }: CharacterD
         name: formData.name,
         avatar: formData.avatar || undefined,
         basicInfo: {
-          age: formData.age ? parseInt(formData.age) : undefined,
-          gender: formData.gender || undefined,
-          occupation: formData.occupation || undefined,
-          description: formData.description || undefined
+          description: formData.description || undefined,
+          appearance: formData.appearance || undefined,
+          personality: formData.personality || undefined,
+          characterArc: formData.characterArc || undefined
         }
       };
 
@@ -110,43 +110,47 @@ export function CharacterDialog({ open, onClose, onSave, character }: CharacterD
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="age">年龄</Label>
-              <Input
-                id="age"
-                type="number"
-                value={formData.age}
-                onChange={(e) => setFormData({ ...formData, age: e.target.value })}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="gender">性别</Label>
-              <Input
-                id="gender"
-                value={formData.gender}
-                onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-              />
-            </div>
-          </div>
-
           <div>
-            <Label htmlFor="occupation">职业</Label>
-            <Input
-              id="occupation"
-              value={formData.occupation}
-              onChange={(e) => setFormData({ ...formData, occupation: e.target.value })}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="description">描述</Label>
+            <Label htmlFor="description">基本信息</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={4}
+              rows={3}
+              placeholder="包含年龄、性别、职业等基本信息..."
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="appearance">外貌描述</Label>
+            <Textarea
+              id="appearance"
+              value={formData.appearance}
+              onChange={(e) => setFormData({ ...formData, appearance: e.target.value })}
+              rows={3}
+              placeholder="描述人物的外貌特征..."
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="personality">性格描述</Label>
+            <Textarea
+              id="personality"
+              value={formData.personality}
+              onChange={(e) => setFormData({ ...formData, personality: e.target.value })}
+              rows={3}
+              placeholder="描述人物的性格特点..."
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="characterArc">人物弧光</Label>
+            <Textarea
+              id="characterArc"
+              value={formData.characterArc}
+              onChange={(e) => setFormData({ ...formData, characterArc: e.target.value })}
+              rows={3}
+              placeholder="描述人物的成长轨迹和变化..."
             />
           </div>
 

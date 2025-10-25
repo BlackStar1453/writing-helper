@@ -48,9 +48,6 @@ export function CharacterCard({ character, onEdit, onDelete, onCharacterClick }:
             </Avatar>
             <div>
               <h3 className="text-lg font-semibold">{character.name}</h3>
-              {character.basicInfo.occupation && (
-                <p className="text-sm text-gray-500">{character.basicInfo.occupation}</p>
-              )}
             </div>
           </div>
           <div className="flex gap-2">
@@ -74,25 +71,44 @@ export function CharacterCard({ character, onEdit, onDelete, onCharacterClick }:
 
       <CardContent className="space-y-4">
         {/* 基础信息 */}
-        <div className="space-y-2">
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            {character.basicInfo.age && (
-              <div>
-                <span className="text-gray-500">年龄:</span> {character.basicInfo.age}
-              </div>
-            )}
-            {character.basicInfo.gender && (
-              <div>
-                <span className="text-gray-500">性别:</span> {character.basicInfo.gender}
-              </div>
-            )}
-          </div>
-          {character.basicInfo.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+        {character.basicInfo.description && (
+          <div className="space-y-2">
+            <div className="text-xs font-medium text-gray-500">基本信息</div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
               {character.basicInfo.description}
             </p>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* 外貌描述 */}
+        {character.basicInfo.appearance && (
+          <div className="space-y-2">
+            <div className="text-xs font-medium text-gray-500">外貌</div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+              {character.basicInfo.appearance}
+            </p>
+          </div>
+        )}
+
+        {/* 性格描述 */}
+        {character.basicInfo.personality && (
+          <div className="space-y-2">
+            <div className="text-xs font-medium text-gray-500">性格</div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+              {character.basicInfo.personality}
+            </p>
+          </div>
+        )}
+
+        {/* 人物弧光 */}
+        {character.basicInfo.characterArc && (
+          <div className="space-y-2">
+            <div className="text-xs font-medium text-gray-500">人物弧光</div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+              {character.basicInfo.characterArc}
+            </p>
+          </div>
+        )}
 
         {/* 时间线 */}
         <div className="border-t pt-4">
