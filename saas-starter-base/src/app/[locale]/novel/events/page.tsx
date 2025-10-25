@@ -13,7 +13,7 @@ import { EventCard as EventCardType } from '@/lib/novel/types';
 export default function EventsPage() {
   const { currentNovelId } = useNovels();
   const { events, createEvent, updateEvent, deleteEvent } = useEvents(currentNovelId);
-  const { characters } = useCharacters(currentNovelId);
+  const { characters, createCharacter } = useCharacters(currentNovelId);
   const { locations } = useLocations(currentNovelId);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventCardType | null>(null);
@@ -67,6 +67,8 @@ export default function EventsPage() {
         event={editingEvent}
         characters={characters}
         locations={locations}
+        novelId={currentNovelId || ''}
+        onCreateCharacter={createCharacter}
         onCreate={createEvent}
         onUpdate={updateEvent}
       />

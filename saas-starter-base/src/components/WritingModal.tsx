@@ -1242,6 +1242,8 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                     <NovelContextPanel
                       context={novelContext}
                       onChange={onNovelContextChange}
+                      timeline={timeline}
+                      onTimelineChange={onTimelineChange}
                     />
                   ) : rightPanelView === 'timeline' && onTimelineChange ? (
                     /* Timeline界面 */

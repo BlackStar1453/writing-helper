@@ -11,6 +11,89 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { generateUUID } from '@/lib/novel/platform-utils';
 import { toast } from 'sonner';
+import { getSettings } from '@/lib/db-utils';
+import { Loader2, GripVertical } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+/**
+ * 可排序的步骤项组件
+ */
+interface SortableStepItemProps {
+  step: EventProcess;
+  index: number;
+  onStepChange: (id: string, value: string) => void;
+  onRemoveStep: (id: string) => void;
+}
+
+function SortableStepItem({ step, index, onStepChange, onRemoveStep }: SortableStepItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: step.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-start gap-2">
+      {/* 拖拽手柄 */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center cursor-grab active:cursor-grabbing mt-1"
+      >
+        <GripVertical className="h-4 w-4" />
+      </div>
+
+      {/* 步骤序号 */}
+      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium mt-1">
+        {index + 1}
+      </div>
+
+      {/* 步骤内容 */}
+      <Textarea
+        value={step.description}
+        onChange={(e) => onStepChange(step.id, e.target.value)}
+        placeholder={`第 ${index + 1} 步...`}
+        rows={2}
+        className="flex-1"
+      />
+
+      {/* 删除按钮 */}
+      <Button
+        size="sm"
+        variant="outline"
+        onClick={() => onRemoveStep(step.id)}
+        className="mt-1"
+      >
+        ×
+      </Button>
+    </div>
+  );
+}
 
 interface EventDialogProps {
   isOpen: boolean;
@@ -18,6 +101,8 @@ interface EventDialogProps {
   event: EventCard | null;
   characters: Character[];
   locations: Location[];
+  novelId: string;
+  onCreateCharacter: (data: Partial<Character>) => Promise<string>;
   onCreate: (
     name: string,
     outline: string,
@@ -43,6 +128,8 @@ export function EventDialog({
   event,
   characters,
   locations,
+  novelId,
+  onCreateCharacter,
   onCreate,
   onUpdate,
 }: EventDialogProps) {
@@ -51,6 +138,15 @@ export function EventDialog({
   const [process, setProcess] = useState<EventProcess[]>([]);
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([]);
   const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
+  const [isGeneratingProcess, setIsGeneratingProcess] = useState(false);
+
+  // 配置拖拽传感器
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // 重置表单
   useEffect(() => {
@@ -93,22 +189,24 @@ export function EventDialog({
     setProcess(process.map(p => (p.id === id ? { ...p, description } : p)));
   };
 
-  const handleMoveStep = (id: string, direction: 'up' | 'down') => {
-    const index = process.findIndex(p => p.id === id);
-    if (index === -1) return;
-    if (direction === 'up' && index === 0) return;
-    if (direction === 'down' && index === process.length - 1) return;
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
 
-    const newProcess = [...process];
-    const targetIndex = direction === 'up' ? index - 1 : index + 1;
-    [newProcess[index], newProcess[targetIndex]] = [newProcess[targetIndex], newProcess[index]];
-    
-    // 重新排序
-    newProcess.forEach((p, i) => {
-      p.order = i + 1;
-    });
-    
-    setProcess(newProcess);
+    if (over && active.id !== over.id) {
+      setProcess((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+
+        const newItems = arrayMove(items, oldIndex, newIndex);
+
+        // 重新排序
+        newItems.forEach((p, i) => {
+          p.order = i + 1;
+        });
+
+        return newItems;
+      });
+    }
   };
 
   const toggleCharacter = (id: string) => {
@@ -121,6 +219,100 @@ export function EventDialog({
     setSelectedLocationIds(prev =>
       prev.includes(id) ? prev.filter(lid => lid !== id) : [...prev, id]
     );
+  };
+
+  // 生成事件流程
+  const handleGenerateProcess = async () => {
+    if (!name.trim()) {
+      toast.error('请先输入事件名称');
+      return;
+    }
+    if (!outline.trim()) {
+      toast.error('请先输入事件大纲');
+      return;
+    }
+
+    try {
+      setIsGeneratingProcess(true);
+
+      // 获取API设置
+      const apiSettings = await getSettings();
+      if (!apiSettings.apiToken) {
+        toast.error('请先在设置中配置 API Token');
+        return;
+      }
+
+      // 准备已关联的人物信息
+      const existingCharacters = selectedCharacterIds.map(id => {
+        const char = characters.find(c => c.id === id);
+        return char ? {
+          name: char.name,
+          description: char.basicInfo.description
+        } : null;
+      }).filter(Boolean);
+
+      // 调用API生成事件流程和人物信息
+      const response = await fetch('/api/novel/generate-event-process', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          eventName: name,
+          eventOutline: outline,
+          apiToken: apiSettings.apiToken,
+          model: apiSettings.aiModel,
+          existingCharacters,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate event process');
+      }
+
+      const data = await response.json();
+
+      // 将生成的流程转换为EventProcess格式
+      const generatedProcess: EventProcess[] = data.process.map((item: { description: string }, index: number) => ({
+        id: generateUUID(),
+        order: index + 1,
+        description: item.description,
+      }));
+
+      setProcess(generatedProcess);
+
+      // 处理生成的人物信息
+      if (data.characters && data.characters.length > 0) {
+        const newCharacterIds: string[] = [];
+
+        for (const charData of data.characters) {
+          // 创建人物卡片
+          const characterId = await onCreateCharacter({
+            name: charData.name,
+            basicInfo: {
+              description: `外貌: ${charData.appearance}\n性格: ${charData.personality}`
+            },
+            timeline: [],
+            relationships: [],
+            references: []
+          });
+
+          newCharacterIds.push(characterId);
+        }
+
+        // 将新创建的人物添加到已选择的人物列表
+        setSelectedCharacterIds(prev => [...prev, ...newCharacterIds]);
+
+        toast.success(`事件流程已生成，并自动创建了 ${data.characters.length} 个人物卡片`);
+      } else {
+        toast.success('事件流程已生成');
+      }
+    } catch (err) {
+      console.error('Failed to generate event process:', err);
+      toast.error('生成事件流程失败: ' + (err instanceof Error ? err.message : '未知错误'));
+    } finally {
+      setIsGeneratingProcess(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -246,51 +438,49 @@ export function EventDialog({
           <div>
             <div className="flex justify-between items-center mb-2">
               <label className="text-sm font-medium">事件流程 (前因后果)</label>
-              <Button size="sm" variant="outline" onClick={handleAddStep}>
-                添加步骤
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleGenerateProcess}
+                  disabled={isGeneratingProcess}
+                >
+                  {isGeneratingProcess ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      生成中...
+                    </>
+                  ) : (
+                    '生成事件流程'
+                  )}
+                </Button>
+                <Button size="sm" variant="outline" onClick={handleAddStep}>
+                  添加步骤
+                </Button>
+              </div>
             </div>
-            <div className="space-y-2">
-              {process.map((step, index) => (
-                <div key={step.id} className="flex items-start gap-2">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-medium mt-1">
-                    {index + 1}
-                  </div>
-                  <Textarea
-                    value={step.description}
-                    onChange={(e) => handleStepChange(step.id, e.target.value)}
-                    placeholder={`第 ${index + 1} 步...`}
-                    rows={2}
-                    className="flex-1"
-                  />
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleMoveStep(step.id, 'up')}
-                      disabled={index === 0}
-                    >
-                      ↑
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleMoveStep(step.id, 'down')}
-                      disabled={index === process.length - 1}
-                    >
-                      ↓
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleRemoveStep(step.id)}
-                    >
-                      ×
-                    </Button>
-                  </div>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={process.map(p => p.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="space-y-2">
+                  {process.map((step, index) => (
+                    <SortableStepItem
+                      key={step.id}
+                      step={step}
+                      index={index}
+                      onStepChange={handleStepChange}
+                      onRemoveStep={handleRemoveStep}
+                    />
+                  ))}
                 </div>
-              ))}
-            </div>
+              </SortableContext>
+            </DndContext>
           </div>
 
           {/* 操作按钮 */}

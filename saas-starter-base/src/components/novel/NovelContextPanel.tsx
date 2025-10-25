@@ -5,7 +5,7 @@
 'use client';
 
 import React from 'react';
-import { NovelContext, Character, Location, PromptCard, SettingCard, EventCard } from '@/lib/novel/types';
+import { NovelContext, Character, Location, PromptCard, SettingCard, EventCard, ChapterTimelineItem } from '@/lib/novel/types';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
 import { useLocations } from '@/lib/novel/hooks/use-locations';
 import { usePrompts } from '@/lib/novel/hooks/use-prompts';
@@ -16,13 +16,16 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { X, User, MapPin, Sparkles, Settings, Calendar } from 'lucide-react';
+import { generateUUID } from '@/lib/novel/platform-utils';
 
 interface NovelContextPanelProps {
   context: NovelContext;
   onChange: (context: NovelContext) => void;
+  timeline?: ChapterTimelineItem[];
+  onTimelineChange?: (timeline: ChapterTimelineItem[]) => void;
 }
 
-export function NovelContextPanel({ context, onChange }: NovelContextPanelProps) {
+export function NovelContextPanel({ context, onChange, timeline = [], onTimelineChange }: NovelContextPanelProps) {
   const { currentNovelId } = useNovels();
   const { characters } = useCharacters(currentNovelId);
   const { locations } = useLocations(currentNovelId);
@@ -116,6 +119,17 @@ export function NovelContextPanel({ context, onChange }: NovelContextPanelProps)
         ...context,
         selectedEvents: [...(context.selectedEvents || []), event]
       });
+
+      // 将事件流程同步到Timeline
+      if (onTimelineChange && event.process && event.process.length > 0) {
+        const newTimelineItems: ChapterTimelineItem[] = event.process.map((step, index) => ({
+          id: generateUUID(),
+          order: timeline.length + index + 1,
+          content: step.description
+        }));
+
+        onTimelineChange([...timeline, ...newTimelineItems]);
+      }
     }
     setShowEventSelect(false);
   };

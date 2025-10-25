@@ -1,8 +1,8 @@
-import HarperEditor from '../../components/HarperEditor';
+import { NovelHomePage } from '../../components/novel/NovelHomePage';
 
 export default async function HomePage() {
   return (
-    <HarperEditor />
+    <NovelHomePage />
   );
 }
 

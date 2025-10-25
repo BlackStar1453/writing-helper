@@ -4,6 +4,170 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2, Edit2, Check, X, GripVertical, Sparkles } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+/**
+ * 可排序的时间线项组件
+ */
+interface SortableTimelineItemProps {
+  item: TimelineItem;
+  index: number;
+  readOnly: boolean;
+  editingId: string | null;
+  editingContent: string;
+  generatingItemId?: string | null;
+  onStartEdit: (item: TimelineItem) => void;
+  onSaveEdit: () => void;
+  onCancelEdit: () => void;
+  onEditingContentChange: (content: string) => void;
+  onDelete: (id: string) => void;
+  onGenerateContent?: (item: TimelineItem, index: number) => void;
+  onJumpToContent?: (id: string) => void;
+}
+
+function SortableTimelineItem({
+  item,
+  index,
+  readOnly,
+  editingId,
+  editingContent,
+  generatingItemId,
+  onStartEdit,
+  onSaveEdit,
+  onCancelEdit,
+  onEditingContentChange,
+  onDelete,
+  onGenerateContent,
+  onJumpToContent,
+}: SortableTimelineItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
+    >
+      {editingId === item.id ? (
+        // 编辑模式
+        <div className="space-y-2">
+          <Textarea
+            value={editingContent}
+            onChange={(e) => onEditingContentChange(e.target.value)}
+            className="min-h-[60px]"
+          />
+          <div className="flex gap-2 justify-end">
+            <Button size="sm" variant="ghost" onClick={onCancelEdit}>
+              <X className="h-4 w-4 mr-1" />
+              取消
+            </Button>
+            <Button size="sm" onClick={onSaveEdit}>
+              <Check className="h-4 w-4 mr-1" />
+              保存
+            </Button>
+          </div>
+        </div>
+      ) : (
+        // 显示模式
+        <div className="flex items-start gap-2">
+          {/* 拖拽手柄 */}
+          {!readOnly && (
+            <div
+              {...attributes}
+              {...listeners}
+              className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400 flex items-center justify-center cursor-grab active:cursor-grabbing"
+            >
+              <GripVertical className="h-4 w-4" />
+            </div>
+          )}
+
+          {/* 序号 */}
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-medium">
+            {item.order}
+          </div>
+
+          {/* 内容 */}
+          <div
+            className="flex-1 min-w-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 -my-1 transition-colors"
+            onClick={() => onJumpToContent?.(item.id)}
+            title="点击跳转到对应内容"
+          >
+            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+              {item.content}
+            </p>
+          </div>
+
+          {/* 操作按钮 */}
+          {!readOnly && (
+            <div className="flex-shrink-0 flex gap-1">
+              {onGenerateContent && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => onGenerateContent(item, index)}
+                  disabled={generatingItemId === item.id}
+                  className="h-8 w-8 p-0 text-purple-500 hover:text-purple-600"
+                  title="生成该节点对应的内容"
+                >
+                  {generatingItemId === item.id ? (
+                    <div className="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full" />
+                  ) : (
+                    <Sparkles className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => onStartEdit(item)}
+                className="h-8 w-8 p-0"
+              >
+                <Edit2 className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => onDelete(item.id)}
+                className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export interface TimelineItem {
   id: string;
@@ -50,6 +214,14 @@ export function TimelinePanel({
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedVersion, setSelectedVersion] = useState<number | null>(null);
 
+  // 配置拖拽传感器
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
   const handleStartEdit = (item: TimelineItem) => {
     setEditingId(item.id);
     setEditingContent(item.content);
@@ -92,34 +264,23 @@ export function TimelinePanel({
     setShowAddForm(false);
   };
 
-  const handleMoveUp = (index: number) => {
-    if (index === 0) return;
-    
-    const newTimeline = [...timeline];
-    [newTimeline[index - 1], newTimeline[index]] = [newTimeline[index], newTimeline[index - 1]];
-    
-    // 更新order
-    const reorderedTimeline = newTimeline.map((item, idx) => ({
-      ...item,
-      order: idx + 1
-    }));
-    
-    onChange(reorderedTimeline);
-  };
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
 
-  const handleMoveDown = (index: number) => {
-    if (index === timeline.length - 1) return;
-    
-    const newTimeline = [...timeline];
-    [newTimeline[index], newTimeline[index + 1]] = [newTimeline[index + 1], newTimeline[index]];
-    
-    // 更新order
-    const reorderedTimeline = newTimeline.map((item, idx) => ({
-      ...item,
-      order: idx + 1
-    }));
-    
-    onChange(reorderedTimeline);
+    if (over && active.id !== over.id) {
+      const oldIndex = timeline.findIndex((item) => item.id === active.id);
+      const newIndex = timeline.findIndex((item) => item.id === over.id);
+
+      const newTimeline = arrayMove(timeline, oldIndex, newIndex);
+
+      // 更新order
+      const reorderedTimeline = newTimeline.map((item, idx) => ({
+        ...item,
+        order: idx + 1
+      }));
+
+      onChange(reorderedTimeline);
+    }
   };
 
   return (
@@ -181,112 +342,36 @@ export function TimelinePanel({
       )}
 
       {/* 时间线列表 */}
-      <div className="space-y-2">
-        {timeline.map((item, index) => (
-          <div
-            key={item.id}
-            className="p-3 bg-gray-50 dark:bg-gray-800 rounded-lg"
-          >
-            {editingId === item.id ? (
-              // 编辑模式
-              <div className="space-y-2">
-                <Textarea
-                  value={editingContent}
-                  onChange={(e) => setEditingContent(e.target.value)}
-                  className="min-h-[60px]"
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={timeline.map(item => item.id)}
+          strategy={verticalListSortingStrategy}
+        >
+          <div className="space-y-2">
+            {timeline.map((item, index) => (
+              <React.Fragment key={item.id}>
+                <SortableTimelineItem
+                  item={item}
+                  index={index}
+                  readOnly={readOnly}
+                  editingId={editingId}
+                  editingContent={editingContent}
+                  generatingItemId={generatingItemId}
+                  onStartEdit={handleStartEdit}
+                  onSaveEdit={handleSaveEdit}
+                  onCancelEdit={handleCancelEdit}
+                  onEditingContentChange={setEditingContent}
+                  onDelete={handleDelete}
+                  onGenerateContent={onGenerateContent}
+                  onJumpToContent={onJumpToContent}
                 />
-                <div className="flex gap-2 justify-end">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handleCancelEdit}
-                  >
-                    <X className="h-4 w-4 mr-1" />
-                    取消
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleSaveEdit}
-                  >
-                    <Check className="h-4 w-4 mr-1" />
-                    保存
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              // 显示模式
-              <>
-                <div className="flex items-start gap-2">
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-medium">
-                    {item.order}
-                  </div>
-                  <div
-                    className="flex-1 min-w-0 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded px-2 py-1 -mx-2 -my-1 transition-colors"
-                    onClick={() => onJumpToContent?.(item.id)}
-                    title="点击跳转到对应内容"
-                  >
-                    <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                      {item.content}
-                    </p>
-                  </div>
-                  {!readOnly && (
-                    <div className="flex-shrink-0 flex gap-1">
-                      {onGenerateContent && (
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => onGenerateContent(item, index)}
-                          disabled={generatingItemId === item.id}
-                          className="h-8 w-8 p-0 text-purple-500 hover:text-purple-600"
-                          title="生成该节点对应的内容"
-                        >
-                          {generatingItemId === item.id ? (
-                            <div className="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full" />
-                          ) : (
-                            <Sparkles className="h-4 w-4" />
-                          )}
-                        </Button>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleMoveUp(index)}
-                        disabled={index === 0}
-                        className="h-8 w-8 p-0"
-                      >
-                        ↑
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleMoveDown(index)}
-                        disabled={index === timeline.length - 1}
-                        className="h-8 w-8 p-0"
-                      >
-                        ↓
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleStartEdit(item)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDelete(item.id)}
-                        className="h-8 w-8 p-0 text-red-500 hover:text-red-600"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
 
-                {/* 候选版本显示 */}
-                {candidateVersions && candidateVersions.timelineItemId === item.id && (
+                {/* 候选版本显示 - 保持原有逻辑 */}
+                {candidateVersions && candidateVersions.timelineItemId === item.id && editingId !== item.id && (
                   <div className="mt-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-800">
                     <div className="flex items-center justify-between mb-2">
                       <h5 className="text-xs font-medium text-purple-700 dark:text-purple-300">
@@ -354,11 +439,11 @@ export function TimelinePanel({
                     )}
                   </div>
                 )}
-              </>
-            )}
+              </React.Fragment>
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }

@@ -83,71 +83,67 @@ export function NovelNav({ children }: { children?: React.ReactNode }) {
 
   return (
     <>
-      <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
-        <div className="container mx-auto px-4">
+      <nav className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo/Title */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                  小说创作工具
-                </h1>
-              </div>
-
-              {/* 项目切换器 */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <FolderOpen className="h-4 w-4" />
-                    <span className="max-w-[150px] truncate">
-                      {currentNovel?.title || '选择项目'}
-                    </span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
-                  {novels.map((novel) => (
-                    <DropdownMenuItem
-                      key={novel.id}
-                      onClick={() => handleSwitchNovel(novel.id)}
-                      className={currentNovel?.id === novel.id ? 'bg-emerald-50 dark:bg-emerald-900/20' : ''}
-                    >
-                      <BookOpen className="h-4 w-4 mr-2" />
-                      <span className="flex-1 truncate">{novel.title}</span>
-                      {currentNovel?.id === novel.id && (
-                        <span className="text-xs text-emerald-600">✓</span>
-                      )}
-                    </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => router.push('/novel/projects')}>
-                    <FolderOpen className="h-4 w-4 mr-2" />
-                    管理项目
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+              <BookOpen className="h-6 w-6 text-gray-900 dark:text-white" />
+              <h1 className="text-lg font-light text-gray-900 dark:text-white">
+                小说创作工具
+              </h1>
+            </Link>
 
             {/* Navigation Links */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-6">
               {navItems.map((item) => {
                 const active = isActive(item.href);
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    className={`text-sm transition-colors ${
                       active
-                        ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 font-medium'
-                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
+                        ? 'text-gray-900 dark:text-white font-medium'
+                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                     }`}
                   >
-                    {item.icon}
-                    <span className="hidden sm:inline">{item.name}</span>
+                    {item.name}
                   </Link>
                 );
               })}
+
+              {/* 项目切换器 */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 rounded-lg text-gray-600 dark:text-gray-400"
+                  >
+                    <span className="max-w-[120px] truncate">
+                      {currentNovel?.title || '选择项目'}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  {novels.map((novel) => (
+                    <DropdownMenuItem
+                      key={novel.id}
+                      onClick={() => handleSwitchNovel(novel.id)}
+                    >
+                      <span className="flex-1 truncate">{novel.title}</span>
+                      {currentNovel?.id === novel.id && (
+                        <span className="text-xs">✓</span>
+                      )}
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => router.push('/novel/projects')}>
+                    管理项目
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
