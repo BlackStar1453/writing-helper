@@ -11,6 +11,7 @@ import { WritingModal } from '@/components/WritingModal';
 import { useChapters } from '@/lib/novel/hooks/use-chapters';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
 import { useLocations } from '@/lib/novel/hooks/use-locations';
+import { useSettings } from '@/lib/novel/hooks/use-settings';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { NovelContext, Chapter, ChapterTimelineItem } from '@/lib/novel/types';
 import { getSettings } from '@/lib/db-utils';
@@ -28,6 +29,7 @@ export default function ChapterWritingPage() {
   const { chapters, getChapterById, updateChapter } = useChapters(currentNovelId);
   const { characters } = useCharacters(currentNovelId);
   const { locations } = useLocations(currentNovelId);
+  const { settings } = useSettings(currentNovelId);
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
@@ -119,6 +121,7 @@ export default function ChapterWritingPage() {
           chapterInfo: novelContext.chapterInfo,
           selectedCharacters: settings.selectedCharacters,
           selectedLocations: settings.selectedLocations,
+          selectedSettings: settings.selectedSettings,
           plotSummary: settings.plotSummary,
           globalPrompt: settings.globalPrompt,
           chapterPrompt: settings.chapterPrompt,
@@ -180,6 +183,7 @@ export default function ChapterWritingPage() {
           chapterInfo: novelContext.chapterInfo,
           selectedCharacters: settings.selectedCharacters,
           selectedLocations: settings.selectedLocations,
+          selectedSettings: settings.selectedSettings,
           plotSummary: settings.plotSummary,
           globalPrompt: settings.globalPrompt,
           chapterPrompt: settings.chapterPrompt,
@@ -465,10 +469,12 @@ export default function ChapterWritingPage() {
           allChapters={chapters}
           allCharacters={characters}
           allLocations={locations}
+          allSettings={settings}
           currentChapterId={chapterId}
           initialSettings={{
             selectedCharacters: novelContext.selectedCharacters,
             selectedLocations: novelContext.selectedLocations,
+            selectedSettings: novelContext.selectedSettings,
             plotSummary: novelContext.plotSummary || '',
             chapterPrompt: novelContext.chapterPrompt || '',
             globalPrompt: novelContext.globalPrompt || '',

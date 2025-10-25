@@ -131,6 +131,16 @@ function buildTimelinePrompt(context: any): string {
     });
   }
 
+  // 设定卡片
+  if (context.selectedSettings && context.selectedSettings.length > 0) {
+    parts.push(`## 世界设定`);
+    context.selectedSettings.forEach((setting: any) => {
+      parts.push(`### ${setting.name} (${setting.category})`);
+      parts.push(setting.description);
+      parts.push('');
+    });
+  }
+
   // 情节概括
   if (context.plotSummary) {
     parts.push(`## 情节概括`);

@@ -8,12 +8,13 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Chapter, Character, Location } from '@/lib/novel/types';
+import { Chapter, Character, Location, SettingCard } from '@/lib/novel/types';
 
 export interface GenerateDraftSettings {
   referenceChapters: Chapter[]; // 参考章节
   selectedCharacters: Character[]; // 选中的人物
   selectedLocations: Location[]; // 选中的地点
+  selectedSettings: SettingCard[]; // 选中的设定卡片
   plotSummary: string; // 情节概括
   chapterPrompt: string; // 章节Prompt
   globalPrompt: string; // 全局Prompt
@@ -25,6 +26,7 @@ interface GenerateDraftSettingsModalProps {
   allChapters: Chapter[]; // 所有章节
   allCharacters: Character[]; // 所有人物
   allLocations: Location[]; // 所有地点
+  allSettings: SettingCard[]; // 所有设定卡片
   currentChapterId: string; // 当前章节ID
   initialSettings?: Partial<GenerateDraftSettings>; // 初始设置
   onConfirm: (settings: GenerateDraftSettings) => void; // 确认生成初稿回调
@@ -38,6 +40,7 @@ export function GenerateDraftSettingsModal({
   allChapters,
   allCharacters,
   allLocations,
+  allSettings,
   currentChapterId,
   initialSettings,
   onConfirm,
@@ -47,6 +50,7 @@ export function GenerateDraftSettingsModal({
   const [selectedChapterIds, setSelectedChapterIds] = useState<string[]>([]);
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([]);
   const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
+  const [selectedSettingIds, setSelectedSettingIds] = useState<string[]>([]);
   const [plotSummary, setPlotSummary] = useState('');
   const [chapterPrompt, setChapterPrompt] = useState('');
   const [globalPrompt, setGlobalPrompt] = useState('');
@@ -57,6 +61,7 @@ export function GenerateDraftSettingsModal({
       setSelectedChapterIds(initialSettings.referenceChapters?.map(c => c.id) || []);
       setSelectedCharacterIds(initialSettings.selectedCharacters?.map(c => c.id) || []);
       setSelectedLocationIds(initialSettings.selectedLocations?.map(l => l.id) || []);
+      setSelectedSettingIds(initialSettings.selectedSettings?.map(s => s.id) || []);
       setPlotSummary(initialSettings.plotSummary || '');
       setChapterPrompt(initialSettings.chapterPrompt || '');
       setGlobalPrompt(initialSettings.globalPrompt || '');
@@ -93,12 +98,22 @@ export function GenerateDraftSettingsModal({
     );
   };
 
+  // 切换设定选择
+  const toggleSetting = (settingId: string) => {
+    setSelectedSettingIds(prev =>
+      prev.includes(settingId)
+        ? prev.filter(id => id !== settingId)
+        : [...prev, settingId]
+    );
+  };
+
   // 构建设置对象
   const buildSettings = (): GenerateDraftSettings => {
     return {
       referenceChapters: allChapters.filter(c => selectedChapterIds.includes(c.id)),
       selectedCharacters: allCharacters.filter(c => selectedCharacterIds.includes(c.id)),
       selectedLocations: allLocations.filter(l => selectedLocationIds.includes(l.id)),
+      selectedSettings: allSettings.filter(s => selectedSettingIds.includes(s.id)),
       plotSummary,
       chapterPrompt,
       globalPrompt,
@@ -211,6 +226,46 @@ export function GenerateDraftSettingsModal({
                         </span>
                       )}
                     </span>
+                  </label>
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* 设定卡片选择 */}
+          <div>
+            <Label className="text-lg font-semibold mb-2 block">
+              设定卡片
+            </Label>
+            <div className="space-y-2 max-h-48 overflow-y-auto border rounded-md p-3">
+              {allSettings.length === 0 ? (
+                <p className="text-sm text-gray-500">暂无设定卡片</p>
+              ) : (
+                allSettings.map(setting => (
+                  <label
+                    key={setting.id}
+                    className="flex items-start gap-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedSettingIds.includes(setting.id)}
+                      onChange={() => toggleSetting(setting.id)}
+                      className="mt-1"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{setting.name}</span>
+                        <span className="text-xs px-1.5 py-0.5 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded">
+                          {setting.category}
+                        </span>
+                      </div>
+                      {setting.description && (
+                        <span className="text-xs text-gray-500 block mt-1">
+                          {setting.description.substring(0, 80)}
+                          {setting.description.length > 80 ? '...' : ''}
+                        </span>
+                      )}
+                    </div>
                   </label>
                 ))
               )}

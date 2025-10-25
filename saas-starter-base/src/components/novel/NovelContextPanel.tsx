@@ -5,15 +5,16 @@
 'use client';
 
 import React from 'react';
-import { NovelContext, Character, Location, PromptCard } from '@/lib/novel/types';
+import { NovelContext, Character, Location, PromptCard, SettingCard } from '@/lib/novel/types';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
 import { useLocations } from '@/lib/novel/hooks/use-locations';
 import { usePrompts } from '@/lib/novel/hooks/use-prompts';
+import { useSettings } from '@/lib/novel/hooks/use-settings';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { X, User, MapPin, Sparkles } from 'lucide-react';
+import { X, User, MapPin, Sparkles, Settings } from 'lucide-react';
 
 interface NovelContextPanelProps {
   context: NovelContext;
@@ -25,14 +26,17 @@ export function NovelContextPanel({ context, onChange }: NovelContextPanelProps)
   const { characters } = useCharacters(currentNovelId);
   const { locations } = useLocations(currentNovelId);
   const { prompts } = usePrompts(currentNovelId);
+  const { settings } = useSettings(currentNovelId);
 
   const [showCharacterSelect, setShowCharacterSelect] = React.useState(false);
   const [showLocationSelect, setShowLocationSelect] = React.useState(false);
   const [showPromptSelect, setShowPromptSelect] = React.useState(false);
+  const [showSettingSelect, setShowSettingSelect] = React.useState(false);
 
   const selectedCharacterIds = context.selectedCharacters?.map(c => c.id) || [];
   const selectedLocationIds = context.selectedLocations?.map(l => l.id) || [];
   const selectedPromptIds = context.selectedPrompts?.map(p => p.id) || [];
+  const selectedSettingIds = context.selectedSettings?.map(s => s.id) || [];
 
   const handleAddCharacter = (character: Character) => {
     if (!selectedCharacterIds.includes(character.id)) {
@@ -82,6 +86,23 @@ export function NovelContextPanel({ context, onChange }: NovelContextPanelProps)
     onChange({
       ...context,
       selectedPrompts: context.selectedPrompts?.filter(p => p.id !== promptId)
+    });
+  };
+
+  const handleAddSetting = (setting: SettingCard) => {
+    if (!selectedSettingIds.includes(setting.id)) {
+      onChange({
+        ...context,
+        selectedSettings: [...(context.selectedSettings || []), setting]
+      });
+    }
+    setShowSettingSelect(false);
+  };
+
+  const handleRemoveSetting = (settingId: string) => {
+    onChange({
+      ...context,
+      selectedSettings: context.selectedSettings?.filter(s => s.id !== settingId)
     });
   };
 

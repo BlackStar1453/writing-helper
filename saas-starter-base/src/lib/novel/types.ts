@@ -92,6 +92,18 @@ export interface PromptCard {
   updatedAt: Date;
 }
 
+// ========== 设定卡片 ==========
+
+export interface SettingCard {
+  id: string;
+  novelId: string;            // 所属小说项目ID
+  name: string;               // 设定名称,如"魔法系统"、"世界观"
+  category: string;           // 设定分类,如"世界设定"、"背景设定"、"功能设定"
+  description: string;        // 设定的详细描述
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // ========== Menu卡片 ==========
 
 export interface MenuCard {
@@ -159,6 +171,7 @@ export interface NovelContext {
   selectedCharacters?: Character[];
   selectedLocations?: Location[];
   selectedPrompts?: PromptCard[];
+  selectedSettings?: SettingCard[];  // 选中的设定卡片
   plotSummary?: string;
   globalPrompt?: string;
   chapterPrompt?: string;
