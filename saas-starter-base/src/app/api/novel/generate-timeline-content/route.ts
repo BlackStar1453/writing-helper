@@ -25,6 +25,15 @@ interface GenerateTimelineContentRequest {
     section?: string;
     title?: string;
   };
+  context?: {
+    selectedCharacters?: any[];
+    selectedLocations?: any[];
+    selectedPrompts?: any[];
+    selectedSettings?: any[];
+    plotSummary?: string;
+    globalPrompt?: string;
+    chapterPrompt?: string;
+  };
   apiToken: string;
   model?: string;
 }
@@ -43,6 +52,76 @@ function buildPrompt(request: GenerateTimelineContentRequest): string {
     if (request.chapterInfo.section) parts.push(`节: ${request.chapterInfo.section}`);
     if (request.chapterInfo.title) parts.push(`标题: ${request.chapterInfo.title}`);
     parts.push('');
+  }
+
+  // 上下文信息
+  if (request.context) {
+    // 人物卡片
+    if (request.context.selectedCharacters && request.context.selectedCharacters.length > 0) {
+      parts.push(`## 相关人物`);
+      request.context.selectedCharacters.forEach((character: any) => {
+        parts.push(`### ${character.name}`);
+        if (character.description) parts.push(character.description);
+        parts.push('');
+      });
+    }
+
+    // 地点卡片
+    if (request.context.selectedLocations && request.context.selectedLocations.length > 0) {
+      parts.push(`## 相关地点`);
+      request.context.selectedLocations.forEach((location: any) => {
+        parts.push(`### ${location.name}`);
+        if (location.description) parts.push(location.description);
+        parts.push('');
+      });
+    }
+
+    // Prompt卡片
+    if (request.context.selectedPrompts && request.context.selectedPrompts.length > 0) {
+      parts.push(`## 写作风格指导`);
+      request.context.selectedPrompts.forEach((prompt: any) => {
+        parts.push(`### ${prompt.name}`);
+        parts.push(prompt.description);
+        if (prompt.exampleBefore) {
+          parts.push(`\n示例文本:\n${prompt.exampleBefore}`);
+        }
+        if (prompt.exampleAfter) {
+          parts.push(`\n优化后:\n${prompt.exampleAfter}`);
+        }
+        parts.push('');
+      });
+    }
+
+    // 设定卡片
+    if (request.context.selectedSettings && request.context.selectedSettings.length > 0) {
+      parts.push(`## 世界设定`);
+      request.context.selectedSettings.forEach((setting: any) => {
+        parts.push(`### ${setting.name} (${setting.category})`);
+        parts.push(setting.description);
+        parts.push('');
+      });
+    }
+
+    // 全局Prompt
+    if (request.context.globalPrompt) {
+      parts.push(`## 全局写作指导`);
+      parts.push(request.context.globalPrompt);
+      parts.push('');
+    }
+
+    // 章节Prompt
+    if (request.context.chapterPrompt) {
+      parts.push(`## 本章写作指导`);
+      parts.push(request.context.chapterPrompt);
+      parts.push('');
+    }
+
+    // 情节概括
+    if (request.context.plotSummary) {
+      parts.push(`## 情节概括`);
+      parts.push(request.context.plotSummary);
+      parts.push('');
+    }
   }
 
   // 当前章节内容

@@ -16,9 +16,11 @@ import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { NovelContext, Chapter, ChapterTimelineItem } from '@/lib/novel/types';
 import { getSettings } from '@/lib/db-utils';
 import { GenerateDraftSettingsModal, GenerateDraftSettings } from '@/components/novel/GenerateDraftSettingsModal';
+import { GenerateTimelineContentModal } from '@/components/novel/GenerateTimelineContentModal';
 import { insertContentAtTimelinePosition, cleanContentForDisplay } from '@/lib/novel/content-utils';
 import { CandidateVersions, ContentVersion } from '@/components/novel/TimelinePanel';
 import { toast } from 'sonner';
+import { usePrompts } from '@/lib/novel/hooks/use-prompts';
 
 export default function ChapterWritingPage() {
   const params = useParams();
@@ -30,6 +32,7 @@ export default function ChapterWritingPage() {
   const { characters } = useCharacters(currentNovelId);
   const { locations } = useLocations(currentNovelId);
   const { settings } = useSettings(currentNovelId);
+  const { prompts } = usePrompts(currentNovelId);
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +43,9 @@ export default function ChapterWritingPage() {
   const [generatingTimelineItemId, setGeneratingTimelineItemId] = useState<string | null>(null);
   const [candidateVersions, setCandidateVersions] = useState<CandidateVersions | null>(null);
   const [isWritingModalOpen, setIsWritingModalOpen] = useState(false);
+  const [isTimelineContentModalOpen, setIsTimelineContentModalOpen] = useState(false);
+  const [selectedTimelineItem, setSelectedTimelineItem] = useState<ChapterTimelineItem | null>(null);
+  const [selectedTimelineIndex, setSelectedTimelineIndex] = useState<number>(-1);
 
   // 加载章节数据
   useEffect(() => {
@@ -258,12 +264,25 @@ export default function ChapterWritingPage() {
     }
   };
 
-  // 为Timeline节点生成对应的内容
-  const handleGenerateTimelineContent = async (timelineItem: ChapterTimelineItem, index: number) => {
-    try {
-      if (!chapter) return;
+  // 为Timeline节点生成对应的内容 - 打开配置Modal
+  const handleGenerateTimelineContent = (timelineItem: ChapterTimelineItem, index: number) => {
+    setSelectedTimelineItem(timelineItem);
+    setSelectedTimelineIndex(index);
+    setIsTimelineContentModalOpen(true);
+  };
 
-      setGeneratingTimelineItemId(timelineItem.id);
+  // 确认生成Timeline节点内容
+  const handleConfirmGenerateTimelineContent = async (genSettings: {
+    selectedCharacterIds: string[];
+    selectedLocationIds: string[];
+    selectedPromptIds: string[];
+    selectedSettingIds: string[];
+  }) => {
+    try {
+      if (!chapter || !selectedTimelineItem) return;
+
+      setIsTimelineContentModalOpen(false);
+      setGeneratingTimelineItemId(selectedTimelineItem.id);
 
       // 获取API设置
       const apiSettings = await getSettings();
@@ -274,13 +293,28 @@ export default function ChapterWritingPage() {
         return;
       }
 
+      // 构建上下文
+      const selectedCharacters = characters.filter(c => genSettings.selectedCharacterIds.includes(c.id));
+      const selectedLocations = locations.filter(l => genSettings.selectedLocationIds.includes(l.id));
+      const selectedPrompts = prompts.filter(p => genSettings.selectedPromptIds.includes(p.id));
+      const selectedSettings = settings.filter(s => genSettings.selectedSettingIds.includes(s.id));
+
+      const context = {
+        ...novelContext,
+        selectedCharacters,
+        selectedLocations,
+        selectedPrompts,
+        selectedSettings,
+      };
+
       // 构建请求数据
       const requestData = {
         currentContent: chapter.content || '',
         timeline: chapter.timeline || [],
-        targetItem: timelineItem,
-        targetIndex: index,
-        chapterInfo: novelContext.chapterInfo,
+        targetItem: selectedTimelineItem,
+        targetIndex: selectedTimelineIndex,
+        chapterInfo: context.chapterInfo,
+        context,
         apiToken: apiSettings.apiToken,
         model: apiSettings.aiModel,
       };
@@ -482,6 +516,18 @@ export default function ChapterWritingPage() {
           onConfirm={handleConfirmGenerate}
           onGenerateTimeline={handleGenerateTimeline}
           isGeneratingTimeline={isGeneratingTimeline}
+        />
+
+        {/* 生成Timeline节点内容设置Modal */}
+        <GenerateTimelineContentModal
+          isOpen={isTimelineContentModalOpen}
+          onClose={() => setIsTimelineContentModalOpen(false)}
+          onConfirm={handleConfirmGenerateTimelineContent}
+          timelineItem={selectedTimelineItem}
+          allCharacters={characters}
+          allLocations={locations}
+          allPrompts={prompts}
+          allSettings={settings}
         />
       </div>
     </NovelNav>
