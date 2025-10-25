@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { getSettings } from '@/lib/novel/storage/settings-storage';
+import { getSettings } from '@/lib/db-utils';
 
 interface RegenerateFieldDialogProps {
   open: boolean;
@@ -42,13 +42,13 @@ export function RegenerateFieldDialog({
   characterName
 }: RegenerateFieldDialogProps) {
   const [requirement, setRequirement] = useState('');
-  const [generatedValue, setGeneratedValue] = useState('');
+  const [generatedValue, setGeneratedValue] = useState(currentValue || '');
   const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (open) {
       setRequirement('');
-      setGeneratedValue(currentValue);
+      setGeneratedValue(currentValue || '');
     }
   }, [open, currentValue]);
 
@@ -63,8 +63,9 @@ export function RegenerateFieldDialog({
 
       // 获取API设置
       const apiSettings = await getSettings();
-      if (!apiSettings.apiToken) {
+      if (!apiSettings || !apiSettings.apiToken) {
         toast.error('请先在设置中配置 API Token');
+        setIsGenerating(false);
         return;
       }
 
@@ -85,7 +86,16 @@ export function RegenerateFieldDialog({
       });
 
       if (!response.ok) {
-        throw new Error('Failed to regenerate field');
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error || `API请求失败 (${response.status})`;
+
+        if (response.status === 401) {
+          toast.error('API Token无效，请在应用设置中检查配置');
+        } else {
+          toast.error(errorMessage);
+        }
+        setIsGenerating(false);
+        return;
       }
 
       const data = await response.json();
@@ -93,7 +103,7 @@ export function RegenerateFieldDialog({
       toast.success('生成成功');
     } catch (error) {
       console.error('Error regenerating field:', error);
-      toast.error('生成失败，请重试');
+      toast.error('生成失败，请检查网络连接或API配置');
     } finally {
       setIsGenerating(false);
     }
@@ -167,7 +177,7 @@ export function RegenerateFieldDialog({
             <Button variant="outline" onClick={onClose}>
               取消
             </Button>
-            <Button onClick={handleSave} disabled={!generatedValue.trim()}>
+            <Button onClick={handleSave} disabled={!generatedValue || !generatedValue.trim()}>
               保存
             </Button>
           </div>

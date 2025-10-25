@@ -8,7 +8,8 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Chapter, Character, Location, SettingCard, EventCard } from '@/lib/novel/types';
+import { Chapter, Character, Location, SettingCard, EventCard, ChapterTimelineItem } from '@/lib/novel/types';
+import { Pencil, Trash2, Loader2 } from 'lucide-react';
 
 export interface GenerateDraftSettings {
   referenceChapters: Chapter[]; // 参考章节
@@ -31,9 +32,10 @@ interface GenerateDraftSettingsModalProps {
   allEvents: EventCard[]; // 所有事件卡片
   currentChapterId: string; // 当前章节ID
   initialSettings?: Partial<GenerateDraftSettings>; // 初始设置
-  onConfirm: (settings: GenerateDraftSettings) => void; // 确认生成初稿回调
-  onGenerateTimeline: (settings: GenerateDraftSettings) => void; // 生成Timeline回调
+  onConfirm: (settings: GenerateDraftSettings, timeline: ChapterTimelineItem[]) => void; // 确认生成初稿回调
+  onGenerateTimeline: (settings: GenerateDraftSettings) => Promise<ChapterTimelineItem[]>; // 生成Timeline回调
   isGeneratingTimeline?: boolean; // 是否正在生成Timeline
+  initialTimeline?: ChapterTimelineItem[]; // 初始timeline
 }
 
 export function GenerateDraftSettingsModal({
@@ -49,6 +51,7 @@ export function GenerateDraftSettingsModal({
   onConfirm,
   onGenerateTimeline,
   isGeneratingTimeline = false,
+  initialTimeline = [],
 }: GenerateDraftSettingsModalProps) {
   const [selectedChapterIds, setSelectedChapterIds] = useState<string[]>([]);
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([]);
@@ -58,6 +61,9 @@ export function GenerateDraftSettingsModal({
   const [plotSummary, setPlotSummary] = useState('');
   const [chapterPrompt, setChapterPrompt] = useState('');
   const [globalPrompt, setGlobalPrompt] = useState('');
+  const [timeline, setTimeline] = useState<ChapterTimelineItem[]>(initialTimeline);
+  const [editingTimelineId, setEditingTimelineId] = useState<string | null>(null);
+  const [editingTimelineContent, setEditingTimelineContent] = useState('');
 
   // 初始化设置
   useEffect(() => {
@@ -135,10 +141,48 @@ export function GenerateDraftSettingsModal({
     };
   };
 
+  // 生成Timeline
+  const handleGenerateTimeline = async () => {
+    const settings = buildSettings();
+    const generatedTimeline = await onGenerateTimeline(settings);
+    setTimeline(generatedTimeline);
+  };
+
+  // 编辑Timeline节点
+  const handleEditTimeline = (item: ChapterTimelineItem) => {
+    setEditingTimelineId(item.id);
+    setEditingTimelineContent(item.content);
+  };
+
+  // 保存Timeline编辑
+  const handleSaveTimelineEdit = () => {
+    if (!editingTimelineId) return;
+    setTimeline(prev =>
+      prev.map(item =>
+        item.id === editingTimelineId
+          ? { ...item, content: editingTimelineContent }
+          : item
+      )
+    );
+    setEditingTimelineId(null);
+    setEditingTimelineContent('');
+  };
+
+  // 取消Timeline编辑
+  const handleCancelTimelineEdit = () => {
+    setEditingTimelineId(null);
+    setEditingTimelineContent('');
+  };
+
+  // 删除Timeline节点
+  const handleDeleteTimeline = (id: string) => {
+    setTimeline(prev => prev.filter(item => item.id !== id));
+  };
+
   // 确认生成初稿
   const handleConfirm = () => {
     const settings = buildSettings();
-    onConfirm(settings);
+    onConfirm(settings, timeline);
     onOpenChange(false);
   };
 
@@ -360,6 +404,96 @@ export function GenerateDraftSettingsModal({
               placeholder="适用于整部小说的写作风格和要求..."
             />
           </div>
+
+          {/* Timeline显示区域 */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-lg font-semibold">时间线</Label>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateTimeline}
+                disabled={isGeneratingTimeline}
+              >
+                {isGeneratingTimeline ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    生成中...
+                  </>
+                ) : (
+                  '生成Timeline'
+                )}
+              </Button>
+            </div>
+            <div className="border rounded-md p-3 space-y-2 max-h-64 overflow-y-auto">
+              {timeline.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  暂无时间线，点击"生成Timeline"按钮生成
+                </p>
+              ) : (
+                timeline.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-start gap-2 p-2 bg-gray-50 rounded hover:bg-gray-100"
+                  >
+                    <span className="text-sm font-medium text-gray-500 min-w-[2rem]">
+                      {item.order}.
+                    </span>
+                    {editingTimelineId === item.id ? (
+                      <div className="flex-1 flex gap-2">
+                        <textarea
+                          value={editingTimelineContent}
+                          onChange={(e) => setEditingTimelineContent(e.target.value)}
+                          className="flex-1 p-1 text-sm border rounded resize-none"
+                          rows={2}
+                        />
+                        <div className="flex flex-col gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={handleSaveTimelineEdit}
+                            className="h-6 px-2"
+                          >
+                            保存
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={handleCancelTimelineEdit}
+                            className="h-6 px-2"
+                          >
+                            取消
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="flex-1 text-sm">{item.content}</span>
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleEditTimeline(item)}
+                            className="h-6 w-6 p-0"
+                          >
+                            <Pencil className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleDeleteTimeline(item.id)}
+                            className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
 
         {/* 操作按钮 */}
@@ -370,21 +504,9 @@ export function GenerateDraftSettingsModal({
           >
             取消
           </Button>
-          <div className="flex space-x-3">
-            <Button
-              variant="outline"
-              onClick={() => {
-                const settings = buildSettings();
-                onGenerateTimeline(settings);
-              }}
-              disabled={isGeneratingTimeline}
-            >
-              {isGeneratingTimeline ? '生成中...' : '生成Timeline'}
-            </Button>
-            <Button onClick={handleConfirm}>
-              生成初稿
-            </Button>
-          </div>
+          <Button onClick={handleConfirm}>
+            生成初稿
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

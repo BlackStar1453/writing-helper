@@ -110,7 +110,7 @@ export default function ChapterWritingPage() {
   };
 
   // 生成Timeline
-  const handleGenerateTimeline = async (settings: GenerateDraftSettings) => {
+  const handleGenerateTimeline = async (settings: GenerateDraftSettings): Promise<ChapterTimelineItem[]> => {
     try {
       setIsGeneratingTimeline(true);
 
@@ -120,7 +120,7 @@ export default function ChapterWritingPage() {
       // 检查API Token
       if (!apiSettings.apiToken) {
         toast.error('请先在设置中配置API Token');
-        return;
+        return [];
       }
 
       // 构建请求数据
@@ -153,26 +153,19 @@ export default function ChapterWritingPage() {
       }
 
       const data = await response.json();
-
-      // 更新章节的timeline
-      if (chapter && data.timeline) {
-        await updateChapter(chapter.id, {
-          timeline: data.timeline,
-        });
-
-        // 重新加载章节
-        await loadChapter();
-      }
+      toast.success('Timeline生成成功');
+      return data.timeline || [];
     } catch (err) {
       console.error('Failed to generate timeline:', err);
       toast.error('生成Timeline失败: ' + (err instanceof Error ? err.message : '未知错误'));
+      return [];
     } finally {
       setIsGeneratingTimeline(false);
     }
   };
 
   // 确认生成初稿
-  const handleConfirmGenerate = async (settings: GenerateDraftSettings) => {
+  const handleConfirmGenerate = async (settings: GenerateDraftSettings, timeline: ChapterTimelineItem[]) => {
     try {
       setIsGeneratingDraft(true);
 
@@ -196,7 +189,7 @@ export default function ChapterWritingPage() {
           globalPrompt: settings.globalPrompt,
           chapterPrompt: settings.chapterPrompt,
           referenceChapters: settings.referenceChapters, // 添加参考章节
-          timeline: chapter?.timeline || [], // 添加当前章节的timeline
+          timeline: timeline, // 使用Modal中的timeline
         },
         apiToken: apiSettings.apiToken,
         model: apiSettings.aiModel,
@@ -219,19 +212,14 @@ export default function ChapterWritingPage() {
 
       // 更新章节内容和时间线
       if (chapter) {
-        // 只有当API返回了新的timeline时才更新,否则保留现有timeline
         const updateData: any = {
           content: data.content,
           selectedCharacters: settings.selectedCharacters?.map(c => c.id),
           selectedLocations: settings.selectedLocations?.map(l => l.id),
           plotSummary: settings.plotSummary,
           chapterPrompt: settings.chapterPrompt,
+          timeline: timeline, // 保存Modal中的timeline
         };
-
-        // 如果API返回了timeline(即没有传入timeline时生成的),则更新timeline
-        if (data.timeline && data.timeline.length > 0) {
-          updateData.timeline = data.timeline;
-        }
 
         await updateChapter(chapter.id, updateData);
 
@@ -523,6 +511,7 @@ export default function ChapterWritingPage() {
           onConfirm={handleConfirmGenerate}
           onGenerateTimeline={handleGenerateTimeline}
           isGeneratingTimeline={isGeneratingTimeline}
+          initialTimeline={chapter?.timeline || []}
         />
 
         {/* 生成Timeline节点内容设置Modal */}
