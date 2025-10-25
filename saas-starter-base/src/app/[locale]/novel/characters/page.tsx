@@ -9,6 +9,7 @@ import { useCharacters } from '@/lib/novel/hooks/use-characters';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { CharacterCard } from '@/components/novel/CharacterCard';
 import { CharacterDialog } from '@/components/novel/CharacterDialog';
+import { RegenerateFieldDialog } from '@/components/novel/RegenerateFieldDialog';
 import { NovelNav } from '@/components/novel/NovelNav';
 import { Button } from '@/components/ui/button';
 import { Character } from '@/lib/novel/types';
@@ -27,6 +28,13 @@ export default function CharactersPage() {
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
+  const [isRegenerateDialogOpen, setIsRegenerateDialogOpen] = useState(false);
+  const [regenerateContext, setRegenerateContext] = useState<{
+    characterId: string;
+    characterName: string;
+    fieldName: string;
+    currentValue: string;
+  } | null>(null);
 
   const handleCreate = () => {
     setEditingCharacter(null);
@@ -50,6 +58,36 @@ export default function CharactersPage() {
     if (confirm('确定要删除这个人物吗?这将同时删除所有相关的关系。')) {
       await deleteCharacter(id);
     }
+  };
+
+  const handleRegenerateField = (characterId: string, fieldName: string, currentValue: string) => {
+    const character = characters.find(c => c.id === characterId);
+    if (!character) return;
+
+    setRegenerateContext({
+      characterId,
+      characterName: character.name,
+      fieldName,
+      currentValue
+    });
+    setIsRegenerateDialogOpen(true);
+  };
+
+  const handleSaveRegeneratedField = async (newValue: string) => {
+    if (!regenerateContext) return;
+
+    const { characterId, fieldName } = regenerateContext;
+
+    // 更新人物卡片
+    await updateCharacter(characterId, {
+      basicInfo: {
+        ...characters.find(c => c.id === characterId)?.basicInfo,
+        [fieldName]: newValue
+      }
+    });
+
+    setIsRegenerateDialogOpen(false);
+    setRegenerateContext(null);
   };
 
   if (loading) {
@@ -107,6 +145,7 @@ export default function CharactersPage() {
                 character={character}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onRegenerateField={handleRegenerateField}
               />
             ))}
           </div>
@@ -118,6 +157,20 @@ export default function CharactersPage() {
           onSave={handleSave}
           character={editingCharacter}
         />
+
+        {regenerateContext && (
+          <RegenerateFieldDialog
+            open={isRegenerateDialogOpen}
+            onClose={() => {
+              setIsRegenerateDialogOpen(false);
+              setRegenerateContext(null);
+            }}
+            onSave={handleSaveRegeneratedField}
+            fieldName={regenerateContext.fieldName}
+            currentValue={regenerateContext.currentValue}
+            characterName={regenerateContext.characterName}
+          />
+        )}
       </div>
     </>
   );

@@ -9,16 +9,17 @@ import { Character, CharacterTimelineEvent, CharacterRelationship, Reference } f
 import { Card, CardHeader, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar } from '@/components/ui/avatar';
-import { User, Calendar, Users, FileText, ChevronDown, ChevronUp, Edit, Trash2 } from 'lucide-react';
+import { User, Calendar, Users, FileText, ChevronDown, ChevronUp, Edit, Trash2, Sparkles } from 'lucide-react';
 
 interface CharacterCardProps {
   character: Character;
   onEdit: (character: Character) => void;
   onDelete: (id: string) => void;
   onCharacterClick?: (id: string) => void;
+  onRegenerateField?: (characterId: string, fieldName: string, currentValue: string) => void;
 }
 
-export function CharacterCard({ character, onEdit, onDelete, onCharacterClick }: CharacterCardProps) {
+export function CharacterCard({ character, onEdit, onDelete, onCharacterClick, onRegenerateField }: CharacterCardProps) {
   const [expandedSections, setExpandedSections] = useState({
     timeline: false,
     relationships: false,
@@ -30,6 +31,12 @@ export function CharacterCard({ character, onEdit, onDelete, onCharacterClick }:
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  const handleRegenerate = (fieldName: string, currentValue: string) => {
+    if (onRegenerateField) {
+      onRegenerateField(character.id, fieldName, currentValue);
+    }
   };
 
   return (
@@ -72,8 +79,21 @@ export function CharacterCard({ character, onEdit, onDelete, onCharacterClick }:
       <CardContent className="space-y-4">
         {/* 基础信息 */}
         {character.basicInfo.description && (
-          <div className="space-y-2">
-            <div className="text-xs font-medium text-gray-500">基本信息</div>
+          <div className="space-y-2 group">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-medium text-gray-500">基本信息</div>
+              {onRegenerateField && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity h-6 px-2"
+                  onClick={() => handleRegenerate('description', character.basicInfo.description || '')}
+                >
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  <span className="text-xs">重新生成</span>
+                </Button>
+              )}
+            </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
               {character.basicInfo.description}
             </p>
@@ -82,8 +102,21 @@ export function CharacterCard({ character, onEdit, onDelete, onCharacterClick }:
 
         {/* 外貌描述 */}
         {character.basicInfo.appearance && (
-          <div className="space-y-2">
-            <div className="text-xs font-medium text-gray-500">外貌</div>
+          <div className="space-y-2 group">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-medium text-gray-500">外貌</div>
+              {onRegenerateField && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity h-6 px-2"
+                  onClick={() => handleRegenerate('appearance', character.basicInfo.appearance || '')}
+                >
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  <span className="text-xs">重新生成</span>
+                </Button>
+              )}
+            </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
               {character.basicInfo.appearance}
             </p>
@@ -92,8 +125,21 @@ export function CharacterCard({ character, onEdit, onDelete, onCharacterClick }:
 
         {/* 性格描述 */}
         {character.basicInfo.personality && (
-          <div className="space-y-2">
-            <div className="text-xs font-medium text-gray-500">性格</div>
+          <div className="space-y-2 group">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-medium text-gray-500">性格</div>
+              {onRegenerateField && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity h-6 px-2"
+                  onClick={() => handleRegenerate('personality', character.basicInfo.personality || '')}
+                >
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  <span className="text-xs">重新生成</span>
+                </Button>
+              )}
+            </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
               {character.basicInfo.personality}
             </p>
@@ -102,8 +148,21 @@ export function CharacterCard({ character, onEdit, onDelete, onCharacterClick }:
 
         {/* 人物弧光 */}
         {character.basicInfo.characterArc && (
-          <div className="space-y-2">
-            <div className="text-xs font-medium text-gray-500">人物弧光</div>
+          <div className="space-y-2 group">
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-medium text-gray-500">人物弧光</div>
+              {onRegenerateField && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity h-6 px-2"
+                  onClick={() => handleRegenerate('characterArc', character.basicInfo.characterArc || '')}
+                >
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  <span className="text-xs">重新生成</span>
+                </Button>
+              )}
+            </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
               {character.basicInfo.characterArc}
             </p>
