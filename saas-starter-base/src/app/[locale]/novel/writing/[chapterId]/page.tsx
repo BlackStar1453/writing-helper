@@ -683,6 +683,9 @@ export default function ChapterWritingPage() {
           onSaveVersion={handleSaveVersion}
           onLoadVersion={handleLoadVersion}
           onDeleteVersion={handleDeleteVersion}
+          allCharacters={characters}
+          allLocations={locations}
+          allSettings={settings}
         />
 
         {/* 生成初稿设置Modal */}
@@ -750,6 +753,9 @@ function WritingModalWrapper({
   onSaveVersion,
   onLoadVersion,
   onDeleteVersion,
+  allCharacters,
+  allLocations,
+  allSettings,
 }: {
   chapter: Chapter;
   novelContext: NovelContext;
@@ -772,6 +778,9 @@ function WritingModalWrapper({
   onSaveVersion: (description?: string) => void;
   onLoadVersion: (version: number) => void;
   onDeleteVersion: (versionId: string) => void;
+  allCharacters: any[];
+  allLocations: any[];
+  allSettings: any[];
 }) {
   const [text, setText] = useState(chapter.content || '');
   const [initialContent, setInitialContent] = useState(chapter.content || '');
@@ -833,6 +842,9 @@ function WritingModalWrapper({
       onSaveVersion={onSaveVersion}
       onLoadVersion={onLoadVersion}
       onDeleteVersion={onDeleteVersion}
+      allCharacters={allCharacters}
+      allLocations={allLocations}
+      allSettings={allSettings}
     />
   );
 }

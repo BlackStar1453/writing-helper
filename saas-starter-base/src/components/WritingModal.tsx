@@ -19,6 +19,10 @@ import { TimelinePanel, CandidateVersions, ContentVersion } from './novel/Timeli
 import { cleanContentForDisplay } from '@/lib/novel/content-utils';
 import { useMenus } from '@/lib/novel/hooks/use-menus';
 import { usePrompts } from '@/lib/novel/hooks/use-prompts';
+import { SmartWritingSettingsModal, SmartWritingSettings } from './novel/SmartWritingSettingsModal';
+import { SmartWritingCandidatesModal, SmartWritingCandidate } from './novel/SmartWritingCandidatesModal';
+import { getSettings } from '@/lib/db-utils';
+import { toast } from 'sonner';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
 
 interface WritingModalProps {
@@ -75,6 +79,10 @@ interface WritingModalProps {
   onApplyVersion?: (version: ContentVersion) => void;
   onClearCandidates?: () => void;
   onJumpToTimelineContent?: (timelineItemId: string) => void;
+  // 智能续写/重写相关props
+  allCharacters?: any[];
+  allLocations?: any[];
+  allSettings?: any[];
 }
 
 // 导出ref方法接口
@@ -127,7 +135,10 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     candidateVersions,
     onApplyVersion,
     onClearCandidates,
-    onJumpToTimelineContent
+    onJumpToTimelineContent,
+    allCharacters = [],
+    allLocations = [],
+    allSettings = []
   } = props;
 
   // 加载Menu卡片
@@ -239,6 +250,17 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [showProgress, setShowProgress] = useState(false); // Progress区域是否展开
   const [showTips, setShowTips] = useState(false); // Tips区域是否展开
+
+  // 智能续写/重写相关状态
+  const [smartWritingMode, setSmartWritingMode] = useState<'continue' | 'rewrite' | null>(null);
+  const [smartWritingSettingsOpen, setSmartWritingSettingsOpen] = useState(false);
+  const [smartWritingCandidatesOpen, setSmartWritingCandidatesOpen] = useState(false);
+  const [smartWritingCandidates, setSmartWritingCandidates] = useState<SmartWritingCandidate[]>([]);
+  const [isGeneratingSmartWriting, setIsGeneratingSmartWriting] = useState(false);
+  const [presetRewriteStyle, setPresetRewriteStyle] = useState<'vivid' | 'concise' | 'formal' | 'casual' | 'emotional' | 'character-based'>('vivid');
+  const [smartWritingSelectionStart, setSmartWritingSelectionStart] = useState(0);
+  const [smartWritingSelectionEnd, setSmartWritingSelectionEnd] = useState(0);
+  const [smartWritingSelectedText, setSmartWritingSelectedText] = useState('');
 
   const linterRef = useRef<any>(null);
   const agentMessagesEndRef = useRef<HTMLDivElement>(null);
@@ -592,6 +614,192 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
 
     // 关闭popup
     setSelectionPopup({ show: false, selectedText: '', context: '', position: { x: 0, y: 0 } });
+  };
+
+  // ========== 智能续写/重写相关方法 ==========
+
+  // 打开续写设置Modal
+  const handleOpenContinueWriting = () => {
+    if (!textareaRef.current) return;
+
+    const selectionStart = textareaRef.current.selectionStart;
+    const selectionEnd = textareaRef.current.selectionEnd;
+    const selectedText = text.substring(selectionStart, selectionEnd);
+
+    // 保存选择信息
+    setSmartWritingSelectionStart(selectionStart);
+    setSmartWritingSelectionEnd(selectionEnd);
+    setSmartWritingSelectedText(selectedText || text.substring(Math.max(0, selectionStart - 200), selectionStart));
+
+    // 打开设置Modal
+    setSmartWritingMode('continue');
+    setSmartWritingSettingsOpen(true);
+
+    // 关闭选择popup
+    setSelectionPopup({ show: false, selectedText: '', context: '', position: { x: 0, y: 0 } });
+  };
+
+  // 打开重写设置Modal
+  const handleOpenRewrite = (style: 'vivid' | 'concise' | 'formal' | 'casual' | 'emotional' | 'character-based') => {
+    if (!textareaRef.current) return;
+
+    const selectionStart = textareaRef.current.selectionStart;
+    const selectionEnd = textareaRef.current.selectionEnd;
+    const selectedText = text.substring(selectionStart, selectionEnd);
+
+    if (!selectedText.trim()) {
+      toast.error('请先选中要重写的文本');
+      return;
+    }
+
+    // 保存选择信息
+    setSmartWritingSelectionStart(selectionStart);
+    setSmartWritingSelectionEnd(selectionEnd);
+    setSmartWritingSelectedText(selectedText);
+    setPresetRewriteStyle(style);
+
+    // 打开设置Modal
+    setSmartWritingMode('rewrite');
+    setSmartWritingSettingsOpen(true);
+
+    // 关闭选择popup
+    setSelectionPopup({ show: false, selectedText: '', context: '', position: { x: 0, y: 0 } });
+  };
+
+  // 生成智能续写/重写内容
+  const handleSmartWritingGenerate = async (settings: SmartWritingSettings) => {
+    try {
+      setIsGeneratingSmartWriting(true);
+      // 不要关闭modal，保持打开并显示loading状态
+
+      // 获取API设置
+      const apiSettings = await getSettings();
+      if (!apiSettings.apiToken) {
+        toast.error('请先在设置中配置 API Token');
+        setIsGeneratingSmartWriting(false);
+        return;
+      }
+
+      // 提取上下文：以选中文本为中心
+      // 对于续写：选中文本是光标位置之前的内容，contextAfter是光标之后的内容
+      // 对于重写：选中文本是要重写的内容，contextBefore是之前的内容，contextAfter是之后的内容
+      const contextBefore = text.substring(
+        Math.max(0, smartWritingSelectionStart - 500),
+        smartWritingSelectionStart
+      );
+      const contextAfter = text.substring(
+        smartWritingSelectionEnd,
+        Math.min(text.length, smartWritingSelectionEnd + 500)
+      );
+
+      // 查找当前Timeline节点
+      let currentTimelineNode: ChapterTimelineItem | undefined;
+      if (settings.useTimeline && timeline && timeline.length > 0) {
+        const textBeforeCursor = text.substring(0, smartWritingSelectionStart);
+        const markers = textBeforeCursor.match(/<!-- TIMELINE_NODE:(.*?) -->/g) || [];
+        if (markers.length > 0) {
+          const lastMarker = markers[markers.length - 1];
+          const nodeId = lastMarker.match(/<!-- TIMELINE_NODE:(.*?) -->/)?.[1];
+          if (nodeId) {
+            currentTimelineNode = timeline.find(item => item.id === nodeId);
+          }
+        }
+      }
+
+      // 构建请求数据
+      const requestData = smartWritingMode === 'continue' ? {
+        selectedText: smartWritingSelectedText,
+        contextBefore,
+        contextAfter,
+        length: settings.length || 'medium',
+        selectedCharacters: settings.selectedCharacters,
+        selectedLocations: settings.selectedLocations,
+        selectedSettings: settings.selectedSettings,
+        useTimeline: settings.useTimeline,
+        currentTimelineNode: settings.useTimeline ? currentTimelineNode : undefined,
+        customPrompt: settings.customPrompt,
+        novelContext: novelContext || {},
+        apiToken: apiSettings.apiToken,
+        model: apiSettings.aiModel || 'deepseek-chat'
+      } : {
+        selectedText: smartWritingSelectedText,
+        contextBefore,
+        contextAfter,
+        rewriteStyle: settings.rewriteStyle || 'vivid',
+        selectedCharacters: settings.selectedCharacters,
+        selectedLocations: settings.selectedLocations,
+        selectedSettings: settings.selectedSettings,
+        customPrompt: settings.customPrompt,
+        novelContext: novelContext || {},
+        apiToken: apiSettings.apiToken,
+        model: apiSettings.aiModel || 'deepseek-chat'
+      };
+
+      // 调用API
+      const apiUrl = smartWritingMode === 'continue'
+        ? '/api/novel/continue-writing'
+        : '/api/novel/rewrite-paragraph';
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to ${smartWritingMode === 'continue' ? 'continue writing' : 'rewrite paragraph'}`);
+      }
+
+      const data = await response.json();
+
+      // 生成成功后关闭设置modal
+      setSmartWritingSettingsOpen(false);
+
+      // 显示候选版本
+      setSmartWritingCandidates(data.candidates);
+      setSmartWritingCandidatesOpen(true);
+
+      toast.success(`已生成${data.candidates.length}个候选版本，请选择一个应用`);
+    } catch (err) {
+      console.error('Smart writing error:', err);
+      toast.error(`${smartWritingMode === 'continue' ? '续写' : '重写'}失败: ` + (err instanceof Error ? err.message : '未知错误'));
+      // 发生错误时不关闭modal，让用户可以重试或修改设置
+    } finally {
+      setIsGeneratingSmartWriting(false);
+    }
+  };
+
+  // 应用候选版本
+  const handleApplySmartWritingCandidate = (candidate: SmartWritingCandidate) => {
+    if (smartWritingMode === 'continue') {
+      // 续写：在光标位置插入内容
+      const before = text.substring(0, smartWritingSelectionStart);
+      const after = text.substring(smartWritingSelectionStart);
+      const newText = before + '\n\n' + candidate.content + '\n\n' + after;
+
+      setText(newText);
+      if (onTextChange) {
+        onTextChange(newText);
+      }
+
+      toast.success('续写内容已应用');
+    } else {
+      // 重写：替换选中的文本
+      const before = text.substring(0, smartWritingSelectionStart);
+      const after = text.substring(smartWritingSelectionEnd);
+      const newText = before + candidate.content + after;
+
+      setText(newText);
+      if (onTextChange) {
+        onTextChange(newText);
+      }
+
+      toast.success('重写内容已应用');
+    }
+
+    // 关闭候选版本Modal
+    setSmartWritingCandidatesOpen(false);
+    setSmartWritingCandidates([]);
   };
 
   // ========== 引导写作相关方法 ==========
@@ -1383,9 +1591,81 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
             }}
           >
             <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-2 pt-1">
-              "{selectionPopup.selectedText}"
+              "{selectionPopup.selectedText.length > 50 ? selectionPopup.selectedText.substring(0, 50) + '...' : selectionPopup.selectedText}"
             </div>
             <div className="flex flex-col gap-1">
+              {/* 续写选项 */}
+              <button
+                onClick={handleOpenContinueWriting}
+                className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300 flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                续写
+              </button>
+
+              {/* 重写选项（子菜单） */}
+              <div className="relative group">
+                <button className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300 flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    重写
+                  </span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+
+                {/* 子菜单 */}
+                <div className="absolute left-full top-0 ml-1 hidden group-hover:block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[140px] z-50">
+                  <button
+                    onClick={() => handleOpenRewrite('vivid')}
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                  >
+                    更生动
+                  </button>
+                  <button
+                    onClick={() => handleOpenRewrite('concise')}
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                  >
+                    更简洁
+                  </button>
+                  <button
+                    onClick={() => handleOpenRewrite('formal')}
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                  >
+                    更正式
+                  </button>
+                  <button
+                    onClick={() => handleOpenRewrite('casual')}
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                  >
+                    更口语化
+                  </button>
+                  <button
+                    onClick={() => handleOpenRewrite('emotional')}
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                  >
+                    增强情感
+                  </button>
+                  <button
+                    onClick={() => handleOpenRewrite('character-based')}
+                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                  >
+                    保持人物性格
+                  </button>
+                </div>
+              </div>
+
+              {/* 分隔线 */}
+              {enabledMenus.filter(m => m.enabled).length > 0 && (
+                <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+              )}
+
+              {/* 现有的Menu选项 */}
               {enabledMenus.filter(m => m.enabled).sort((a, b) => a.order - b.order).map(menu => (
                 <button
                   key={menu.id}
@@ -1907,6 +2187,38 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
             </div>
           </div>
         </div>
+      )}
+
+      {/* 智能续写/重写设置Modal */}
+      {smartWritingMode && (
+        <SmartWritingSettingsModal
+          isOpen={smartWritingSettingsOpen}
+          onClose={() => setSmartWritingSettingsOpen(false)}
+          mode={smartWritingMode}
+          selectedText={smartWritingSelectedText}
+          onGenerate={handleSmartWritingGenerate}
+          novelContext={novelContext || {}}
+          allCharacters={allCharacters}
+          allLocations={allLocations}
+          allSettings={allSettings}
+          currentTimelineNode={timeline && timeline.length > 0 ? timeline[0] : undefined}
+          isGenerating={isGeneratingSmartWriting}
+          presetRewriteStyle={smartWritingMode === 'rewrite' ? presetRewriteStyle : undefined}
+        />
+      )}
+
+      {/* 智能续写/重写候选版本Modal */}
+      {smartWritingMode && (
+        <SmartWritingCandidatesModal
+          isOpen={smartWritingCandidatesOpen}
+          onClose={() => {
+            setSmartWritingCandidatesOpen(false);
+            setSmartWritingCandidates([]);
+          }}
+          mode={smartWritingMode}
+          candidates={smartWritingCandidates}
+          onApply={handleApplySmartWritingCandidate}
+        />
       )}
     </div>
   );
