@@ -114,7 +114,7 @@ export default async function RootLayout({
             }}
           >
             {children}
-            <Toaster position="top-right" richColors />
+            <Toaster position="bottom-right" richColors />
           </SWRProvider>
         </NextIntlClientProvider>
       </body>

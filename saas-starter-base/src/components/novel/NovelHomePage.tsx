@@ -16,7 +16,8 @@ import {
   Settings,
   Calendar,
   PenTool,
-  ChevronRight
+  ChevronRight,
+  Cog
 } from 'lucide-react';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { Button } from '@/components/ui/button';
@@ -83,6 +84,12 @@ const featureItems: FeatureItem[] = [
     description: '规划重要事件流程',
     href: '/novel/events',
     icon: <Calendar className="h-5 w-5" />
+  },
+  {
+    name: '应用设置',
+    description: '配置应用参数和偏好',
+    href: '/novel/app-settings',
+    icon: <Cog className="h-5 w-5" />
   }
 ];
 
