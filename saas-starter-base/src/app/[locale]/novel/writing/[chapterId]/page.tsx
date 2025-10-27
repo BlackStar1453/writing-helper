@@ -14,7 +14,7 @@ import { useLocations } from '@/lib/novel/hooks/use-locations';
 import { useSettings } from '@/lib/novel/hooks/use-settings';
 import { useEvents } from '@/lib/novel/hooks/use-events';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
-import { NovelContext, Chapter, ChapterTimelineItem } from '@/lib/novel/types';
+import { NovelContext, Chapter, ChapterTimelineItem, ChapterVersion } from '@/lib/novel/types';
 import { getSettings } from '@/lib/db-utils';
 import { GenerateDraftSettingsModal, GenerateDraftSettings } from '@/components/novel/GenerateDraftSettingsModal';
 import { GenerateTimelineContentModal } from '@/components/novel/GenerateTimelineContentModal';
@@ -49,6 +49,10 @@ export default function ChapterWritingPage() {
   const [selectedTimelineItem, setSelectedTimelineItem] = useState<ChapterTimelineItem | null>(null);
   const [selectedTimelineIndex, setSelectedTimelineIndex] = useState<number>(-1);
 
+  // 版本控制状态
+  const [chapterVersions, setChapterVersions] = useState<ChapterVersion[]>([]);
+  const [currentVersion, setCurrentVersion] = useState<number>(1);
+
   // 加载章节数据
   useEffect(() => {
     loadChapter();
@@ -73,6 +77,10 @@ export default function ChapterWritingPage() {
       }
 
       setChapter(data);
+
+      // 加载版本历史
+      setChapterVersions(data.versions || []);
+      setCurrentVersion(data.currentVersion || 1);
 
       // 初始化NovelContext
       const selectedChars = characters.filter(c => data.selectedCharacters?.includes(c.id));
@@ -225,6 +233,31 @@ export default function ChapterWritingPage() {
 
         // 重新加载章节
         await loadChapter();
+
+        // 自动创建版本1（如果是第一次生成初稿）
+        if (chapterVersions.length === 0) {
+          const version1: ChapterVersion = {
+            id: `version-${Date.now()}`,
+            chapterId: chapter.id,
+            version: 1,
+            content: data.content,
+            timeline: timeline,
+            createdAt: new Date(),
+            description: '初稿',
+          };
+
+          await updateChapter(chapter.id, {
+            versions: [version1],
+            currentVersion: 1,
+          });
+
+          setChapterVersions([version1]);
+          setCurrentVersion(1);
+
+          toast.success('初稿生成成功！已自动保存为版本 1');
+        } else {
+          toast.success('初稿生成成功！');
+        }
       }
     } catch (err) {
       console.error('Failed to generate draft:', err);
@@ -342,6 +375,67 @@ export default function ChapterWritingPage() {
     }
   };
 
+  // 重新生成Timeline节点内容（基于修改建议）
+  const handleRegenerateTimelineContent = async (timelineItem: ChapterTimelineItem, index: number) => {
+    try {
+      if (!chapter) return;
+
+      setGeneratingTimelineItemId(timelineItem.id);
+
+      // 获取API设置
+      const apiSettings = await getSettings();
+      if (!apiSettings.apiToken) {
+        toast.error('请先在设置中配置 API Token');
+        return;
+      }
+
+      // 使用当前的novelContext（包含已选择的人物、地点等）
+      const context = {
+        ...novelContext,
+      };
+
+      // 构建请求数据
+      const requestData = {
+        currentContent: chapter.content || '',
+        timeline: chapter.timeline || [],
+        targetItem: timelineItem,
+        targetIndex: index,
+        chapterInfo: context.chapterInfo,
+        context,
+        apiToken: apiSettings.apiToken,
+        model: apiSettings.aiModel,
+      };
+
+      // 调用API重新生成内容
+      const response = await fetch('/api/novel/regenerate-timeline-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to regenerate timeline content');
+      }
+
+      const data = await response.json();
+
+      // 保存候选版本供用户选择
+      setCandidateVersions({
+        timelineItemId: data.timelineItemId,
+        versions: data.versions,
+      });
+
+      toast.success('已生成3个候选版本，请选择一个应用');
+    } catch (err) {
+      console.error('Failed to regenerate timeline content:', err);
+      toast.error('重新生成内容失败: ' + (err instanceof Error ? err.message : '未知错误'));
+    } finally {
+      setGeneratingTimelineItemId(null);
+    }
+  };
+
   // 应用选中的版本
   const handleApplyVersion = async (version: ContentVersion) => {
     try {
@@ -420,6 +514,102 @@ export default function ChapterWritingPage() {
     window.dispatchEvent(event);
   };
 
+  // 保存新版本
+  const handleSaveVersion = async (description?: string) => {
+    try {
+      if (!chapter) return;
+
+      const nextVersion = currentVersion + 1;
+
+      // 创建新版本
+      const newVersion: ChapterVersion = {
+        id: `version-${Date.now()}`,
+        chapterId: chapter.id,
+        version: nextVersion,
+        content: chapter.content,
+        timeline: chapter.timeline || [],
+        createdAt: new Date(),
+        description: description || `第${nextVersion}次修改`,
+      };
+
+      // 添加新版本到列表
+      const updatedVersions = [...chapterVersions, newVersion];
+
+      // 限制版本数量为10个
+      if (updatedVersions.length > 10) {
+        updatedVersions.shift(); // 删除最旧的版本
+      }
+
+      // 更新章节
+      await updateChapter(chapter.id, {
+        versions: updatedVersions,
+        currentVersion: nextVersion,
+      });
+
+      // 更新本地状态
+      setChapterVersions(updatedVersions);
+      setCurrentVersion(nextVersion);
+
+      toast.success(`版本 ${nextVersion} 保存成功！`);
+    } catch (err) {
+      console.error('Failed to save version:', err);
+      toast.error('保存版本失败: ' + (err instanceof Error ? err.message : '未知错误'));
+    }
+  };
+
+  // 加载指定版本
+  const handleLoadVersion = async (version: number) => {
+    try {
+      if (!chapter) return;
+
+      const targetVersion = chapterVersions.find(v => v.version === version);
+      if (!targetVersion) {
+        toast.error('版本不存在');
+        return;
+      }
+
+      // 更新章节内容和timeline
+      await updateChapter(chapter.id, {
+        content: targetVersion.content,
+        timeline: targetVersion.timeline,
+        currentVersion: version,
+      });
+
+      // 更新本地状态
+      setCurrentVersion(version);
+
+      // 重新加载章节
+      await loadChapter();
+
+      toast.success(`已切换到版本 ${version}`);
+    } catch (err) {
+      console.error('Failed to load version:', err);
+      toast.error('加载版本失败: ' + (err instanceof Error ? err.message : '未知错误'));
+    }
+  };
+
+  // 删除版本
+  const handleDeleteVersion = async (versionId: string) => {
+    try {
+      if (!chapter) return;
+
+      const updatedVersions = chapterVersions.filter(v => v.id !== versionId);
+
+      // 更新章节
+      await updateChapter(chapter.id, {
+        versions: updatedVersions,
+      });
+
+      // 更新本地状态
+      setChapterVersions(updatedVersions);
+
+      toast.success('版本删除成功！');
+    } catch (err) {
+      console.error('Failed to delete version:', err);
+      toast.error('删除版本失败: ' + (err instanceof Error ? err.message : '未知错误'));
+    }
+  };
+
   if (loading) {
     return (
       <NovelNav>
@@ -485,8 +675,14 @@ export default function ChapterWritingPage() {
           onApplyVersion={handleApplyVersion}
           onClearCandidates={handleClearCandidates}
           onJumpToTimelineContent={handleJumpToTimelineContent}
+          onRegenerateTimelineContent={handleRegenerateTimelineContent}
           isOpen={isWritingModalOpen}
           onOpenChange={setIsWritingModalOpen}
+          chapterVersions={chapterVersions}
+          currentVersion={currentVersion}
+          onSaveVersion={handleSaveVersion}
+          onLoadVersion={handleLoadVersion}
+          onDeleteVersion={handleDeleteVersion}
         />
 
         {/* 生成初稿设置Modal */}
@@ -541,6 +737,7 @@ function WritingModalWrapper({
   onSubmit,
   onTimelineChange,
   onGenerateTimelineContent,
+  onRegenerateTimelineContent,
   generatingTimelineItemId,
   candidateVersions,
   onApplyVersion,
@@ -548,6 +745,11 @@ function WritingModalWrapper({
   onJumpToTimelineContent,
   isOpen,
   onOpenChange,
+  chapterVersions,
+  currentVersion,
+  onSaveVersion,
+  onLoadVersion,
+  onDeleteVersion,
 }: {
   chapter: Chapter;
   novelContext: NovelContext;
@@ -557,6 +759,7 @@ function WritingModalWrapper({
   onSubmit: (data: { text: string }) => void;
   onTimelineChange: (timeline: ChapterTimelineItem[]) => void;
   onGenerateTimelineContent: (timelineItem: ChapterTimelineItem, index: number) => void;
+  onRegenerateTimelineContent: (timelineItem: ChapterTimelineItem, index: number) => void;
   generatingTimelineItemId: string | null;
   candidateVersions: CandidateVersions | null;
   onApplyVersion: (version: ContentVersion) => void;
@@ -564,12 +767,19 @@ function WritingModalWrapper({
   onJumpToTimelineContent: (timelineItemId: string) => void;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  chapterVersions: ChapterVersion[];
+  currentVersion: number;
+  onSaveVersion: (description?: string) => void;
+  onLoadVersion: (version: number) => void;
+  onDeleteVersion: (versionId: string) => void;
 }) {
   const [text, setText] = useState(chapter.content || '');
+  const [initialContent, setInitialContent] = useState(chapter.content || '');
 
-  // 当chapter.content变化时更新text状态
+  // 当chapter.content变化时更新text状态和初始内容
   useEffect(() => {
     setText(chapter.content || '');
+    setInitialContent(chapter.content || '');
   }, [chapter.content]);
 
   useEffect(() => {
@@ -579,9 +789,20 @@ function WritingModalWrapper({
   }, [onOpenChange]);
 
   // 关闭时自动保存
-  const handleClose = () => {
+  const handleClose = async () => {
     // 保存当前内容
     onSubmit({ text });
+
+    // 检查内容是否有变化
+    const hasContentChanged = text !== initialContent;
+
+    // 如果内容有变化且已有版本历史，自动保存新版本
+    if (hasContentChanged && chapterVersions.length > 0) {
+      // 自动生成版本描述
+      const autoDescription = `第${currentVersion + 1}次修改`;
+      onSaveVersion(autoDescription);
+    }
+
     // 关闭modal
     onOpenChange(false);
   };
@@ -601,11 +822,17 @@ function WritingModalWrapper({
       timeline={chapter.timeline || []}
       onTimelineChange={onTimelineChange}
       onGenerateTimelineContent={onGenerateTimelineContent}
+      onRegenerateTimelineContent={onRegenerateTimelineContent}
       generatingTimelineItemId={generatingTimelineItemId}
       candidateVersions={candidateVersions}
       onApplyVersion={onApplyVersion}
       onClearCandidates={onClearCandidates}
       onJumpToTimelineContent={onJumpToTimelineContent}
+      chapterVersions={chapterVersions}
+      currentVersion={currentVersion}
+      onSaveVersion={onSaveVersion}
+      onLoadVersion={onLoadVersion}
+      onDeleteVersion={onDeleteVersion}
     />
   );
 }

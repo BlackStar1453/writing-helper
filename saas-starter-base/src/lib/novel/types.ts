@@ -159,6 +159,20 @@ export interface ChapterTimelineItem {
   id: string;
   order: number;
   content: string;
+  modificationSuggestion?: string; // 修改建议
+  isReviewed?: boolean; // 是否已审核（用于段落保留功能）
+}
+
+// ========== 章节版本 ==========
+
+export interface ChapterVersion {
+  id: string;
+  chapterId: string;
+  version: number; // 版本号（1, 2, 3...）
+  content: string; // 完整章节内容
+  timeline: ChapterTimelineItem[]; // 时间线快照
+  createdAt: Date;
+  description: string; // 版本描述（如"初稿"、"第1次修改"）
 }
 
 export interface Chapter {
@@ -174,6 +188,8 @@ export interface Chapter {
   plotSummary?: string; // 情节概括
   chapterPrompt?: string; // 章节Prompt
   timeline?: ChapterTimelineItem[]; // 剧情时间线
+  currentVersion?: number; // 当前版本号
+  versions?: ChapterVersion[]; // 版本历史（最多保存10个）
   createdAt: Date;
   updatedAt: Date;
 }
