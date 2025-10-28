@@ -1,7 +1,6 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Manrope } from 'next/font/google';
-import { getUser } from '@/lib/db/queries';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Toaster } from 'sonner';
@@ -106,13 +105,7 @@ export default async function RootLayout({
     >
       <body className="min-h-[100dvh] bg-gray-50">
         <NextIntlClientProvider messages={messages}>
-          <SWRProvider
-            fallback={{
-              // We do NOT await here
-              // Only components that read this data will suspend
-              '/api/user': getUser(),
-            }}
-          >
+          <SWRProvider>
             {children}
             <Toaster position="bottom-right" richColors />
           </SWRProvider>
