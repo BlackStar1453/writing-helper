@@ -13,7 +13,7 @@ export function createTimelineMarker(timelineItemId: string, content: string): s
 
 /**
  * 在正确的位置插入Timeline节点对应的内容
- * 
+ *
  * @param currentContent 当前章节内容
  * @param newContent 新生成的内容(已包含标记)
  * @param targetTimelineId 目标timeline节点ID
@@ -33,6 +33,34 @@ export function insertContentAtTimelinePosition(
     return newContent;
   }
 
+  // 检查是否已存在该节点的内容,如果存在则替换
+  const targetStartMarker = `<!-- TIMELINE_NODE:${targetTimelineId} -->`;
+  const targetEndMarker = `<!-- /TIMELINE_NODE -->`;
+  const existingStartPos = currentContent.indexOf(targetStartMarker);
+
+  if (existingStartPos !== -1) {
+    // 找到了该节点的现有内容,进行替换
+    const contentStart = existingStartPos + targetStartMarker.length;
+    const existingEndPos = currentContent.indexOf(targetEndMarker, contentStart);
+
+    if (existingEndPos !== -1) {
+      // 提取新内容(去除标记)
+      const newContentWithoutMarkers = newContent
+        .replace(targetStartMarker, '')
+        .replace(targetEndMarker, '')
+        .trim();
+
+      // 替换现有内容
+      return (
+        currentContent.slice(0, contentStart) +
+        `\n${newContentWithoutMarkers}\n` +
+        currentContent.slice(existingEndPos)
+      );
+    }
+  }
+
+  // 如果不存在该节点的内容,则插入到正确位置
+
   // 如果是第一个节点,插入到开头
   if (targetIndex === 0) {
     return `${newContent}\n\n${currentContent}`;
@@ -45,17 +73,26 @@ export function insertContentAtTimelinePosition(
     return `${currentContent}\n\n${newContent}`;
   }
 
-  const prevEndMarker = `<!-- /TIMELINE_NODE:${prevNode.id} -->`;
-  const insertPos = currentContent.indexOf(prevEndMarker);
+  // 正确的结束标记格式(不包含ID)
+  const prevStartMarker = `<!-- TIMELINE_NODE:${prevNode.id} -->`;
+  const prevEndMarker = `<!-- /TIMELINE_NODE -->`;
 
-  if (insertPos !== -1) {
-    // 找到了前一个节点的标记,在其后插入
-    const insertPoint = insertPos + prevEndMarker.length;
-    return (
-      currentContent.slice(0, insertPoint) +
-      `\n\n${newContent}\n\n` +
-      currentContent.slice(insertPoint)
-    );
+  // 查找前一个节点的开始位置
+  const prevStartPos = currentContent.indexOf(prevStartMarker);
+
+  if (prevStartPos !== -1) {
+    // 从前一个节点的开始位置之后查找结束标记
+    const prevEndPos = currentContent.indexOf(prevEndMarker, prevStartPos);
+
+    if (prevEndPos !== -1) {
+      // 找到了前一个节点的标记,在其后插入
+      const insertPoint = prevEndPos + prevEndMarker.length;
+      return (
+        currentContent.slice(0, insertPoint) +
+        `\n\n${newContent}\n\n` +
+        currentContent.slice(insertPoint)
+      );
+    }
   }
 
   // 如果找不到标记,说明是旧内容或用户手动编辑过

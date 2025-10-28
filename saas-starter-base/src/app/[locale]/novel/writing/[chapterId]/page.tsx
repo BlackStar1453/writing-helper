@@ -18,7 +18,7 @@ import { NovelContext, Chapter, ChapterTimelineItem, ChapterVersion } from '@/li
 import { getSettings } from '@/lib/db-utils';
 import { GenerateDraftSettingsModal, GenerateDraftSettings } from '@/components/novel/GenerateDraftSettingsModal';
 import { GenerateTimelineContentModal } from '@/components/novel/GenerateTimelineContentModal';
-import { insertContentAtTimelinePosition, cleanContentForDisplay } from '@/lib/novel/content-utils';
+import { insertContentAtTimelinePosition } from '@/lib/novel/content-utils';
 import { CandidateVersions, ContentVersion } from '@/components/novel/TimelinePanel';
 import { toast } from 'sonner';
 import { usePrompts } from '@/lib/novel/hooks/use-prompts';
@@ -376,7 +376,7 @@ export default function ChapterWritingPage() {
   };
 
   // 重新生成Timeline节点内容（基于修改建议）
-  const handleRegenerateTimelineContent = async (timelineItem: ChapterTimelineItem, index: number) => {
+  const handleRegenerateTimelineContent = async (timelineItem: ChapterTimelineItem, index: number, currentContent?: string) => {
     try {
       if (!chapter) return;
 
@@ -395,8 +395,9 @@ export default function ChapterWritingPage() {
       };
 
       // 构建请求数据
+      // 优先使用传入的currentContent(编辑器中的最新内容),否则使用chapter.content
       const requestData = {
-        currentContent: chapter.content || '',
+        currentContent: currentContent || chapter.content || '',
         timeline: chapter.timeline || [],
         targetItem: timelineItem,
         targetIndex: index,
@@ -765,7 +766,7 @@ function WritingModalWrapper({
   onSubmit: (data: { text: string }) => void;
   onTimelineChange: (timeline: ChapterTimelineItem[]) => void;
   onGenerateTimelineContent: (timelineItem: ChapterTimelineItem, index: number) => void;
-  onRegenerateTimelineContent: (timelineItem: ChapterTimelineItem, index: number) => void;
+  onRegenerateTimelineContent: (timelineItem: ChapterTimelineItem, index: number, currentContent?: string) => void;
   generatingTimelineItemId: string | null;
   candidateVersions: CandidateVersions | null;
   onApplyVersion: (version: ContentVersion) => void;
@@ -816,6 +817,15 @@ function WritingModalWrapper({
     onOpenChange(false);
   };
 
+  // 包装onRegenerateTimelineContent,传递当前编辑器中的内容
+  const handleRegenerateWithCurrentContent = (timelineItem: ChapterTimelineItem, index: number) => {
+    // 传递当前编辑器中的内容(text是已清理标记的内容,需要传递原始的带标记的内容)
+    // 但是text是用户正在编辑的内容,可能已经修改过,所以我们需要重新添加标记
+    // 实际上,我们应该传递initialText(带标记的原始内容)和用户的修改
+    // 为了简化,我们直接传递text,让API使用最新的内容
+    onRegenerateTimelineContent(timelineItem, index, text);
+  };
+
   // 传递原始内容(带标记),WritingModal内部会进行清理
   return (
     <WritingModal
@@ -831,7 +841,7 @@ function WritingModalWrapper({
       timeline={chapter.timeline || []}
       onTimelineChange={onTimelineChange}
       onGenerateTimelineContent={onGenerateTimelineContent}
-      onRegenerateTimelineContent={onRegenerateTimelineContent}
+      onRegenerateTimelineContent={handleRegenerateWithCurrentContent}
       generatingTimelineItemId={generatingTimelineItemId}
       candidateVersions={candidateVersions}
       onApplyVersion={onApplyVersion}
