@@ -183,6 +183,7 @@ export default function ChapterWritingPage() {
           selectedCharacters: settings.selectedCharacters,
           selectedLocations: settings.selectedLocations,
           selectedSettings: settings.selectedSettings,
+          selectedPrompts: settings.selectedPrompts, // 添加Prompt卡片
           plotSummary: settings.plotSummary,
           globalPrompt: settings.globalPrompt,
           chapterPrompt: settings.chapterPrompt,

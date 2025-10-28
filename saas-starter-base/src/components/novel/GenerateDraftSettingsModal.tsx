@@ -8,8 +8,9 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Chapter, Character, Location, SettingCard, EventCard, ChapterTimelineItem } from '@/lib/novel/types';
+import { Chapter, Character, Location, SettingCard, EventCard, ChapterTimelineItem, PromptCard } from '@/lib/novel/types';
 import { Pencil, Trash2, Loader2 } from 'lucide-react';
+import { usePrompts } from '@/lib/novel/hooks/use-prompts';
 
 export interface GenerateDraftSettings {
   referenceChapters: Chapter[]; // 参考章节
@@ -17,6 +18,7 @@ export interface GenerateDraftSettings {
   selectedLocations: Location[]; // 选中的地点
   selectedSettings: SettingCard[]; // 选中的设定卡片
   selectedEvents: EventCard[]; // 选中的事件卡片
+  selectedPrompts: PromptCard[]; // 选中的Prompt卡片
   plotSummary: string; // 情节概括
   chapterPrompt: string; // 章节Prompt
   globalPrompt: string; // 全局Prompt
@@ -58,12 +60,16 @@ export function GenerateDraftSettingsModal({
   const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
   const [selectedSettingIds, setSelectedSettingIds] = useState<string[]>([]);
   const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
+  const [selectedPromptIds, setSelectedPromptIds] = useState<string[]>([]);
   const [plotSummary, setPlotSummary] = useState('');
   const [chapterPrompt, setChapterPrompt] = useState('');
   const [globalPrompt, setGlobalPrompt] = useState('');
   const [timeline, setTimeline] = useState<ChapterTimelineItem[]>(initialTimeline);
   const [editingTimelineId, setEditingTimelineId] = useState<string | null>(null);
   const [editingTimelineContent, setEditingTimelineContent] = useState('');
+
+  // 获取Prompt卡片
+  const { prompts } = usePrompts(currentChapterId.split('-')[0]); // 使用novelId
 
   // 初始化设置
   useEffect(() => {
@@ -73,6 +79,7 @@ export function GenerateDraftSettingsModal({
       setSelectedLocationIds(initialSettings.selectedLocations?.map(l => l.id) || []);
       setSelectedSettingIds(initialSettings.selectedSettings?.map(s => s.id) || []);
       setSelectedEventIds(initialSettings.selectedEvents?.map(e => e.id) || []);
+      setSelectedPromptIds(initialSettings.selectedPrompts?.map(p => p.id) || []);
       setPlotSummary(initialSettings.plotSummary || '');
       setChapterPrompt(initialSettings.chapterPrompt || '');
       setGlobalPrompt(initialSettings.globalPrompt || '');
@@ -127,6 +134,15 @@ export function GenerateDraftSettingsModal({
     );
   };
 
+  // 切换Prompt选择
+  const togglePrompt = (promptId: string) => {
+    setSelectedPromptIds(prev =>
+      prev.includes(promptId)
+        ? prev.filter(id => id !== promptId)
+        : [...prev, promptId]
+    );
+  };
+
   // 构建设置对象
   const buildSettings = (): GenerateDraftSettings => {
     return {
@@ -135,6 +151,7 @@ export function GenerateDraftSettingsModal({
       selectedLocations: allLocations.filter(l => selectedLocationIds.includes(l.id)),
       selectedSettings: allSettings.filter(s => selectedSettingIds.includes(s.id)),
       selectedEvents: allEvents.filter(e => selectedEventIds.includes(e.id)),
+      selectedPrompts: prompts.filter(p => selectedPromptIds.includes(p.id)),
       plotSummary,
       chapterPrompt,
       globalPrompt,
@@ -360,6 +377,40 @@ export function GenerateDraftSettingsModal({
                   </label>
                 ))
               )}
+            </div>
+          </div>
+
+          {/* Prompt卡片选择 */}
+          <div>
+            <Label className="text-lg font-semibold mb-2 block">
+              写作风格 (可选)
+            </Label>
+            <p className="text-sm text-gray-600 mb-3">选择Prompt卡片来指定生成初稿的语言风格</p>
+            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border border-gray-200 dark:border-gray-700 rounded">
+              {prompts.length === 0 ? (
+                <div className="text-sm text-gray-500 font-light">
+                  暂无Prompt卡片,可在Prompt管理页面创建
+                </div>
+              ) : (
+                prompts.map((prompt) => (
+                  <button
+                    key={prompt.id}
+                    type="button"
+                    onClick={() => togglePrompt(prompt.id)}
+                    className={`px-3 py-1.5 text-sm rounded-md border transition-colors ${
+                      selectedPromptIds.includes(prompt.id)
+                        ? 'bg-blue-500 text-white border-blue-500'
+                        : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }`}
+                    title={prompt.description}
+                  >
+                    {prompt.name}
+                  </button>
+                ))
+              )}
+            </div>
+            <div className="text-xs text-gray-500 mt-1 font-light">
+              如果不选择Prompt卡片,将使用与上下文统一的语言风格
             </div>
           </div>
 
