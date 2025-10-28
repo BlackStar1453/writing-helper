@@ -266,12 +266,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState<number | null>(null); // 选中的suggestion索引
   const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number } | null>(null); // popover位置
   const [showPopover, setShowPopover] = useState(false); // 是否显示popover
-  const [selectionPopup, setSelectionPopup] = useState<{ show: boolean; selectedText: string; context: string; position: { x: number; y: number } }>({
-    show: false,
-    selectedText: '',
-    context: '',
-    position: { x: 0, y: 0 }
-  }); // 文本选择popup
   const [showHistorySidebar, setShowHistorySidebar] = useState(false); // 是否显示chat历史记录侧边栏
   const [showWritingHistorySidebar, setShowWritingHistorySidebar] = useState(false); // 是否显示写作历史记录侧边栏
   const [showVersionHistorySidebar, setShowVersionHistorySidebar] = useState(false); // 是否显示版本历史侧边栏
@@ -298,12 +292,19 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
   const [smartWritingSelectionEnd, setSmartWritingSelectionEnd] = useState(0);
   const [smartWritingSelectedText, setSmartWritingSelectedText] = useState('');
 
+  // 选中文本状态(用于在Suggestions tab中显示)
+  const [selectedTextInfo, setSelectedTextInfo] = useState<{
+    text: string;
+    start: number;
+    end: number;
+    context: string;
+  } | null>(null);
+
   const linterRef = useRef<any>(null);
   const agentMessagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
-  const selectionPopupRef = useRef<HTMLDivElement>(null);
   const historySidebarRef = useRef<HTMLDivElement>(null);
   const writingHistorySidebarRef = useRef<HTMLDivElement>(null);
   const versionHistorySidebarRef = useRef<HTMLDivElement>(null);
@@ -581,74 +582,23 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
 
       const context = fullText.substring(sentenceStart, sentenceEnd).trim();
 
-      // 使用鼠标位置来定位popup,显示在选中内容下方
-      const mouseX = e.clientX;
-      const mouseY = e.clientY;
-
-      setSelectionPopup({
-        show: true,
-        selectedText,
-        context,
-        position: {
-          x: mouseX,
-          y: mouseY + 10 // 在鼠标位置下方10px
-        }
+      // 更新选中文本状态
+      setSelectedTextInfo({
+        text: selectedText,
+        start: selectionStart,
+        end: selectionEnd,
+        context
       });
+
+      // 切换到Suggestions tab
+      setRightPanelView('suggestions');
 
       // 关闭suggestion popover
       setShowPopover(false);
     } else {
-      // 如果没有选中文本,关闭popup
-      setSelectionPopup({ show: false, selectedText: '', context: '', position: { x: 0, y: 0 } });
+      // 如果没有选中文本,清除选中文本状态
+      setSelectedTextInfo(null);
     }
-  };
-
-  // 处理selection popup的action
-  const handleSelectionAction = (menuId: string) => {
-    const { selectedText, context } = selectionPopup;
-
-    // 查找对应的Menu卡片
-    const menu = enabledMenus.find(m => m.id === menuId && m.enabled);
-    if (!menu) {
-      console.error('Menu not found:', menuId);
-      return;
-    }
-
-    // 替换占位符
-    let question = menu.promptTemplate
-      .replace(/\{\{selectedText\}\}/g, selectedText)
-      .replace(/\{\{context\}\}/g, context);
-
-    // 如果Menu关联了Prompt卡片,添加Prompt上下文
-    if (menu.promptCardIds && menu.promptCardIds.length > 0) {
-      const relatedPrompts = prompts.filter(p => menu.promptCardIds!.includes(p.id));
-      if (relatedPrompts.length > 0) {
-        const promptContext = relatedPrompts.map(p =>
-          `【Prompt: ${p.name}】\n描述: ${p.description}\n示例前: ${p.exampleBefore}\n示例后: ${p.exampleAfter}`
-        ).join('\n\n');
-        question = `${promptContext}\n\n${question}`;
-      }
-    }
-
-    // 如果Menu关联了人物卡片,添加人物上下文
-    if (menu.characterIds && menu.characterIds.length > 0) {
-      const relatedCharacters = characters.filter(c => menu.characterIds!.includes(c.id));
-      if (relatedCharacters.length > 0) {
-        const characterContext = relatedCharacters.map(c =>
-          `【人物: ${c.name}】\n描述: ${c.description}\n性格: ${c.personality}\n背景: ${c.background}`
-        ).join('\n\n');
-        question = `${characterContext}\n\n${question}`;
-      }
-    }
-
-    // 发送到Agent Chat,并创建新的chat会话
-    if (onAgentSendMessage) {
-      onAgentSendMessage(question, menu.name);
-      setRightPanelView('agent');
-    }
-
-    // 关闭popup
-    setSelectionPopup({ show: false, selectedText: '', context: '', position: { x: 0, y: 0 } });
   };
 
   // ========== 智能续写/重写相关方法 ==========
@@ -669,9 +619,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     // 打开设置Modal
     setSmartWritingMode('continue');
     setSmartWritingSettingsOpen(true);
-
-    // 关闭选择popup
-    setSelectionPopup({ show: false, selectedText: '', context: '', position: { x: 0, y: 0 } });
   };
 
   // 打开重写设置Modal
@@ -696,9 +643,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     // 打开设置Modal
     setSmartWritingMode('rewrite');
     setSmartWritingSettingsOpen(true);
-
-    // 关闭选择popup
-    setSelectionPopup({ show: false, selectedText: '', context: '', position: { x: 0, y: 0 } });
   };
 
   // 生成智能续写/重写内容
@@ -1010,16 +954,11 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
           setShowPopover(false);
         }
       }
-
-      // 关闭selection popup
-      if (selectionPopup.show && selectionPopupRef.current && !selectionPopupRef.current.contains(e.target as Node)) {
-        setSelectionPopup({ show: false, selectedText: '', context: '', position: { x: 0, y: 0 } });
-      }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showPopover, selectionPopup.show]);
+  }, [showPopover]);
   
   // ESC键关闭
   useEffect(() => {
@@ -1359,24 +1298,187 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                   {rightPanelView === 'suggestions' ? (
                     /* Analysis界面 - 只显示AI suggestions */
                     <>
+                      {/* 选中文本显示区域 */}
+                      {selectedTextInfo && (
+                        <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3 mb-3">
+                          <div className="flex items-center gap-2 mb-2">
+                            <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                            </svg>
+                            <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">选中的文本</span>
+                            <button
+                              onClick={() => setSelectedTextInfo(null)}
+                              className="ml-auto text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+
+                          {/* 选中文本的缩略显示 */}
+                          <div
+                            className="text-sm text-gray-700 dark:text-gray-300 mb-3 p-2 bg-white dark:bg-gray-800 rounded border border-purple-100 dark:border-purple-900 cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors"
+                            onClick={() => {
+                              // 跳转到选中文本位置
+                              if (textareaRef.current) {
+                                textareaRef.current.focus();
+                                textareaRef.current.setSelectionRange(selectedTextInfo.start, selectedTextInfo.end);
+                                textareaRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                              }
+                            }}
+                            title="点击跳转到文本位置"
+                          >
+                            "{selectedTextInfo.text.length > 100 ? selectedTextInfo.text.substring(0, 100) + '...' : selectedTextInfo.text}"
+                          </div>
+
+                          {/* 操作按钮 */}
+                          <div className="flex flex-col gap-2">
+                            {/* 续写按钮 */}
+                            <button
+                              onClick={() => {
+                                setSmartWritingSelectionStart(selectedTextInfo.start);
+                                setSmartWritingSelectionEnd(selectedTextInfo.end);
+                                setSmartWritingSelectedText(selectedTextInfo.text);
+                                setSmartWritingMode('continue');
+                                setSmartWritingSettingsOpen(true);
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300 flex items-center gap-2"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                              续写
+                            </button>
+
+                            {/* 重写按钮组 */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <button
+                                onClick={() => {
+                                  setSmartWritingSelectionStart(selectedTextInfo.start);
+                                  setSmartWritingSelectionEnd(selectedTextInfo.end);
+                                  setSmartWritingSelectedText(selectedTextInfo.text);
+                                  setPresetRewriteStyle('vivid');
+                                  setSmartWritingMode('rewrite');
+                                  setSmartWritingSettingsOpen(true);
+                                }}
+                                className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                              >
+                                更生动
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSmartWritingSelectionStart(selectedTextInfo.start);
+                                  setSmartWritingSelectionEnd(selectedTextInfo.end);
+                                  setSmartWritingSelectedText(selectedTextInfo.text);
+                                  setPresetRewriteStyle('concise');
+                                  setSmartWritingMode('rewrite');
+                                  setSmartWritingSettingsOpen(true);
+                                }}
+                                className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                              >
+                                更简洁
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSmartWritingSelectionStart(selectedTextInfo.start);
+                                  setSmartWritingSelectionEnd(selectedTextInfo.end);
+                                  setSmartWritingSelectedText(selectedTextInfo.text);
+                                  setPresetRewriteStyle('emotional');
+                                  setSmartWritingMode('rewrite');
+                                  setSmartWritingSettingsOpen(true);
+                                }}
+                                className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                              >
+                                增强情感
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSmartWritingSelectionStart(selectedTextInfo.start);
+                                  setSmartWritingSelectionEnd(selectedTextInfo.end);
+                                  setSmartWritingSelectedText(selectedTextInfo.text);
+                                  setPresetRewriteStyle('character-based');
+                                  setSmartWritingMode('rewrite');
+                                  setSmartWritingSettingsOpen(true);
+                                }}
+                                className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                              >
+                                保持人物性格
+                              </button>
+                            </div>
+
+                            {/* Menu卡片操作 */}
+                            {enabledMenus.filter(m => m.enabled).length > 0 && (
+                              <>
+                                <div className="border-t border-purple-200 dark:border-purple-800 my-1"></div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  {enabledMenus.filter(m => m.enabled).sort((a, b) => a.order - b.order).slice(0, 4).map(menu => (
+                                    <button
+                                      key={menu.id}
+                                      onClick={() => {
+                                        // 使用Menu卡片的prompt模板
+                                        let question = menu.promptTemplate
+                                          .replace(/\{\{selectedText\}\}/g, selectedTextInfo.text)
+                                          .replace(/\{\{context\}\}/g, selectedTextInfo.context);
+
+                                        // 如果Menu关联了Prompt卡片,添加Prompt上下文
+                                        if (menu.promptCardIds && menu.promptCardIds.length > 0) {
+                                          const relatedPrompts = prompts.filter(p => menu.promptCardIds!.includes(p.id));
+                                          if (relatedPrompts.length > 0) {
+                                            const promptContext = relatedPrompts.map(p =>
+                                              `【Prompt: ${p.name}】\n描述: ${p.description}\n示例前: ${p.exampleBefore}\n示例后: ${p.exampleAfter}`
+                                            ).join('\n\n');
+                                            question = `${promptContext}\n\n${question}`;
+                                          }
+                                        }
+
+                                        // 如果Menu关联了人物卡片,添加人物上下文
+                                        if (menu.characterIds && menu.characterIds.length > 0) {
+                                          const relatedCharacters = characters.filter(c => menu.characterIds!.includes(c.id));
+                                          if (relatedCharacters.length > 0) {
+                                            const characterContext = relatedCharacters.map(c =>
+                                              `【人物: ${c.name}】\n描述: ${c.description}\n性格: ${c.personality}\n背景: ${c.background}`
+                                            ).join('\n\n');
+                                            question = `${characterContext}\n\n${question}`;
+                                          }
+                                        }
+
+                                        // 发送到Agent Chat
+                                        if (onAgentSendMessage) {
+                                          onAgentSendMessage(question, menu.name);
+                                          setRightPanelView('agent');
+                                        }
+                                      }}
+                                      className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300 truncate"
+                                      title={menu.description}
+                                    >
+                                      {menu.name}
+                                    </button>
+                                  ))}
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       {isLoadingAISuggestions ? (
                         <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                           <div className="animate-spin w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full mx-auto mb-2"></div>
                           Analyzing with AI...
                         </div>
-                      ) : aiSuggestions.length === 0 ? (
+                      ) : aiSuggestions.length === 0 && !selectedTextInfo ? (
                         <div className="text-center py-8">
                           <svg className="w-12 h-12 mx-auto text-gray-300 dark:text-gray-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           <p className="text-gray-500 dark:text-gray-400 text-sm">No issues found</p>
                         </div>
-                      ) : (
-                        <>
+                      ) : null}
 
-                          {/* AI建议 */}
-                          {aiSuggestions.length > 0 && (
-                            <div>
+                      {/* AI建议 */}
+                      {aiSuggestions.length > 0 && (
+                        <div>
                               <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 px-1">
                                 AI Suggestions ({aiSuggestions.length})
                               </h3>
@@ -1455,8 +1557,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                               ))}
                             </div>
                           )}
-                        </>
-                      )}
                     </>
                   ) : rightPanelView === 'agent' ? (
                     /* Agent Chat界面 */
@@ -1633,111 +1733,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                 </>
               );
             })()}
-          </div>
-        )}
-
-        {/* Selection Popup */}
-        {selectionPopup.show && (
-          <div
-            ref={selectionPopupRef}
-            className="fixed z-50 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 p-2"
-            style={{
-              left: `${selectionPopup.position.x}px`,
-              top: `${selectionPopup.position.y}px`,
-            }}
-          >
-            <div className="text-xs text-gray-500 dark:text-gray-400 mb-2 px-2 pt-1">
-              "{selectionPopup.selectedText.length > 50 ? selectionPopup.selectedText.substring(0, 50) + '...' : selectionPopup.selectedText}"
-            </div>
-            <div className="flex flex-col gap-1">
-              {/* 续写选项 */}
-              <button
-                onClick={handleOpenContinueWriting}
-                className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300 flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                续写
-              </button>
-
-              {/* 重写选项（子菜单） */}
-              <div className="relative group">
-                <button className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300 flex items-center justify-between">
-                  <span className="flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                    重写
-                  </span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-
-                {/* 子菜单 */}
-                <div className="absolute left-full top-0 ml-1 hidden group-hover:block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg min-w-[140px] z-50">
-                  <button
-                    onClick={() => handleOpenRewrite('vivid')}
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                  >
-                    更生动
-                  </button>
-                  <button
-                    onClick={() => handleOpenRewrite('concise')}
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                  >
-                    更简洁
-                  </button>
-                  <button
-                    onClick={() => handleOpenRewrite('formal')}
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                  >
-                    更正式
-                  </button>
-                  <button
-                    onClick={() => handleOpenRewrite('casual')}
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                  >
-                    更口语化
-                  </button>
-                  <button
-                    onClick={() => handleOpenRewrite('emotional')}
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                  >
-                    增强情感
-                  </button>
-                  <button
-                    onClick={() => handleOpenRewrite('character-based')}
-                    className="w-full px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                  >
-                    保持人物性格
-                  </button>
-                </div>
-              </div>
-
-              {/* 分隔线 */}
-              {enabledMenus.filter(m => m.enabled).length > 0 && (
-                <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
-              )}
-
-              {/* 现有的Menu选项 */}
-              {enabledMenus.filter(m => m.enabled).sort((a, b) => a.order - b.order).map(menu => (
-                <button
-                  key={menu.id}
-                  onClick={() => handleSelectionAction(menu.id)}
-                  className="px-3 py-1.5 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                  title={menu.description}
-                >
-                  {menu.name}
-                </button>
-              ))}
-              {enabledMenus.filter(m => m.enabled).length === 0 && (
-                <div className="px-3 py-2 text-sm text-gray-500">
-                  暂无可用菜单项,请在Menu管理页面创建
-                </div>
-              )}
-            </div>
           </div>
         )}
 

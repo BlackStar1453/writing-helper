@@ -236,18 +236,7 @@ function SortableTimelineItem({
                     )}
                   </div>
                 </div>
-              ) : (
-                // 添加修改建议按钮
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => setEditingSuggestion(true)}
-                  className="text-xs text-amber-600 hover:text-amber-700"
-                >
-                  <Lightbulb className="h-3 w-3 mr-1" />
-                  添加修改建议
-                </Button>
-              )}
+              ) : null}
             </div>
           )}
         </div>
