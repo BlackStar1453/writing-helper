@@ -140,9 +140,6 @@ importers:
       drizzle-orm:
         specifier: ^0.43.1
         version: 0.43.1(@opentelemetry/api@1.9.0)(postgres@3.4.7)
-      harper.js:
-        specifier: ^0.68.0
-        version: 0.68.0
       jose:
         specifier: ^6.0.12
         version: 6.1.0
@@ -2847,9 +2844,6 @@ packages:
     resolution: {integrity: sha512-vafaFqs8MZkRrSX7sFVUdo3ap/eNiLnb4IakshzvP56X5Nr1iGKAIqdX6tMlm6HcNRIkr6AxO5jFEoJzzpT8aQ==}
     engines: {node: '>=0.4.7'}
     hasBin: true
-
-  harper.js@0.68.0:
-    resolution: {integrity: sha512-8oredBE/CElbqKm7DDl4oUyxltzvZXmvmdGD9xt3Hw+PWMaKD8OeWnAyeSgNc/IMAUEYmubBUbvR4y423zypSA==}
 
   has-flag@4.0.0:
     resolution: {integrity: sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==}
@@ -7149,8 +7143,6 @@ snapshots:
       wordwrap: 1.0.0
     optionalDependencies:
       uglify-js: 3.19.3
-
-  harper.js@0.68.0: {}
 
   has-flag@4.0.0: {}
 

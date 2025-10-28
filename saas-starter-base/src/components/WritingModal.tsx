@@ -451,7 +451,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
       return;
     }
 
-    // 写作模式下不需要Harper检测,传递空数组
     onSubmit({ userText: text, errors: [] });
   };
 

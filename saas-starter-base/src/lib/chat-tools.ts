@@ -42,7 +42,7 @@ export const analyzeTextTool = tool(
             .optional(),
           json: z.string().optional(),
         })
-      ).describe('Array of detected errors from Harper grammar checker'),
+      ).describe('Array of detected errors from grammar checker'),
     }),
   }
 );

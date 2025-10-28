@@ -33,7 +33,7 @@ export interface AISuggestion {
 }
 
 /**
- * AI结构化建议接口 (类似Harper格式)
+ * AI结构化建议接口
  */
 export interface AIStructuredSuggestion {
   start: number;
@@ -189,7 +189,7 @@ export function formatWritingMessage(data: WritingData): string {
   message += `【我的写作内容】\n${userText}\n\n`;
 
   if (errors.length > 0) {
-    message += `【Harper检测到的问题】\n`;
+    message += `【检测到的问题】\n`;
     message += `共发现 ${errors.length} 个问题:\n\n`;
 
     errors.forEach((error, index) => {
@@ -211,7 +211,7 @@ export function formatWritingMessage(data: WritingData): string {
       message += `\n`;
     });
   } else {
-    message += `【Harper检测结果】\n未发现语法或拼写错误。\n\n`;
+    message += `【检测结果】\n未发现语法或拼写错误。\n\n`;
   }
 
   message += `请帮我:\n`;

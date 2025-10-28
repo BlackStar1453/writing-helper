@@ -83,7 +83,6 @@
     "dotenv": "^16.6.1",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.43.1",
-    "harper.js": "^0.68.0",
     "jose": "^6.0.12",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.511.0",
