@@ -10,7 +10,6 @@ import {
 import { setSession } from '@/lib/auth/session';
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { createCheckoutSession } from '@/lib/payments/stripe';
 import {
   validatedAction,
   validatedActionWithUser
@@ -213,13 +212,6 @@ export const signIn = validatedAction(signInSchema, async (data, formData) => {
         tauriAuth: true,
         email
       };
-    }
-
-    const redirectTo = formData.get('redirect') as string | null;
-    if (redirectTo === 'checkout') {
-      const priceId = formData.get('priceId') as string;
-      const user = userWithExtras[0] || (await db.select().from(users).where(eq(users.id, authData.user.id)).limit(1))[0];
-      return createCheckoutSession({ user, priceId });
     }
 
     redirect('/dashboard');
@@ -464,13 +456,6 @@ export const signUp = validatedAction(signUpSchema, async (data, formData) => {
         tauriAuth: true,
         email
       };
-    }
-
-    const redirectTo = formData.get('redirect') as string | null;
-    if (redirectTo === 'checkout') {
-      const priceId = formData.get('priceId') as string;
-      const currentUser = userRecord[0] || (await db.select().from(users).where(eq(users.id, authData.user.id)).limit(1))[0];
-      return createCheckoutSession({ user: currentUser, priceId });
     }
 
     // 当 Supabase 关闭邮箱验证（autoconfirm=ON）时，signUp 会返回有效 session。

@@ -63,7 +63,7 @@ export function useEvents(novelId: string | null) {
     await loadEvents();
 
     // 返回创建的事件(包含生成的ID和时间戳)
-    const createdEvent = await storage.read<EventCard>('events', id);
+    const createdEvent = await storage.read('events', id) as EventCard;
     return createdEvent;
   };
 
@@ -79,7 +79,7 @@ export function useEvents(novelId: string | null) {
     }
   ): Promise<void> => {
     const storage = getStorageAdapter();
-    const event = await storage.read<EventCard>('events', id);
+    const event = await storage.read('events', id) as EventCard;
     if (!event) {
       throw new Error('Event not found');
     }

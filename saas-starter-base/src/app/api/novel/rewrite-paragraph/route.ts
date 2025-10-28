@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { NovelContext, Character, Location, Setting } from '@/lib/novel/types';
+import { NovelContext, Character, Location, SettingCard } from '@/lib/novel/types';
 
 interface RewriteRequest {
   selectedText: string;           // 选中的文本
@@ -12,7 +12,7 @@ interface RewriteRequest {
   rewriteStyle: 'vivid' | 'concise' | 'formal' | 'casual' | 'emotional' | 'character-based';
   selectedCharacters: Character[];
   selectedLocations: Location[];
-  selectedSettings: Setting[];
+  selectedSettings: SettingCard[];
   customPrompt?: string;
   novelContext: NovelContext;
   apiToken: string;
@@ -113,9 +113,9 @@ function buildRewritePrompt(request: RewriteRequest): string {
   if (request.selectedCharacters && request.selectedCharacters.length > 0) {
     parts.push('**相关人物**:');
     request.selectedCharacters.forEach(char => {
-      parts.push(`- ${char.name}: ${char.basicInfo || char.description || ''}`);
-      if (char.personality) parts.push(`  性格: ${char.personality}`);
-      if (char.appearance) parts.push(`  外貌: ${char.appearance}`);
+      parts.push(`- ${char.name}: ${char.basicInfo?.description || ''}`);
+      if (char.basicInfo?.personality) parts.push(`  性格: ${char.basicInfo.personality}`);
+      if (char.basicInfo?.appearance) parts.push(`  外貌: ${char.basicInfo.appearance}`);
     });
     parts.push('');
   }

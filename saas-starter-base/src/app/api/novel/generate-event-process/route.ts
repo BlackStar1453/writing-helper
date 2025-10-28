@@ -251,7 +251,13 @@ function parseEventProcessAndCharacters(rawContent: string): {
             characterArc: currentCharacter.characterArc || ''
           });
         }
-        currentCharacter = {};
+        currentCharacter = {} as {
+          name?: string;
+          description?: string;
+          appearance?: string;
+          personality?: string;
+          characterArc?: string;
+        };
         return;
       }
 
@@ -289,14 +295,23 @@ function parseEventProcessAndCharacters(rawContent: string): {
   });
 
   // 保存最后一个人物
-  if (currentCharacter && currentCharacter.name) {
-    characters.push({
-      name: currentCharacter.name,
-      description: currentCharacter.description || '',
-      appearance: currentCharacter.appearance || '',
-      personality: currentCharacter.personality || '',
-      characterArc: currentCharacter.characterArc || ''
-    });
+  if (currentCharacter) {
+    const char = currentCharacter as {
+      name?: string;
+      description?: string;
+      appearance?: string;
+      personality?: string;
+      characterArc?: string;
+    };
+    if (char.name) {
+      characters.push({
+        name: char.name,
+        description: char.description || '',
+        appearance: char.appearance || '',
+        personality: char.personality || '',
+        characterArc: char.characterArc || ''
+      });
+    }
   }
 
   return { process, characters };

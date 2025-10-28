@@ -1444,7 +1444,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                                           const relatedCharacters = characters.filter(c => menu.characterIds!.includes(c.id));
                                           if (relatedCharacters.length > 0) {
                                             const characterContext = relatedCharacters.map(c =>
-                                              `【人物: ${c.name}】\n描述: ${c.description}\n性格: ${c.personality}\n背景: ${c.background}`
+                                              `【人物: ${c.name}】\n描述: ${c.basicInfo?.description || ''}\n性格: ${c.basicInfo?.personality || ''}\n外貌: ${c.basicInfo?.appearance || ''}`
                                             ).join('\n\n');
                                             question = `${characterContext}\n\n${question}`;
                                           }
@@ -1786,8 +1786,8 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                       if (step.nativeSuggestions && step.nativeSuggestions.length > 0) {
                         fullEssay += `### Native Expression Suggestions\n`;
                         step.nativeSuggestions.forEach((suggestion, idx) => {
-                          fullEssay += `${idx + 1}. **${suggestion.original}** → **${suggestion.suggestion}**\n`;
-                          fullEssay += `   - ${suggestion.explanation}\n`;
+                          fullEssay += `${idx + 1}. **${suggestion.problemText}** → **${suggestion.replacements.join(' / ')}**\n`;
+                          fullEssay += `   - ${suggestion.message}\n`;
                         });
                         fullEssay += `\n`;
                       }

@@ -34,6 +34,7 @@ export class TauriFileStorage implements StorageAdapter {
 
     try {
       // 动态导入 Tauri API
+      // @ts-ignore - Tauri plugin only available in Tauri environment
       const { writeTextFile } = await import('@tauri-apps/plugin-fs');
       const filePath = this.getFilePath(collection, data.id);
       
@@ -48,6 +49,7 @@ export class TauriFileStorage implements StorageAdapter {
     this.checkTauriEnvironment();
 
     try {
+      // @ts-ignore - Tauri plugin only available in Tauri environment
       const { readTextFile } = await import('@tauri-apps/plugin-fs');
       const filePath = this.getFilePath(collection, id);
       
@@ -65,6 +67,7 @@ export class TauriFileStorage implements StorageAdapter {
     data.updatedAt = new Date();
 
     try {
+      // @ts-ignore - Tauri plugin only available in Tauri environment
       const { writeTextFile } = await import('@tauri-apps/plugin-fs');
       const filePath = this.getFilePath(collection, id);
       
@@ -78,6 +81,7 @@ export class TauriFileStorage implements StorageAdapter {
     this.checkTauriEnvironment();
 
     try {
+      // @ts-ignore - Tauri plugin only available in Tauri environment
       const { remove } = await import('@tauri-apps/plugin-fs');
       const filePath = this.getFilePath(collection, id);
       
@@ -91,6 +95,7 @@ export class TauriFileStorage implements StorageAdapter {
     this.checkTauriEnvironment();
 
     try {
+      // @ts-ignore - Tauri plugin only available in Tauri environment
       const { readDir, readTextFile } = await import('@tauri-apps/plugin-fs');
       const dirPath = `${this.basePath}/${collection}`;
       

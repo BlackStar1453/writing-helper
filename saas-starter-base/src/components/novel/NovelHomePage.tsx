@@ -106,7 +106,7 @@ export function NovelHomePage() {
   const handleCreateNovel = async () => {
     const title = prompt('请输入小说项目名称:');
     if (title && title.trim()) {
-      await createNovel(title.trim());
+      await createNovel({ title: title.trim() });
       window.location.reload();
     }
   };

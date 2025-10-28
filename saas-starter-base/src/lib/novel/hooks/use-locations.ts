@@ -147,7 +147,7 @@ export function useLocations(novelId?: string | null) {
 
     try {
       const location = await storageRef.current.read('locations', locationId);
-      const updatedReferences = (location.references || []).filter(r => r.id !== referenceId);
+      const updatedReferences = (location.references || []).filter((r: any) => r.id !== referenceId);
       await storageRef.current.update('locations', locationId, { references: updatedReferences });
       await loadLocations();
     } catch (err) {

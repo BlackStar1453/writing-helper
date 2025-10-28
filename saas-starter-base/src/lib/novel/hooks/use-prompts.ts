@@ -33,8 +33,12 @@ export function usePrompts(novelId?: string | null) {
       setLoading(true);
       setError(null);
 
+      if (!storageRef.current) {
+        throw new Error('Storage not initialized');
+      }
+
       let allPrompts: PromptCard[];
-      if (novelId) {
+      if (novelId && storageRef.current.listByNovelId) {
         // 如果有novelId,只加载该项目的prompts
         allPrompts = await storageRef.current.listByNovelId('prompts', novelId);
       } else {

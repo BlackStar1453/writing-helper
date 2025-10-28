@@ -282,7 +282,7 @@ export function useCharacters(novelId?: string | null) {
 
     try {
       const character = await storageRef.current.read('characters', characterId);
-      const updatedReferences = (character.references || []).filter(r => r.id !== referenceId);
+      const updatedReferences = (character.references || []).filter((r: any) => r.id !== referenceId);
       await storageRef.current.update('characters', characterId, { references: updatedReferences });
       await loadCharacters();
     } catch (err) {

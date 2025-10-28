@@ -116,7 +116,7 @@ function getToolDisplayName(toolName: string): string {
 }
 
 // Helper function to render tool results
-function renderToolResult(toolName: string, result: any): JSX.Element {
+function renderToolResult(toolName: string, result: any): React.ReactElement {
   try {
     switch (toolName) {
       case 'generateTopic':

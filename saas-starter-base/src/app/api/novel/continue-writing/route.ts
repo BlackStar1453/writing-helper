@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { NovelContext, ChapterTimelineItem, Character, Location, Setting } from '@/lib/novel/types';
+import { NovelContext, ChapterTimelineItem, Character, Location, SettingCard } from '@/lib/novel/types';
 
 interface ContinueWritingRequest {
   selectedText: string;           // 选中的文本（光标前的文本）
@@ -12,7 +12,7 @@ interface ContinueWritingRequest {
   length: 'short' | 'medium' | 'long';  // 续写长度
   selectedCharacters: Character[];
   selectedLocations: Location[];
-  selectedSettings: Setting[];
+  selectedSettings: SettingCard[];
   useTimeline: boolean;
   currentTimelineNode?: ChapterTimelineItem;
   customPrompt?: string;
@@ -121,9 +121,9 @@ function buildContinueWritingPrompt(request: ContinueWritingRequest): string {
   if (request.selectedCharacters && request.selectedCharacters.length > 0) {
     parts.push('**相关人物**:');
     request.selectedCharacters.forEach(char => {
-      parts.push(`- ${char.name}: ${char.basicInfo || char.description || ''}`);
-      if (char.personality) parts.push(`  性格: ${char.personality}`);
-      if (char.appearance) parts.push(`  外貌: ${char.appearance}`);
+      parts.push(`- ${char.name}: ${char.basicInfo?.description || ''}`);
+      if (char.basicInfo?.personality) parts.push(`  性格: ${char.basicInfo.personality}`);
+      if (char.basicInfo?.appearance) parts.push(`  外貌: ${char.basicInfo.appearance}`);
     });
     parts.push('');
   }
