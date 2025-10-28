@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { buildNovelPrompt } from '../generate-draft/route';
+import { buildNovelPrompt } from '@/lib/novel/prompt-builder';
 
 export async function POST(request: NextRequest) {
   try {
