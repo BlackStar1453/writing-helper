@@ -7,7 +7,7 @@ import { NovelContext } from '@/lib/novel/types';
 
 export async function POST(request: NextRequest) {
   try {
-    const { context, apiToken, model } = await request.json();
+    const { context, apiToken, model, customPrompt } = await request.json();
 
     if (!context) {
       return NextResponse.json(
@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 构建 Prompt
-    const prompt = buildNovelPrompt(context);
+    // 构建 Prompt - 如果有自定义prompt则使用自定义的,否则自动构建
+    const prompt = customPrompt || buildNovelPrompt(context);
 
     // 调用 DeepSeek API (或用户指定的模型)
     const aiModel = model || 'deepseek-chat';
@@ -176,8 +176,9 @@ function parseGeneratedContent(rawContent: string): { timeline: Array<{ id: stri
 
 /**
  * 构建小说创作 Prompt
+ * 导出此函数以便在其他地方使用(如预览)
  */
-function buildNovelPrompt(context: any): string {
+export function buildNovelPrompt(context: any): string {
   const parts: string[] = [];
 
   // 参考章节
@@ -260,17 +261,21 @@ function buildNovelPrompt(context: any): string {
     });
   }
 
-  // 事件卡片
+  // 事件卡片 - 作为剧情大纲
   if (context.selectedEvents && context.selectedEvents.length > 0) {
-    parts.push(`## 相关事件`);
+    parts.push(`## 剧情大纲(必须遵循)`);
+    parts.push(`本章节需要按照以下事件流程展开,每个步骤都必须在正文中体现:`);
+    parts.push('');
     context.selectedEvents.forEach((event: any) => {
-      parts.push(`### ${event.name}`);
-      parts.push(`**事件大纲:** ${event.outline}`);
+      parts.push(`### 事件: ${event.name}`);
+      parts.push(`**事件概述:** ${event.outline}`);
       if (event.process && event.process.length > 0) {
-        parts.push(`\n**事件流程:**`);
+        parts.push(`\n**详细流程(请严格按照以下步骤展开剧情):**`);
         event.process.forEach((step: any, index: number) => {
           parts.push(`${index + 1}. ${step.description}`);
         });
+        parts.push('');
+        parts.push(`**重要提示:** 请确保在正文中清晰地描写每一个步骤,不要跳过或合并步骤。`);
       }
       parts.push('');
     });
@@ -310,18 +315,33 @@ function buildNovelPrompt(context: any): string {
 
   parts.push(`## 任务`);
   parts.push(`请根据以上信息,创作这一章节的内容。要求:`);
-  parts.push(`1. 内容要符合人物性格和背景`);
-  parts.push(`2. 场景描写要生动具体`);
-  parts.push(`3. 情节推进要自然流畅`);
+
+  let requirementIndex = 1;
+
+  // 如果有事件卡片,优先强调
+  if (context.selectedEvents && context.selectedEvents.length > 0) {
+    parts.push(`${requirementIndex}. **【最重要】严格按照"剧情大纲"中的事件流程展开,每个步骤都必须在正文中详细描写,不得省略或跳过**`);
+    requirementIndex++;
+  }
+
+  parts.push(`${requirementIndex}. 内容要符合人物性格和背景`);
+  requirementIndex++;
+  parts.push(`${requirementIndex}. 场景描写要生动具体`);
+  requirementIndex++;
+  parts.push(`${requirementIndex}. 情节推进要自然流畅`);
+  requirementIndex++;
+
   if (context.timeline && context.timeline.length > 0) {
-    parts.push(`4. 严格按照剧情时间线展开创作,确保每个节点都有对应的内容`);
+    parts.push(`${requirementIndex}. 严格按照剧情时间线展开创作,确保每个节点都有对应的内容`);
+    requirementIndex++;
   }
+
   if (context.referenceChapters && context.referenceChapters.length > 0) {
-    parts.push(`${context.timeline && context.timeline.length > 0 ? '5' : '4'}. 保持与参考章节的风格一致性和情节连贯性`);
-    parts.push(`${context.timeline && context.timeline.length > 0 ? '6' : '5'}. 字数控制在800-1500字左右`);
-  } else {
-    parts.push(`${context.timeline && context.timeline.length > 0 ? '5' : '4'}. 字数控制在800-1500字左右`);
+    parts.push(`${requirementIndex}. 保持与参考章节的风格一致性和情节连贯性`);
+    requirementIndex++;
   }
+
+  parts.push(`${requirementIndex}. 字数控制在800-1500字左右`);
   parts.push('');
 
   // 如果有timeline,只要求输出正文;否则要求输出timeline和正文

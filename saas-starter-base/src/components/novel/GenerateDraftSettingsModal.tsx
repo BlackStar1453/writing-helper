@@ -34,7 +34,7 @@ interface GenerateDraftSettingsModalProps {
   allEvents: EventCard[]; // 所有事件卡片
   currentChapterId: string; // 当前章节ID
   initialSettings?: Partial<GenerateDraftSettings>; // 初始设置
-  onConfirm: (settings: GenerateDraftSettings, timeline: ChapterTimelineItem[]) => void; // 确认生成初稿回调
+  onConfirm: (settings: GenerateDraftSettings, timeline: ChapterTimelineItem[], customPrompt?: string) => void; // 确认生成初稿回调
   onGenerateTimeline: (settings: GenerateDraftSettings) => Promise<ChapterTimelineItem[]>; // 生成Timeline回调
   isGeneratingTimeline?: boolean; // 是否正在生成Timeline
   initialTimeline?: ChapterTimelineItem[]; // 初始timeline
@@ -67,6 +67,11 @@ export function GenerateDraftSettingsModal({
   const [timeline, setTimeline] = useState<ChapterTimelineItem[]>(initialTimeline);
   const [editingTimelineId, setEditingTimelineId] = useState<string | null>(null);
   const [editingTimelineContent, setEditingTimelineContent] = useState('');
+  const [showPromptPreview, setShowPromptPreview] = useState(false);
+  const [promptPreview, setPromptPreview] = useState('');
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [isEditingPrompt, setIsEditingPrompt] = useState(false);
+  const [editedPrompt, setEditedPrompt] = useState('');
 
   // 获取novelId - 从当前章节或第一个章节中获取
   const currentChapter = allChapters.find(c => c.id === currentChapterId);
@@ -200,10 +205,63 @@ export function GenerateDraftSettingsModal({
     setTimeline(prev => prev.filter(item => item.id !== id));
   };
 
+  // 生成Prompt预览
+  const handleGeneratePreview = async () => {
+    setIsLoadingPreview(true);
+    try {
+      const settings = buildSettings();
+      const currentChapter = allChapters.find(c => c.id === currentChapterId);
+
+      const context = {
+        chapterInfo: currentChapter ? {
+          volume: currentChapter.volumeId,
+          chapter: currentChapter.chapterId,
+          section: currentChapter.sectionId,
+          title: currentChapter.title,
+        } : null,
+        selectedCharacters: settings.selectedCharacters,
+        selectedLocations: settings.selectedLocations,
+        selectedSettings: settings.selectedSettings,
+        selectedEvents: settings.selectedEvents,
+        selectedPrompts: settings.selectedPrompts,
+        plotSummary: settings.plotSummary,
+        globalPrompt: settings.globalPrompt,
+        chapterPrompt: settings.chapterPrompt,
+        referenceChapters: settings.referenceChapters,
+        timeline: timeline,
+      };
+
+      const response = await fetch('/api/novel/preview-prompt', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ context }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate preview');
+      }
+
+      const data = await response.json();
+      setPromptPreview(data.prompt);
+      setEditedPrompt(data.prompt); // 初始化编辑内容
+      setShowPromptPreview(true);
+      setIsEditingPrompt(false); // 默认不是编辑模式
+    } catch (error) {
+      console.error('Failed to generate preview:', error);
+    } finally {
+      setIsLoadingPreview(false);
+    }
+  };
+
   // 确认生成初稿
   const handleConfirm = () => {
     const settings = buildSettings();
-    onConfirm(settings, timeline);
+    // 如果用户生成了预览,则使用编辑后的prompt(无论是否修改)
+    // 这样可以确保用户看到的预览内容就是最终发送给AI的内容
+    const customPrompt = showPromptPreview ? editedPrompt : undefined;
+    onConfirm(settings, timeline, customPrompt);
     onOpenChange(false);
   };
 
@@ -576,6 +634,64 @@ export function GenerateDraftSettingsModal({
                 ))
               )}
             </div>
+          </div>
+
+          {/* AI输入预览 */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-lg font-semibold">AI输入预览</Label>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGeneratePreview}
+                  disabled={isLoadingPreview}
+                >
+                  {isLoadingPreview ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      生成中...
+                    </>
+                  ) : (
+                    '生成预览'
+                  )}
+                </Button>
+                {showPromptPreview && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setIsEditingPrompt(!isEditingPrompt)}
+                  >
+                    {isEditingPrompt ? '查看模式' : '编辑模式'}
+                  </Button>
+                )}
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 mb-3">
+              {isEditingPrompt
+                ? '编辑prompt内容,修改后的内容将用于生成初稿'
+                : '查看将要发送给AI的完整prompt内容,确保输入正确'}
+            </p>
+            {showPromptPreview && (
+              <div className="border rounded-md bg-gray-50 max-h-96 overflow-y-auto">
+                {isEditingPrompt ? (
+                  <textarea
+                    className="w-full h-96 p-4 text-xs font-mono bg-white border-0 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
+                    value={editedPrompt}
+                    onChange={(e) => setEditedPrompt(e.target.value)}
+                  />
+                ) : (
+                  <pre className="text-xs whitespace-pre-wrap font-mono p-4">
+                    {editedPrompt}
+                  </pre>
+                )}
+              </div>
+            )}
+            {!showPromptPreview && (
+              <div className="border rounded-md p-4 bg-gray-50 text-center text-sm text-gray-500">
+                点击"生成预览"按钮查看AI输入内容
+              </div>
+            )}
           </div>
         </div>
 

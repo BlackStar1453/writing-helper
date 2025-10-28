@@ -163,7 +163,7 @@ export default function ChapterWritingPage() {
   };
 
   // 确认生成初稿
-  const handleConfirmGenerate = async (settings: GenerateDraftSettings, timeline: ChapterTimelineItem[]) => {
+  const handleConfirmGenerate = async (settings: GenerateDraftSettings, timeline: ChapterTimelineItem[], customPrompt?: string) => {
     try {
       setIsGeneratingDraft(true);
 
@@ -177,12 +177,13 @@ export default function ChapterWritingPage() {
       }
 
       // 构建请求数据 - 使用context对象包装
-      const requestData = {
+      const requestData: any = {
         context: {
           chapterInfo: novelContext.chapterInfo,
           selectedCharacters: settings.selectedCharacters,
           selectedLocations: settings.selectedLocations,
           selectedSettings: settings.selectedSettings,
+          selectedEvents: settings.selectedEvents, // 添加事件卡片
           selectedPrompts: settings.selectedPrompts, // 添加Prompt卡片
           plotSummary: settings.plotSummary,
           globalPrompt: settings.globalPrompt,
@@ -193,6 +194,11 @@ export default function ChapterWritingPage() {
         apiToken: apiSettings.apiToken,
         model: apiSettings.aiModel,
       };
+
+      // 如果有自定义prompt,则添加到请求数据中
+      if (customPrompt) {
+        requestData.customPrompt = customPrompt;
+      }
 
       // 调用API生成初稿
       const response = await fetch('/api/novel/generate-draft', {
