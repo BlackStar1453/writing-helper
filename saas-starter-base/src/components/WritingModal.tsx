@@ -750,11 +750,13 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
 
   // 应用候选版本
   const handleApplySmartWritingCandidate = (candidate: SmartWritingCandidate) => {
+    let newText: string;
+
     if (smartWritingMode === 'continue') {
       // 续写：在光标位置插入内容
       const before = text.substring(0, smartWritingSelectionStart);
       const after = text.substring(smartWritingSelectionStart);
-      const newText = before + '\n\n' + candidate.content + '\n\n' + after;
+      newText = before + '\n\n' + candidate.content + '\n\n' + after;
 
       setText(newText);
       if (onTextChange) {
@@ -766,7 +768,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
       // 重写：替换选中的文本
       const before = text.substring(0, smartWritingSelectionStart);
       const after = text.substring(smartWritingSelectionEnd);
-      const newText = before + candidate.content + after;
+      newText = before + candidate.content + after;
 
       setText(newText);
       if (onTextChange) {
@@ -774,6 +776,11 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
       }
 
       toast.success('重写内容已应用');
+    }
+
+    // 立即触发保存
+    if (newText.trim()) {
+      autoSave(newText);
     }
 
     // 关闭候选版本Modal

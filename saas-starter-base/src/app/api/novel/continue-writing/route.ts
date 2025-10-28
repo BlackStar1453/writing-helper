@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         messages: [
           {
             role: 'system',
-            content: '你是一位专业的小说作家，擅长创作引人入胜的故事。'
+            content: '你是一位专业的小说作家，擅长创作引人入胜的故事。你的任务是根据用户提供的"选中的文本"作为续写起点，在该文本之后进行续写，而不是在整个章节的末尾续写。请仔细阅读选中的文本和上下文，确保续写内容紧接在选中文本之后。'
           },
           {
             role: 'user',
@@ -153,14 +153,20 @@ function buildContinueWritingPrompt(request: ContinueWritingRequest): string {
   }
 
   // 添加上下文
-  parts.push('**前文内容**:');
-  parts.push(request.contextBefore);
+  if (request.contextBefore && request.contextBefore.trim()) {
+    parts.push('**前文上下文**:');
+    parts.push(request.contextBefore);
+    parts.push('');
+  }
+
+  parts.push('**选中的文本(续写起点)**:');
+  parts.push(request.selectedText);
   parts.push('');
-  parts.push('[续写位置]');
+  parts.push('[在此处续写]');
   parts.push('');
 
   if (request.contextAfter && request.contextAfter.trim()) {
-    parts.push('**后文内容**:');
+    parts.push('**后文上下文**:');
     parts.push(request.contextAfter);
     parts.push('');
   }
@@ -174,9 +180,10 @@ function buildContinueWritingPrompt(request: ContinueWritingRequest): string {
 
   parts.push('**续写要求**:');
   parts.push(`1. 续写长度: ${lengthMap[request.length]}`);
-  parts.push('2. 保持人物性格一致');
-  parts.push('3. 情节自然流畅，与前后文衔接');
-  parts.push('4. 生成3个不同的续写版本，每个版本风格略有差异');
+  parts.push('2. **重要**: 请在"选中的文本"之后进行续写,而不是在整个章节之后');
+  parts.push('3. 保持人物性格一致');
+  parts.push('4. 情节自然流畅，与前后文衔接');
+  parts.push('5. 生成3个不同的续写版本，每个版本风格略有差异');
   parts.push('');
 
   // 添加自定义提示词
