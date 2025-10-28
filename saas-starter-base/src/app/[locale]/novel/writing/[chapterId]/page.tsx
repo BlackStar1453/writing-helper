@@ -4,7 +4,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { NovelNav } from '@/components/novel/NovelNav';
 import { WritingModal } from '@/components/WritingModal';
@@ -303,6 +303,12 @@ export default function ChapterWritingPage() {
         chapterPrompt: novelContext.chapterPrompt,
       });
 
+      // 立即同步到本地状态，避免重新打开显示旧内容
+      setChapter({
+        ...chapter,
+        content: data.text,
+      });
+
       toast.success('保存成功！');
     } catch (err) {
       console.error('Failed to save chapter:', err);
@@ -326,13 +332,18 @@ export default function ChapterWritingPage() {
 
       const nextVersion = currentVersion + 1;
 
-      // 创建新版本
+      // 从数据源获取最新内容，避免使用可能过期的本地 chapter.state
+      const latest = await getChapterById(chapter.id);
+      const contentForVersion = latest?.content ?? chapter.content;
+      const timelineForVersion = latest?.timeline ?? (chapter.timeline || []);
+
+      // 创建新版本（使用最新内容）
       const newVersion: ChapterVersion = {
         id: `version-${Date.now()}`,
         chapterId: chapter.id,
         version: nextVersion,
-        content: chapter.content,
-        timeline: chapter.timeline || [],
+        content: contentForVersion,
+        timeline: timelineForVersion,
         createdAt: new Date(),
         description: description || `第${nextVersion}次修改`,
       };
@@ -542,7 +553,7 @@ function WritingModalWrapper({
   onNovelContextChange: (context: NovelContext) => void;
   onGenerateDraft: () => void;
   isGeneratingDraft: boolean;
-  onSubmit: (data: { text: string }) => void;
+  onSubmit: (data: { text: string }) => Promise<void>;
   onTimelineChange: (timeline: ChapterTimelineItem[]) => void;
   onJumpToTimelineContent: (timelineItemId: string) => void;
   isOpen: boolean;
@@ -559,10 +570,15 @@ function WritingModalWrapper({
   const [text, setText] = useState(chapter.content || '');
   const [initialContent, setInitialContent] = useState(chapter.content || '');
 
-  // 当chapter.content变化时更新text状态和初始内容
+  // 自动保存相关引用
+  const autoSaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSavedTextRef = useRef<string>(chapter.content || '');
+
+  // 当chapter.content变化时更新text状态、初始内容及基线
   useEffect(() => {
     setText(chapter.content || '');
     setInitialContent(chapter.content || '');
+    lastSavedTextRef.current = chapter.content || '';
   }, [chapter.content]);
 
   useEffect(() => {
@@ -571,10 +587,40 @@ function WritingModalWrapper({
     return () => window.removeEventListener('open-writing-modal', handleOpen);
   }, [onOpenChange]);
 
-  // 关闭时自动保存
+  // 根据字数变化进行有条件自动保存（防抖）
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // 仅在字数变动时触发自动保存
+    if (text.length === lastSavedTextRef.current.length) return;
+
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    autoSaveTimerRef.current = setTimeout(async () => {
+      try {
+        await onSubmit({ text });
+        // 同步基线，避免重复保存
+        lastSavedTextRef.current = text;
+        setInitialContent(text);
+      } catch (e) {
+        console.error('Auto save (chapter) failed:', e);
+      }
+    }, 1500);
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [text, isOpen, onSubmit]);
+
+  // 关闭时自动保存（等待完成）
   const handleClose = async () => {
     // 保存当前内容
-    onSubmit({ text });
+    await onSubmit({ text });
+    setInitialContent(text);
 
     // 检查内容是否有变化
     const hasContentChanged = text !== initialContent;
@@ -583,11 +629,18 @@ function WritingModalWrapper({
     if (hasContentChanged && chapterVersions.length > 0) {
       // 自动生成版本描述
       const autoDescription = `第${currentVersion + 1}次修改`;
-      onSaveVersion(autoDescription);
+      onSaveVersionProxy(autoDescription);
     }
 
     // 关闭modal
     onOpenChange(false);
+  };
+
+  // 保存版本前优先保存当前编辑内容
+  const onSaveVersionProxy = async (description?: string) => {
+    await onSubmit({ text });
+    setInitialContent(text);
+    onSaveVersion(description);
   };
 
   // 传递原始内容(带标记),WritingModal内部会进行清理
@@ -606,7 +659,7 @@ function WritingModalWrapper({
       onJumpToTimelineContent={onJumpToTimelineContent}
       chapterVersions={chapterVersions}
       currentVersion={currentVersion}
-      onSaveVersion={onSaveVersion}
+      onSaveVersion={onSaveVersionProxy}
       onLoadVersion={onLoadVersion}
       onDeleteVersion={onDeleteVersion}
       allCharacters={allCharacters}
