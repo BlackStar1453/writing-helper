@@ -3,16 +3,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { NovelContext, Character, Location, SettingCard } from '@/lib/novel/types';
+import { NovelContext, Character, Location, SettingCard, PromptCard } from '@/lib/novel/types';
 
 interface RewriteRequest {
   selectedText: string;           // 选中的文本
   contextBefore: string;          // 前文上下文
   contextAfter: string;           // 后文上下文
-  rewriteStyle: 'vivid' | 'concise' | 'formal' | 'casual' | 'emotional' | 'character-based';
+  rewriteStyle?: 'vivid' | 'concise' | 'formal' | 'casual' | 'emotional' | 'character-based';
   selectedCharacters: Character[];
   selectedLocations: Location[];
   selectedSettings: SettingCard[];
+  selectedPrompts: PromptCard[];  // 新增: 选中的Prompt卡片
   customPrompt?: string;
   novelContext: NovelContext;
   apiToken: string;
@@ -156,17 +157,34 @@ function buildRewritePrompt(request: RewriteRequest): string {
   }
 
   // 添加重写要求
-  const styleInstructions = {
-    vivid: '使用更生动的描写，增加细节、感官体验和情感表达',
-    concise: '精简表达，去除冗余，保留核心内容',
-    formal: '使用书面语，提升文学性和正式程度',
-    casual: '使用口语化表达，更自然流畅',
-    emotional: '增强情感表达，突出人物内心活动',
-    'character-based': '严格遵循人物性格特点，确保言行举止符合人设'
-  };
-
   parts.push('**重写要求**:');
-  parts.push(`1. 重写风格: ${styleInstructions[request.rewriteStyle]}`);
+
+  // 如果选择了Prompt卡片,使用Prompt卡片的描述
+  if (request.selectedPrompts && request.selectedPrompts.length > 0) {
+    parts.push('1. 重写风格:');
+    request.selectedPrompts.forEach((prompt, index) => {
+      parts.push(`   ${index + 1}. ${prompt.name}: ${prompt.description}`);
+      if (prompt.exampleBefore) {
+        parts.push(`      示例: ${prompt.exampleBefore}`);
+      }
+    });
+  } else {
+    // 如果没有选择Prompt卡片,使用与上下文统一的语言风格
+    if (request.rewriteStyle) {
+      const styleInstructions = {
+        vivid: '使用更生动的描写，增加细节、感官体验和情感表达',
+        concise: '精简表达，去除冗余，保留核心内容',
+        formal: '使用书面语，提升文学性和正式程度',
+        casual: '使用口语化表达，更自然流畅',
+        emotional: '增强情感表达，突出人物内心活动',
+        'character-based': '严格遵循人物性格特点，确保言行举止符合人设'
+      };
+      parts.push(`1. 重写风格: ${styleInstructions[request.rewriteStyle]}`);
+    } else {
+      parts.push('1. 重写风格: 保持与上下文统一的语言风格和表达方式');
+    }
+  }
+
   parts.push('2. 保持原文的核心意思和情节发展');
   parts.push('3. 与前后文自然衔接');
   parts.push('4. **只重写"需要重写的段落"部分，不要重写前文和后文**');

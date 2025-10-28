@@ -3,7 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { NovelContext, ChapterTimelineItem, Character, Location, SettingCard } from '@/lib/novel/types';
+import { NovelContext, ChapterTimelineItem, Character, Location, SettingCard, PromptCard } from '@/lib/novel/types';
 
 interface ContinueWritingRequest {
   selectedText: string;           // 选中的文本（光标前的文本）
@@ -13,6 +13,7 @@ interface ContinueWritingRequest {
   selectedCharacters: Character[];
   selectedLocations: Location[];
   selectedSettings: SettingCard[];
+  selectedPrompts: PromptCard[];  // 新增: 选中的Prompt卡片
   useTimeline: boolean;
   currentTimelineNode?: ChapterTimelineItem;
   customPrompt?: string;
@@ -181,9 +182,26 @@ function buildContinueWritingPrompt(request: ContinueWritingRequest): string {
   parts.push('**续写要求**:');
   parts.push(`1. 续写长度: ${lengthMap[request.length]}`);
   parts.push('2. **重要**: 请在"选中的文本"之后进行续写,而不是在整个章节之后');
-  parts.push('3. 保持人物性格一致');
-  parts.push('4. 情节自然流畅，与前后文衔接');
-  parts.push('5. 生成3个不同的续写版本，每个版本风格略有差异');
+
+  // 如果选择了Prompt卡片,使用Prompt卡片的描述
+  if (request.selectedPrompts && request.selectedPrompts.length > 0) {
+    parts.push('3. 续写风格:');
+    request.selectedPrompts.forEach((prompt, index) => {
+      parts.push(`   ${index + 1}. ${prompt.name}: ${prompt.description}`);
+      if (prompt.exampleBefore) {
+        parts.push(`      示例: ${prompt.exampleBefore}`);
+      }
+    });
+    parts.push('4. 保持人物性格一致');
+    parts.push('5. 情节自然流畅，与前后文衔接');
+    parts.push('6. 生成3个不同的续写版本，每个版本风格略有差异');
+  } else {
+    // 如果没有选择Prompt卡片,使用与上下文统一的语言风格
+    parts.push('3. 续写风格: 保持与上下文统一的语言风格和表达方式');
+    parts.push('4. 保持人物性格一致');
+    parts.push('5. 情节自然流畅，与前后文衔接');
+    parts.push('6. 生成3个不同的续写版本，每个版本风格略有差异');
+  }
   parts.push('');
 
   // 添加自定义提示词

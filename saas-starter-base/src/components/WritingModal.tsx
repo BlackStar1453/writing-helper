@@ -287,7 +287,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
   const [smartWritingCandidatesOpen, setSmartWritingCandidatesOpen] = useState(false);
   const [smartWritingCandidates, setSmartWritingCandidates] = useState<SmartWritingCandidate[]>([]);
   const [isGeneratingSmartWriting, setIsGeneratingSmartWriting] = useState(false);
-  const [presetRewriteStyle, setPresetRewriteStyle] = useState<'vivid' | 'concise' | 'formal' | 'casual' | 'emotional' | 'character-based'>('vivid');
   const [smartWritingSelectionStart, setSmartWritingSelectionStart] = useState(0);
   const [smartWritingSelectionEnd, setSmartWritingSelectionEnd] = useState(0);
   const [smartWritingSelectedText, setSmartWritingSelectedText] = useState('');
@@ -638,7 +637,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     setSmartWritingSelectionStart(selectionStart);
     setSmartWritingSelectionEnd(selectionEnd);
     setSmartWritingSelectedText(selectedText);
-    setPresetRewriteStyle(style);
 
     // 打开设置Modal
     setSmartWritingMode('rewrite');
@@ -694,6 +692,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
         selectedCharacters: settings.selectedCharacters,
         selectedLocations: settings.selectedLocations,
         selectedSettings: settings.selectedSettings,
+        selectedPrompts: settings.selectedPrompts,
         useTimeline: settings.useTimeline,
         currentTimelineNode: settings.useTimeline ? currentTimelineNode : undefined,
         customPrompt: settings.customPrompt,
@@ -704,10 +703,11 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
         selectedText: smartWritingSelectedText,
         contextBefore,
         contextAfter,
-        rewriteStyle: settings.rewriteStyle || 'vivid',
+        rewriteStyle: settings.rewriteStyle,
         selectedCharacters: settings.selectedCharacters,
         selectedLocations: settings.selectedLocations,
         selectedSettings: settings.selectedSettings,
+        selectedPrompts: settings.selectedPrompts,
         customPrompt: settings.customPrompt,
         novelContext: novelContext || {},
         apiToken: apiSettings.apiToken,
@@ -1358,61 +1358,22 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                               续写
                             </button>
 
-                            {/* 重写按钮组 */}
-                            <div className="grid grid-cols-2 gap-2">
-                              <button
-                                onClick={() => {
-                                  setSmartWritingSelectionStart(selectedTextInfo.start);
-                                  setSmartWritingSelectionEnd(selectedTextInfo.end);
-                                  setSmartWritingSelectedText(selectedTextInfo.text);
-                                  setPresetRewriteStyle('vivid');
-                                  setSmartWritingMode('rewrite');
-                                  setSmartWritingSettingsOpen(true);
-                                }}
-                                className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                              >
-                                更生动
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setSmartWritingSelectionStart(selectedTextInfo.start);
-                                  setSmartWritingSelectionEnd(selectedTextInfo.end);
-                                  setSmartWritingSelectedText(selectedTextInfo.text);
-                                  setPresetRewriteStyle('concise');
-                                  setSmartWritingMode('rewrite');
-                                  setSmartWritingSettingsOpen(true);
-                                }}
-                                className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                              >
-                                更简洁
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setSmartWritingSelectionStart(selectedTextInfo.start);
-                                  setSmartWritingSelectionEnd(selectedTextInfo.end);
-                                  setSmartWritingSelectedText(selectedTextInfo.text);
-                                  setPresetRewriteStyle('emotional');
-                                  setSmartWritingMode('rewrite');
-                                  setSmartWritingSettingsOpen(true);
-                                }}
-                                className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                              >
-                                增强情感
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setSmartWritingSelectionStart(selectedTextInfo.start);
-                                  setSmartWritingSelectionEnd(selectedTextInfo.end);
-                                  setSmartWritingSelectedText(selectedTextInfo.text);
-                                  setPresetRewriteStyle('character-based');
-                                  setSmartWritingMode('rewrite');
-                                  setSmartWritingSettingsOpen(true);
-                                }}
-                                className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                              >
-                                保持人物性格
-                              </button>
-                            </div>
+                            {/* 重写按钮 */}
+                            <button
+                              onClick={() => {
+                                setSmartWritingSelectionStart(selectedTextInfo.start);
+                                setSmartWritingSelectionEnd(selectedTextInfo.end);
+                                setSmartWritingSelectedText(selectedTextInfo.text);
+                                setSmartWritingMode('rewrite');
+                                setSmartWritingSettingsOpen(true);
+                              }}
+                              className="w-full px-3 py-2 text-left text-sm bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300 flex items-center gap-2"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              重写
+                            </button>
 
                             {/* Menu卡片操作 */}
                             {enabledMenus.filter(m => m.enabled).length > 0 && (
@@ -2261,7 +2222,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
           allSettings={allSettings}
           currentTimelineNode={timeline && timeline.length > 0 ? timeline[0] : undefined}
           isGenerating={isGeneratingSmartWriting}
-          presetRewriteStyle={smartWritingMode === 'rewrite' ? presetRewriteStyle : undefined}
         />
       )}
 

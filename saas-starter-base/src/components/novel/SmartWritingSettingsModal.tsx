@@ -9,20 +9,22 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Character, Location, SettingCard, ChapterTimelineItem, NovelContext } from '@/lib/novel/types';
+import { Character, Location, SettingCard, ChapterTimelineItem, NovelContext, PromptCard } from '@/lib/novel/types';
 import { Loader2 } from 'lucide-react';
+import { usePrompts } from '@/lib/novel/hooks/use-prompts';
 
 export interface SmartWritingSettings {
   // 续写设置
   length?: 'short' | 'medium' | 'long';
-  
+
   // 重写设置
   rewriteStyle?: 'vivid' | 'concise' | 'formal' | 'casual' | 'emotional' | 'character-based';
-  
+
   // 通用设置
   selectedCharacters: Character[];
   selectedLocations: Location[];
   selectedSettings: SettingCard[];
+  selectedPrompts: PromptCard[];  // 新增: 选中的Prompt卡片
   useTimeline: boolean;
   currentTimelineNode?: ChapterTimelineItem;
   customPrompt?: string;
@@ -40,7 +42,6 @@ interface SmartWritingSettingsModalProps {
   allSettings: SettingCard[];
   currentTimelineNode?: ChapterTimelineItem;
   isGenerating?: boolean;
-  presetRewriteStyle?: 'vivid' | 'concise' | 'formal' | 'casual' | 'emotional' | 'character-based';
 }
 
 export function SmartWritingSettingsModal({
@@ -55,8 +56,10 @@ export function SmartWritingSettingsModal({
   allSettings,
   currentTimelineNode,
   isGenerating = false,
-  presetRewriteStyle,
 }: SmartWritingSettingsModalProps) {
+  // 加载Prompt卡片
+  const { prompts } = usePrompts(novelContext.novelId);
+
   // 默认设置
   const getDefaultSettings = (): SmartWritingSettings => {
     if (mode === 'continue') {
@@ -65,16 +68,17 @@ export function SmartWritingSettingsModal({
         selectedCharacters: novelContext.selectedCharacters || [],
         selectedLocations: novelContext.selectedLocations || [],
         selectedSettings: [],
+        selectedPrompts: [],
         useTimeline: true,
         currentTimelineNode,
         customPrompt: '',
       };
     } else {
       return {
-        rewriteStyle: presetRewriteStyle || 'vivid',
         selectedCharacters: novelContext.selectedCharacters || [],
         selectedLocations: novelContext.selectedLocations || [],
         selectedSettings: [],
+        selectedPrompts: [],
         useTimeline: false,
         customPrompt: '',
       };
@@ -88,7 +92,7 @@ export function SmartWritingSettingsModal({
     if (isOpen) {
       setSettings(getDefaultSettings());
     }
-  }, [isOpen, mode, presetRewriteStyle]);
+  }, [isOpen, mode]);
 
   // 切换人物选择
   const toggleCharacter = (characterId: string) => {
@@ -127,6 +131,28 @@ export function SmartWritingSettingsModal({
           return {
             ...prev,
             selectedLocations: [...prev.selectedLocations, location]
+          };
+        }
+        return prev;
+      }
+    });
+  };
+
+  // 切换Prompt选择
+  const togglePrompt = (promptId: string) => {
+    setSettings(prev => {
+      const isSelected = prev.selectedPrompts.some(p => p.id === promptId);
+      if (isSelected) {
+        return {
+          ...prev,
+          selectedPrompts: prev.selectedPrompts.filter(p => p.id !== promptId)
+        };
+      } else {
+        const prompt = prompts.find(p => p.id === promptId);
+        if (prompt) {
+          return {
+            ...prev,
+            selectedPrompts: [...prev.selectedPrompts, prompt]
           };
         }
         return prev;
@@ -185,8 +211,8 @@ export function SmartWritingSettingsModal({
             </div>
           </div>
 
-          {/* 续写长度 / 重写风格 */}
-          {mode === 'continue' ? (
+          {/* 续写长度 */}
+          {mode === 'continue' && (
             <div>
               <Label className="text-sm font-light mb-2 block">续写长度</Label>
               <div className="flex gap-2">
@@ -207,33 +233,42 @@ export function SmartWritingSettingsModal({
                 ))}
               </div>
             </div>
-          ) : (
-            <div>
-              <Label className="text-sm font-light mb-2 block">重写风格</Label>
-              <div className="grid grid-cols-3 gap-2">
-                {([
-                  { value: 'vivid', label: '更生动' },
-                  { value: 'concise', label: '更简洁' },
-                  { value: 'formal', label: '更正式' },
-                  { value: 'casual', label: '更口语化' },
-                  { value: 'emotional', label: '增强情感' },
-                  { value: 'character-based', label: '保持人物性格' },
-                ] as const).map((style) => (
-                  <button
-                    key={style.value}
-                    onClick={() => setSettings(prev => ({ ...prev, rewriteStyle: style.value }))}
-                    className={`px-3 py-2 text-sm font-light rounded border transition-colors ${
-                      settings.rewriteStyle === style.value
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                        : 'border-gray-300 dark:border-gray-600 hover:border-blue-300'
-                    }`}
-                  >
-                    {style.label}
-                  </button>
-                ))}
-              </div>
-            </div>
           )}
+
+          {/* Prompt卡片选择 (用于风格设置) */}
+          <div>
+            <Label className="text-sm font-light mb-2 block">
+              {mode === 'continue' ? '续写风格 (可选)' : '重写风格 (可选)'}
+            </Label>
+            <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border border-gray-200 dark:border-gray-700 rounded">
+              {prompts.length === 0 ? (
+                <div className="text-sm text-gray-500 font-light">
+                  暂无Prompt卡片,可在Prompt管理页面创建
+                </div>
+              ) : (
+                prompts.map((prompt) => (
+                  <button
+                    key={prompt.id}
+                    onClick={() => togglePrompt(prompt.id)}
+                    className={`px-3 py-1 text-sm font-light rounded border transition-colors ${
+                      settings.selectedPrompts.some(p => p.id === prompt.id)
+                        ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
+                        : 'border-gray-300 dark:border-gray-600 hover:border-purple-300'
+                    }`}
+                    title={prompt.description}
+                  >
+                    {prompt.name}
+                  </button>
+                ))
+              )}
+            </div>
+            <div className="text-xs text-gray-500 mt-1 font-light">
+              {mode === 'continue'
+                ? '选择Prompt卡片来指定续写的语言风格,如果不选择则使用与上下文统一的语言风格'
+                : '选择Prompt卡片来指定重写的语言风格,如果不选择则使用与上下文统一的语言风格'
+              }
+            </div>
+          </div>
 
           {/* 人物选择 */}
           <div>
