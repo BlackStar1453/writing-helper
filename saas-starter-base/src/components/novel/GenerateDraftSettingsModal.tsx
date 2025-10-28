@@ -68,8 +68,12 @@ export function GenerateDraftSettingsModal({
   const [editingTimelineId, setEditingTimelineId] = useState<string | null>(null);
   const [editingTimelineContent, setEditingTimelineContent] = useState('');
 
+  // 获取novelId - 从当前章节或第一个章节中获取
+  const currentChapter = allChapters.find(c => c.id === currentChapterId);
+  const novelId = currentChapter?.novelId || (allChapters.length > 0 ? allChapters[0].novelId : '');
+
   // 获取Prompt卡片
-  const { prompts } = usePrompts(currentChapterId.split('-')[0]); // 使用novelId
+  const { prompts } = usePrompts(novelId);
 
   // 初始化设置
   useEffect(() => {

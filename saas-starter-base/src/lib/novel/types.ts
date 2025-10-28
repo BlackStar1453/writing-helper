@@ -124,22 +124,6 @@ export interface EventProcess {
   description: string;        // 该步骤的描述
 }
 
-// ========== Menu卡片 ==========
-
-export interface MenuCard {
-  id: string;
-  novelId: string;            // 所属小说项目ID
-  name: string;               // 菜单项名称,如"使用更好的词汇"
-  description: string;        // 菜单项的具体描述,如"根据上下文将选中文本替换为更合适的表达"
-  promptTemplate: string;     // 发送给AI的prompt模板,可以使用{{selectedText}}和{{context}}占位符
-  enabled: boolean;           // 是否启用该菜单项
-  order: number;              // 显示顺序
-  promptCardIds?: string[];   // 关联的Prompt卡片ID列表
-  characterIds?: string[];    // 关联的人物卡片ID列表
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 // ========== 世界时间线 ==========
 
 export interface WorldTimelineEvent {

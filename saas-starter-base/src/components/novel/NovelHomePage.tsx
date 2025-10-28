@@ -68,12 +68,6 @@ const featureItems: FeatureItem[] = [
     icon: <Sparkles className="h-5 w-5" />
   },
   {
-    name: 'Menu卡片',
-    description: '自定义快捷菜单',
-    href: '/novel/menus',
-    icon: <Menu className="h-5 w-5" />
-  },
-  {
     name: '设定卡片',
     description: '记录世界观和背景',
     href: '/novel/settings',

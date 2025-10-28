@@ -17,7 +17,6 @@ import { NovelContext, ChapterTimelineItem, ChapterVersion } from '@/lib/novel/t
 import { NovelContextPanel } from './novel/NovelContextPanel';
 import { TimelinePanel, CandidateVersions, ContentVersion } from './novel/TimelinePanel';
 import { cleanContentForDisplay } from '@/lib/novel/content-utils';
-import { useMenus } from '@/lib/novel/hooks/use-menus';
 import { usePrompts } from '@/lib/novel/hooks/use-prompts';
 import { SmartWritingSettingsModal, SmartWritingSettings } from './novel/SmartWritingSettingsModal';
 import { SmartWritingCandidatesModal, SmartWritingCandidate } from './novel/SmartWritingCandidatesModal';
@@ -135,9 +134,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     allSettings = []
   } = props;
 
-  // 加载Menu卡片
-  const { menus, getEnabledMenus } = useMenus(novelContext?.novelId || '');
-  const enabledMenus = getEnabledMenus ? getEnabledMenus() : menus.filter(m => m.enabled);
+  // 加载Prompt卡片和人物卡片
   const { prompts } = usePrompts(novelContext?.novelId || '');
   const { characters } = useCharacters(novelContext?.novelId || '');
 
@@ -1374,58 +1371,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                               </svg>
                               重写
                             </button>
-
-                            {/* Menu卡片操作 */}
-                            {enabledMenus.filter(m => m.enabled).length > 0 && (
-                              <>
-                                <div className="border-t border-purple-200 dark:border-purple-800 my-1"></div>
-                                <div className="grid grid-cols-2 gap-2">
-                                  {enabledMenus.filter(m => m.enabled).sort((a, b) => a.order - b.order).slice(0, 4).map(menu => (
-                                    <button
-                                      key={menu.id}
-                                      onClick={() => {
-                                        // 使用Menu卡片的prompt模板
-                                        let question = menu.promptTemplate
-                                          .replace(/\{\{selectedText\}\}/g, selectedTextInfo.text)
-                                          .replace(/\{\{context\}\}/g, selectedTextInfo.context);
-
-                                        // 如果Menu关联了Prompt卡片,添加Prompt上下文
-                                        if (menu.promptCardIds && menu.promptCardIds.length > 0) {
-                                          const relatedPrompts = prompts.filter(p => menu.promptCardIds!.includes(p.id));
-                                          if (relatedPrompts.length > 0) {
-                                            const promptContext = relatedPrompts.map(p =>
-                                              `【Prompt: ${p.name}】\n描述: ${p.description}\n示例前: ${p.exampleBefore}\n示例后: ${p.exampleAfter}`
-                                            ).join('\n\n');
-                                            question = `${promptContext}\n\n${question}`;
-                                          }
-                                        }
-
-                                        // 如果Menu关联了人物卡片,添加人物上下文
-                                        if (menu.characterIds && menu.characterIds.length > 0) {
-                                          const relatedCharacters = characters.filter(c => menu.characterIds!.includes(c.id));
-                                          if (relatedCharacters.length > 0) {
-                                            const characterContext = relatedCharacters.map(c =>
-                                              `【人物: ${c.name}】\n描述: ${c.basicInfo?.description || ''}\n性格: ${c.basicInfo?.personality || ''}\n外貌: ${c.basicInfo?.appearance || ''}`
-                                            ).join('\n\n');
-                                            question = `${characterContext}\n\n${question}`;
-                                          }
-                                        }
-
-                                        // 发送到Agent Chat
-                                        if (onAgentSendMessage) {
-                                          onAgentSendMessage(question, menu.name);
-                                          setRightPanelView('agent');
-                                        }
-                                      }}
-                                      className="px-2 py-1.5 text-xs bg-white dark:bg-gray-800 hover:bg-purple-100 dark:hover:bg-purple-900/40 border border-purple-200 dark:border-purple-700 rounded transition-colors text-gray-700 dark:text-gray-300 truncate"
-                                      title={menu.description}
-                                    >
-                                      {menu.name}
-                                    </button>
-                                  ))}
-                                </div>
-                              </>
-                            )}
                           </div>
                         </div>
                       )}

@@ -47,11 +47,6 @@ const navItems: NavItem[] = [
     icon: <Sparkles className="h-5 w-5" />
   },
   {
-    name: 'Menu',
-    href: '/novel/menus',
-    icon: <Menu className="h-5 w-5" />
-  },
-  {
     name: '设定',
     href: '/novel/settings',
     icon: <Settings className="h-5 w-5" />

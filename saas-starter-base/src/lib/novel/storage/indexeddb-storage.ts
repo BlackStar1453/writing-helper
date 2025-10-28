@@ -62,11 +62,6 @@ export class IndexedDBStorage implements StorageAdapter {
           const promptsStore = db.createObjectStore('prompts', { keyPath: 'id' });
           promptsStore.createIndex('novelId', 'novelId', { unique: false });
         }
-        if (!db.objectStoreNames.contains('menus')) {
-          const menusStore = db.createObjectStore('menus', { keyPath: 'id' });
-          menusStore.createIndex('novelId', 'novelId', { unique: false });
-          menusStore.createIndex('order', 'order', { unique: false });
-        }
         if (!db.objectStoreNames.contains('settings')) {
           const settingsStore = db.createObjectStore('settings', { keyPath: 'id' });
           settingsStore.createIndex('novelId', 'novelId', { unique: false });
