@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { User, MapPin, Clock, BookOpen, FileText, FolderOpen, ChevronDown, Sparkles, Menu, Settings, Calendar, Cog } from 'lucide-react';
+import { User, MapPin, Clock, BookOpen, FileText, FolderOpen, ChevronDown, Sparkles, Settings, Calendar, Cog } from 'lucide-react';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { Button } from '@/components/ui/button';
 import {
