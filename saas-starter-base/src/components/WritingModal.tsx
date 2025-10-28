@@ -72,9 +72,6 @@ interface WritingModalProps {
   // 时间线相关props
   timeline?: ChapterTimelineItem[];
   onTimelineChange?: (timeline: ChapterTimelineItem[]) => void;
-  onGenerateTimelineContent?: (timelineItem: ChapterTimelineItem, index: number) => void;
-  onRegenerateTimelineContent?: (timelineItem: ChapterTimelineItem, index: number) => void;
-  generatingTimelineItemId?: string | null;
   candidateVersions?: CandidateVersions | null;
   onApplyVersion?: (version: ContentVersion) => void;
   onClearCandidates?: () => void;
@@ -129,9 +126,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     isGeneratingDraft = false,
     timeline = [],
     onTimelineChange,
-    onGenerateTimelineContent,
-    onRegenerateTimelineContent,
-    generatingTimelineItemId,
     candidateVersions,
     onApplyVersion,
     onClearCandidates,
@@ -1553,9 +1547,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                     <TimelinePanel
                       timeline={timeline}
                       onChange={onTimelineChange}
-                      onGenerateContent={onGenerateTimelineContent}
-                      onRegenerateContent={onRegenerateTimelineContent}
-                      generatingItemId={generatingTimelineItemId}
                       candidateVersions={candidateVersions}
                       onApplyVersion={onApplyVersion}
                       onClearCandidates={onClearCandidates}

@@ -17,11 +17,7 @@ import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { NovelContext, Chapter, ChapterTimelineItem, ChapterVersion } from '@/lib/novel/types';
 import { getSettings } from '@/lib/db-utils';
 import { GenerateDraftSettingsModal, GenerateDraftSettings } from '@/components/novel/GenerateDraftSettingsModal';
-import { GenerateTimelineContentModal } from '@/components/novel/GenerateTimelineContentModal';
-import { insertContentAtTimelinePosition } from '@/lib/novel/content-utils';
-import { CandidateVersions, ContentVersion } from '@/components/novel/TimelinePanel';
 import { toast } from 'sonner';
-import { usePrompts } from '@/lib/novel/hooks/use-prompts';
 
 export default function ChapterWritingPage() {
   const params = useParams();
@@ -34,7 +30,6 @@ export default function ChapterWritingPage() {
   const { locations } = useLocations(currentNovelId);
   const { settings } = useSettings(currentNovelId);
   const { events } = useEvents(currentNovelId);
-  const { prompts } = usePrompts(currentNovelId);
 
   const [chapter, setChapter] = useState<Chapter | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,12 +37,7 @@ export default function ChapterWritingPage() {
   const [isGeneratingDraft, setIsGeneratingDraft] = useState(false);
   const [isGeneratingTimeline, setIsGeneratingTimeline] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [generatingTimelineItemId, setGeneratingTimelineItemId] = useState<string | null>(null);
-  const [candidateVersions, setCandidateVersions] = useState<CandidateVersions | null>(null);
   const [isWritingModalOpen, setIsWritingModalOpen] = useState(false);
-  const [isTimelineContentModalOpen, setIsTimelineContentModalOpen] = useState(false);
-  const [selectedTimelineItem, setSelectedTimelineItem] = useState<ChapterTimelineItem | null>(null);
-  const [selectedTimelineIndex, setSelectedTimelineIndex] = useState<number>(-1);
 
   // 版本控制状态
   const [chapterVersions, setChapterVersions] = useState<ChapterVersion[]>([]);
@@ -287,199 +277,6 @@ export default function ChapterWritingPage() {
     }
   };
 
-  // 为Timeline节点生成对应的内容 - 打开配置Modal
-  const handleGenerateTimelineContent = (timelineItem: ChapterTimelineItem, index: number) => {
-    setSelectedTimelineItem(timelineItem);
-    setSelectedTimelineIndex(index);
-    setIsTimelineContentModalOpen(true);
-  };
-
-  // 确认生成Timeline节点内容
-  const handleConfirmGenerateTimelineContent = async (genSettings: {
-    selectedCharacterIds: string[];
-    selectedLocationIds: string[];
-    selectedPromptIds: string[];
-    selectedSettingIds: string[];
-    selectedEventIds: string[];
-  }) => {
-    try {
-      if (!chapter || !selectedTimelineItem) return;
-
-      setIsTimelineContentModalOpen(false);
-      setGeneratingTimelineItemId(selectedTimelineItem.id);
-
-      // 获取API设置
-      const apiSettings = await getSettings();
-
-      // 检查API Token
-      if (!apiSettings.apiToken) {
-        toast.error('请先在设置中配置API Token');
-        return;
-      }
-
-      // 构建上下文
-      const selectedCharacters = characters.filter(c => genSettings.selectedCharacterIds.includes(c.id));
-      const selectedLocations = locations.filter(l => genSettings.selectedLocationIds.includes(l.id));
-      const selectedPrompts = prompts.filter(p => genSettings.selectedPromptIds.includes(p.id));
-      const selectedSettings = settings.filter(s => genSettings.selectedSettingIds.includes(s.id));
-      const selectedEvents = events.filter(e => genSettings.selectedEventIds.includes(e.id));
-
-      const context = {
-        ...novelContext,
-        selectedCharacters,
-        selectedLocations,
-        selectedPrompts,
-        selectedSettings,
-        selectedEvents,
-      };
-
-      // 构建请求数据
-      const requestData = {
-        currentContent: chapter.content || '',
-        timeline: chapter.timeline || [],
-        targetItem: selectedTimelineItem,
-        targetIndex: selectedTimelineIndex,
-        chapterInfo: context.chapterInfo,
-        context,
-        apiToken: apiSettings.apiToken,
-        model: apiSettings.aiModel,
-      };
-
-      // 调用API生成内容
-      const response = await fetch('/api/novel/generate-timeline-content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to generate timeline content');
-      }
-
-      const data = await response.json();
-
-      // 保存候选版本供用户选择
-      setCandidateVersions({
-        timelineItemId: data.timelineItemId,
-        versions: data.versions,
-      });
-
-      // 不再自动插入,等待用户选择
-    } catch (err) {
-      console.error('Failed to generate timeline content:', err);
-      toast.error('生成内容失败: ' + (err instanceof Error ? err.message : '未知错误'));
-    } finally {
-      setGeneratingTimelineItemId(null);
-    }
-  };
-
-  // 重新生成Timeline节点内容（基于修改建议）
-  const handleRegenerateTimelineContent = async (timelineItem: ChapterTimelineItem, index: number, currentContent?: string) => {
-    try {
-      if (!chapter) return;
-
-      setGeneratingTimelineItemId(timelineItem.id);
-
-      // 获取API设置
-      const apiSettings = await getSettings();
-      if (!apiSettings.apiToken) {
-        toast.error('请先在设置中配置 API Token');
-        return;
-      }
-
-      // 使用当前的novelContext（包含已选择的人物、地点等）
-      const context = {
-        ...novelContext,
-      };
-
-      // 构建请求数据
-      // 优先使用传入的currentContent(编辑器中的最新内容),否则使用chapter.content
-      const requestData = {
-        currentContent: currentContent || chapter.content || '',
-        timeline: chapter.timeline || [],
-        targetItem: timelineItem,
-        targetIndex: index,
-        chapterInfo: context.chapterInfo,
-        context,
-        apiToken: apiSettings.apiToken,
-        model: apiSettings.aiModel,
-      };
-
-      // 调用API重新生成内容
-      const response = await fetch('/api/novel/regenerate-timeline-content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to regenerate timeline content');
-      }
-
-      const data = await response.json();
-
-      // 保存候选版本供用户选择
-      setCandidateVersions({
-        timelineItemId: data.timelineItemId,
-        versions: data.versions,
-      });
-
-      toast.success('已生成3个候选版本，请选择一个应用');
-    } catch (err) {
-      console.error('Failed to regenerate timeline content:', err);
-      toast.error('重新生成内容失败: ' + (err instanceof Error ? err.message : '未知错误'));
-    } finally {
-      setGeneratingTimelineItemId(null);
-    }
-  };
-
-  // 应用选中的版本
-  const handleApplyVersion = async (version: ContentVersion) => {
-    try {
-      if (!chapter || !candidateVersions) return;
-
-      // 使用智能插入逻辑,将内容插入到正确位置
-      const targetIndex = chapter.timeline?.findIndex(
-        item => item.id === candidateVersions.timelineItemId
-      ) ?? -1;
-
-      if (targetIndex === -1) {
-        throw new Error('Timeline item not found');
-      }
-
-      const newContent = insertContentAtTimelinePosition(
-        chapter.content || '',
-        version.content,
-        candidateVersions.timelineItemId,
-        targetIndex,
-        chapter.timeline || []
-      );
-
-      await updateChapter(chapter.id, {
-        content: newContent,
-      });
-
-      // 清空候选版本
-      setCandidateVersions(null);
-
-      // 重新加载章节
-      await loadChapter();
-
-      toast.success('内容应用成功！');
-    } catch (err) {
-      console.error('Failed to apply version:', err);
-      toast.error('应用失败: ' + (err instanceof Error ? err.message : '未知错误'));
-    }
-  };
-
-  // 清空候选版本
-  const handleClearCandidates = () => {
-    setCandidateVersions(null);
-  };
 
   // 处理写作内容提交
   const handleWritingSubmit = async (data: { text: string }) => {
@@ -670,13 +467,7 @@ export default function ChapterWritingPage() {
           isGeneratingDraft={isGeneratingDraft}
           onSubmit={handleWritingSubmit}
           onTimelineChange={handleTimelineChange}
-          onGenerateTimelineContent={handleGenerateTimelineContent}
-          generatingTimelineItemId={generatingTimelineItemId}
-          candidateVersions={candidateVersions}
-          onApplyVersion={handleApplyVersion}
-          onClearCandidates={handleClearCandidates}
           onJumpToTimelineContent={handleJumpToTimelineContent}
-          onRegenerateTimelineContent={handleRegenerateTimelineContent}
           isOpen={isWritingModalOpen}
           onOpenChange={setIsWritingModalOpen}
           chapterVersions={chapterVersions}
@@ -713,19 +504,6 @@ export default function ChapterWritingPage() {
           isGeneratingTimeline={isGeneratingTimeline}
           initialTimeline={chapter?.timeline || []}
         />
-
-        {/* 生成Timeline节点内容设置Modal */}
-        <GenerateTimelineContentModal
-          isOpen={isTimelineContentModalOpen}
-          onClose={() => setIsTimelineContentModalOpen(false)}
-          onConfirm={handleConfirmGenerateTimelineContent}
-          timelineItem={selectedTimelineItem}
-          allCharacters={characters}
-          allLocations={locations}
-          allPrompts={prompts}
-          allSettings={settings}
-          allEvents={events}
-        />
       </div>
     </NovelNav>
   );
@@ -740,12 +518,6 @@ function WritingModalWrapper({
   isGeneratingDraft,
   onSubmit,
   onTimelineChange,
-  onGenerateTimelineContent,
-  onRegenerateTimelineContent,
-  generatingTimelineItemId,
-  candidateVersions,
-  onApplyVersion,
-  onClearCandidates,
   onJumpToTimelineContent,
   isOpen,
   onOpenChange,
@@ -765,12 +537,6 @@ function WritingModalWrapper({
   isGeneratingDraft: boolean;
   onSubmit: (data: { text: string }) => void;
   onTimelineChange: (timeline: ChapterTimelineItem[]) => void;
-  onGenerateTimelineContent: (timelineItem: ChapterTimelineItem, index: number) => void;
-  onRegenerateTimelineContent: (timelineItem: ChapterTimelineItem, index: number, currentContent?: string) => void;
-  generatingTimelineItemId: string | null;
-  candidateVersions: CandidateVersions | null;
-  onApplyVersion: (version: ContentVersion) => void;
-  onClearCandidates: () => void;
   onJumpToTimelineContent: (timelineItemId: string) => void;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -817,15 +583,6 @@ function WritingModalWrapper({
     onOpenChange(false);
   };
 
-  // 包装onRegenerateTimelineContent,传递当前编辑器中的内容
-  const handleRegenerateWithCurrentContent = (timelineItem: ChapterTimelineItem, index: number) => {
-    // 传递当前编辑器中的内容(text是已清理标记的内容,需要传递原始的带标记的内容)
-    // 但是text是用户正在编辑的内容,可能已经修改过,所以我们需要重新添加标记
-    // 实际上,我们应该传递initialText(带标记的原始内容)和用户的修改
-    // 为了简化,我们直接传递text,让API使用最新的内容
-    onRegenerateTimelineContent(timelineItem, index, text);
-  };
-
   // 传递原始内容(带标记),WritingModal内部会进行清理
   return (
     <WritingModal
@@ -840,12 +597,6 @@ function WritingModalWrapper({
       isGeneratingDraft={isGeneratingDraft}
       timeline={chapter.timeline || []}
       onTimelineChange={onTimelineChange}
-      onGenerateTimelineContent={onGenerateTimelineContent}
-      onRegenerateTimelineContent={handleRegenerateWithCurrentContent}
-      generatingTimelineItemId={generatingTimelineItemId}
-      candidateVersions={candidateVersions}
-      onApplyVersion={onApplyVersion}
-      onClearCandidates={onClearCandidates}
       onJumpToTimelineContent={onJumpToTimelineContent}
       chapterVersions={chapterVersions}
       currentVersion={currentVersion}

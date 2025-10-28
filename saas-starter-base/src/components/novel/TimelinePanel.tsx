@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Plus, Trash2, Edit2, Check, X, GripVertical, Sparkles, Lightbulb, CheckCircle, GitCompare } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, GripVertical, Lightbulb, CheckCircle, GitCompare } from 'lucide-react';
 import { ChapterTimelineItem } from '@/lib/novel/types';
 import {
   DndContext,
@@ -33,17 +33,14 @@ interface SortableTimelineItemProps {
   readOnly: boolean;
   editingId: string | null;
   editingContent: string;
-  generatingItemId?: string | null;
   onStartEdit: (item: ChapterTimelineItem) => void;
   onSaveEdit: () => void;
   onCancelEdit: () => void;
   onEditingContentChange: (content: string) => void;
   onDelete: (id: string) => void;
-  onGenerateContent?: (item: ChapterTimelineItem, index: number) => void;
   onJumpToContent?: (id: string) => void;
   onUpdateSuggestion?: (id: string, suggestion: string) => void;
   onToggleReviewed?: (id: string) => void;
-  onRegenerateContent?: (item: ChapterTimelineItem, index: number) => void;
 }
 
 function SortableTimelineItem({
@@ -52,17 +49,14 @@ function SortableTimelineItem({
   readOnly,
   editingId,
   editingContent,
-  generatingItemId,
   onStartEdit,
   onSaveEdit,
   onCancelEdit,
   onEditingContentChange,
   onDelete,
-  onGenerateContent,
   onJumpToContent,
   onUpdateSuggestion,
   onToggleReviewed,
-  onRegenerateContent,
 }: SortableTimelineItemProps) {
   const [editingSuggestion, setEditingSuggestion] = useState(false);
   const [suggestionText, setSuggestionText] = useState(item.modificationSuggestion || '');
@@ -151,22 +145,6 @@ function SortableTimelineItem({
             {/* 操作按钮 */}
             {!readOnly && (
               <div className="flex-shrink-0 flex gap-1">
-                {onGenerateContent && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onGenerateContent(item, index)}
-                    disabled={generatingItemId === item.id}
-                    className="h-8 w-8 p-0 text-purple-500 hover:text-purple-600"
-                    title="生成该节点对应的内容"
-                  >
-                    {generatingItemId === item.id ? (
-                      <div className="animate-spin h-4 w-4 border-2 border-purple-500 border-t-transparent rounded-full" />
-                    ) : (
-                      <Sparkles className="h-4 w-4" />
-                    )}
-                  </Button>
-                )}
                 <Button
                   size="sm"
                   variant="ghost"
@@ -227,22 +205,6 @@ function SortableTimelineItem({
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    {onRegenerateContent && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => onRegenerateContent(item, index)}
-                        disabled={generatingItemId === item.id}
-                        className="text-xs text-purple-600 hover:text-purple-700"
-                      >
-                        {generatingItemId === item.id ? (
-                          <div className="animate-spin h-3 w-3 border-2 border-purple-500 border-t-transparent rounded-full mr-1" />
-                        ) : (
-                          <Sparkles className="h-3 w-3 mr-1" />
-                        )}
-                        重新生成
-                      </Button>
-                    )}
                     <Button
                       size="sm"
                       variant="ghost"
@@ -308,9 +270,6 @@ interface TimelinePanelProps {
   timeline: ChapterTimelineItem[];
   onChange: (timeline: ChapterTimelineItem[]) => void;
   readOnly?: boolean;
-  onGenerateContent?: (timelineItem: ChapterTimelineItem, index: number) => void;
-  onRegenerateContent?: (timelineItem: ChapterTimelineItem, index: number) => void;
-  generatingItemId?: string | null;
   candidateVersions?: CandidateVersions | null;
   onApplyVersion?: (version: ContentVersion) => void;
   onClearCandidates?: () => void;
@@ -321,9 +280,6 @@ export function TimelinePanel({
   timeline,
   onChange,
   readOnly = false,
-  onGenerateContent,
-  onRegenerateContent,
-  generatingItemId,
   candidateVersions,
   onApplyVersion,
   onClearCandidates,
@@ -525,17 +481,14 @@ export function TimelinePanel({
                   readOnly={readOnly}
                   editingId={editingId}
                   editingContent={editingContent}
-                  generatingItemId={generatingItemId}
                   onStartEdit={handleStartEdit}
                   onSaveEdit={handleSaveEdit}
                   onCancelEdit={handleCancelEdit}
                   onEditingContentChange={setEditingContent}
                   onDelete={handleDelete}
-                  onGenerateContent={onGenerateContent}
                   onJumpToContent={onJumpToContent}
                   onUpdateSuggestion={handleUpdateSuggestion}
                   onToggleReviewed={handleToggleReviewed}
-                  onRegenerateContent={onRegenerateContent}
                 />
 
                 {/* 候选版本显示 - 保持原有逻辑 */}
