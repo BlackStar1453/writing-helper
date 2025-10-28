@@ -595,7 +595,6 @@ function WritingModalWrapper({
     <WritingModal
       isOpen={isOpen}
       onClose={handleClose}
-      onSubmit={handleClose}
       onTextChange={setText}
       initialText={chapter.content || ''}
       novelContext={novelContext}

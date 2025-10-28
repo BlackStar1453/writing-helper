@@ -27,7 +27,6 @@ import { useCharacters } from '@/lib/novel/hooks/use-characters';
 interface WritingModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: WritingData) => void;
   // Agent聊天相关props
   agentMessages?: Array<{ role: 'user' | 'assistant'; content: string }>;
   onAgentSendMessage?: (message: string, actionType?: string) => void;
@@ -90,7 +89,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
   const {
     isOpen,
     onClose,
-    onSubmit,
     agentMessages = [],
     onAgentSendMessage,
     isAgentLoading = false,
@@ -441,15 +439,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     }
   };
   
-  // 提交处理 (写作模式)
-  const handleSubmit = () => {
-    if (!text.trim()) {
-      alert('请输入内容后再提交');
-      return;
-    }
 
-    onSubmit({ userText: text, errors: [] });
-  };
 
   // 关闭处理
   const handleClose = () => {
@@ -1832,17 +1822,18 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                     {currentVersion && <span className="text-xs text-gray-500">v{currentVersion}</span>}
                   </button>
                 )}
-                {/* 保存版本按钮 */}
+                {/* 保存按钮 */}
                 {onSaveVersion && (
                   <button
                     onClick={() => setShowVersionDescriptionInput(true)}
                     disabled={!text.trim()}
-                    className="px-3 py-2 border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    title="Save Version"
+                    className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                    title="保存"
                   >
-                    <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                     </svg>
+                    保存
                   </button>
                 )}
                 <button
@@ -1850,16 +1841,6 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                   className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 transition-colors"
                 >
                   关闭
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={!text.trim()}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  {showAnalysisResults ? '重新分析' : '提交分析'}
                 </button>
               </div>
             </>

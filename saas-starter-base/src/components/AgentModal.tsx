@@ -8,7 +8,6 @@ import { WritingModal, WritingModalRef } from './WritingModal';
 import {
   parseMessageOptions,
   removeOptionTags,
-  WritingData,
   parseAISuggestions,
   removeAISuggestionsTags,
   AISuggestion,
@@ -317,69 +316,7 @@ export function AgentModal({ isOpen, onClose, text, errors, initialMessage, apiT
     setMockAISuggestions(suggestions);
   };
 
-  // 处理写作提交
-  const handleWritingSubmit = async (data: WritingData) => {
-    // 保存当前写作内容
-    setCurrentWritingText(data.userText);
 
-    // 显示分析结果
-    setShowAnalysisResults(true);
-
-    // 显示loading状态
-    setIsLoadingAISuggestions(true);
-
-    console.log('Submitting text to analyze API:', data.userText);
-
-    // 异步调用analyze API获取AI结构化建议
-    fetch('/api/analyze', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        text: data.userText,
-        apiToken,
-        aiModel
-      }),
-    })
-      .then(async (response) => {
-        if (response.ok) {
-          const result = await response.json();
-          console.log('AI suggestions received:', result.suggestions);
-          // 更新AI建议
-          setMockAISuggestions(result.suggestions || []);
-        } else {
-          const errorData = await response.json().catch(() => ({}));
-          console.error('Failed to get AI suggestions:', errorData);
-
-          // 如果是API token未设置错误,显示提示
-          if (errorData.error === 'API_TOKEN_NOT_SET') {
-            setMockAISuggestions([{
-              start: 0,
-              end: 0,
-              type: 'Error',
-              message: '⚠️ API Token未设置。请点击右上角的设置按钮,输入您的API Token后再试。\n\n⚠️ API Token not set. Please click the settings button in the top right corner and enter your API Token.',
-              problemText: '',
-              replacements: []
-            }]);
-          } else {
-            // 其他错误,清空建议
-            setMockAISuggestions([]);
-          }
-        }
-      })
-      .catch((error) => {
-        console.error('Error calling analyze API:', error);
-        // 如果出错,清空建议
-        setMockAISuggestions([]);
-      })
-      .finally(() => {
-        setIsLoadingAISuggestions(false);
-      });
-
-    // 不再自动发送"我完成了写作"消息给Feedback Agent
-    // AI suggestions已经通过/api/analyze获取
-  };
 
   // 创建新的chat会话
   const createNewChatSession = (actionType?: string, initialMessage?: string): string => {
@@ -778,7 +715,6 @@ export function AgentModal({ isOpen, onClose, text, errors, initialMessage, apiT
           setIsWritingModalOpen(false);
           setShowAnalysisResults(false);
         }}
-        onSubmit={handleWritingSubmit}
         agentMessages={getAgentMessages()}
         onAgentSendMessage={handleWritingAgentSend}
         isAgentLoading={isAssistantLoading}
