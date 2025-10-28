@@ -48,12 +48,7 @@ export default function ChapterWritingPage() {
     loadChapter();
   }, [chapterId]);
 
-  // 加载完成后自动打开WritingModal
-  useEffect(() => {
-    if (!loading && chapter) {
-      setIsWritingModalOpen(true);
-    }
-  }, [loading, chapter]);
+
 
   const loadChapter = async () => {
     try {
