@@ -440,35 +440,63 @@ export function GenerateDraftSettingsModal({
                       {item.order}.
                     </span>
                     {editingTimelineId === item.id ? (
-                      <div className="flex-1 flex gap-2">
+                      <div className="flex-1 flex flex-col gap-2">
                         <textarea
                           value={editingTimelineContent}
                           onChange={(e) => setEditingTimelineContent(e.target.value)}
-                          className="flex-1 p-1 text-sm border rounded resize-none"
-                          rows={2}
+                          className="flex-1 p-2 text-sm border rounded resize-none"
+                          rows={4}
+                          placeholder="描述这个时间线节点的内容..."
                         />
-                        <div className="flex flex-col gap-1">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={handleSaveTimelineEdit}
-                            className="h-6 px-2"
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs text-gray-600">目标字数:</label>
+                          <select
+                            value={item.targetWordCount || 500}
+                            onChange={(e) => {
+                              const newTimeline = timeline.map(t =>
+                                t.id === item.id
+                                  ? { ...t, targetWordCount: parseInt(e.target.value) }
+                                  : t
+                              );
+                              setTimeline(newTimeline);
+                            }}
+                            className="text-xs border rounded px-2 py-1"
                           >
-                            保存
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={handleCancelTimelineEdit}
-                            className="h-6 px-2"
-                          >
-                            取消
-                          </Button>
+                            <option value="200">简短 (200字)</option>
+                            <option value="500">中等 (500字)</option>
+                            <option value="800">详细 (800字)</option>
+                            <option value="1200">很详细 (1200字)</option>
+                          </select>
+                          <div className="flex gap-1 ml-auto">
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={handleSaveTimelineEdit}
+                              className="h-6 px-2"
+                            >
+                              保存
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={handleCancelTimelineEdit}
+                              className="h-6 px-2"
+                            >
+                              取消
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     ) : (
                       <>
-                        <span className="flex-1 text-sm">{item.content}</span>
+                        <div className="flex-1">
+                          <span className="text-sm">{item.content}</span>
+                          {item.targetWordCount && (
+                            <span className="ml-2 text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                              ~{item.targetWordCount}字
+                            </span>
+                          )}
+                        </div>
                         <div className="flex gap-1">
                           <Button
                             size="sm"

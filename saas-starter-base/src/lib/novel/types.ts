@@ -161,6 +161,7 @@ export interface ChapterTimelineItem {
   content: string;
   modificationSuggestion?: string; // 修改建议
   isReviewed?: boolean; // 是否已审核（用于段落保留功能）
+  targetWordCount?: number; // 目标字数 (用于生成初稿时控制详细程度)
 }
 
 // ========== 章节版本 ==========

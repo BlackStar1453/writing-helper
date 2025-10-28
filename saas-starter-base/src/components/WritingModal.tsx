@@ -149,11 +149,53 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
 
   // 清理Timeline标记用于显示
   const [text, setText] = useState(cleanContentForDisplay(initialText));
+  const [saveStatus, setSaveStatus] = useState<'saved' | 'saving' | 'unsaved'>('saved'); // 保存状态
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null); // 自动保存定时器
 
   // 当initialText变化时更新text状态
   useEffect(() => {
     setText(cleanContentForDisplay(initialText));
   }, [initialText]);
+
+  // 自动保存函数
+  const autoSave = (content: string) => {
+    if (!onSaveWritingHistory || !content.trim()) return;
+
+    setSaveStatus('saving');
+    try {
+      onSaveWritingHistory(content);
+      setSaveStatus('saved');
+      // 2秒后隐藏"已保存"状态
+      setTimeout(() => {
+        setSaveStatus('unsaved');
+      }, 2000);
+    } catch (error) {
+      console.error('Auto save failed:', error);
+      setSaveStatus('unsaved');
+    }
+  };
+
+  // 防抖自动保存: 用户停止输入1.5秒后自动保存
+  useEffect(() => {
+    if (!text.trim()) return;
+
+    // 清除之前的定时器
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    // 设置新的定时器
+    autoSaveTimerRef.current = setTimeout(() => {
+      autoSave(text);
+    }, 1500); // 1.5秒后自动保存
+
+    // 清理函数
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [text, onSaveWritingHistory]);
 
   // 监听跳转到Timeline内容的事件
   useEffect(() => {
@@ -1163,9 +1205,26 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
             {/* 普通模式: 标题 */}
             {!guidedMode && (
               <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {showAnalysisResults ? 'Your Text' : 'Your Writing'}
-                </label>
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {showAnalysisResults ? 'Your Text' : 'Your Writing'}
+                  </label>
+                  {/* 保存状态指示器 */}
+                  {saveStatus === 'saving' && (
+                    <span className="text-xs text-gray-500 flex items-center gap-1">
+                      <div className="w-3 h-3 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                      保存中...
+                    </span>
+                  )}
+                  {saveStatus === 'saved' && (
+                    <span className="text-xs text-green-600 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      已保存
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center gap-2">
                   {novelContext && onGenerateDraft && (
                     <button
@@ -1218,9 +1277,16 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
                 onChange={(e) => {
                   const newText = e.target.value;
                   setText(newText);
+                  setSaveStatus('unsaved'); // 标记为未保存
                   // 如果文本被清空,清除currentWritingId
                   if (newText.trim() === '' && onClearCurrentWriting) {
                     onClearCurrentWriting();
+                  }
+                }}
+                onBlur={() => {
+                  // 失焦时立即保存
+                  if (text.trim() && onSaveWritingHistory) {
+                    autoSave(text);
                   }
                 }}
                 onScroll={handleScroll}
