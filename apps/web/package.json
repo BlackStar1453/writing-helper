@@ -1,5 +1,5 @@
 {
-  "name": "saas-starter-base",
+  "name": "web",
   "private": true,
   "scripts": {
     "dev": "next dev",

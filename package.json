@@ -4,12 +4,12 @@
   "private": true,
   "description": "Writing Assistant - AI-powered grammar checker and writing tool",
   "scripts": {
-    "dev:web": "pnpm --filter saas-starter-base dev",
+    "dev:web": "pnpm --filter web dev",
     "dev:tauri": "cd apps/desktop && cargo tauri dev",
-    "build:web": "pnpm --filter saas-starter-base build",
+    "build:web": "pnpm --filter web build",
     "build:tauri": "cd apps/desktop && cargo tauri build",
-    "lint": "pnpm --filter saas-starter-base lint",
-    "test": "pnpm --filter saas-starter-base test"
+    "lint": "pnpm --filter web lint",
+    "test": "pnpm --filter web test"
   },
   "devDependencies": {
     "pnpm": "^9.0.0"
