@@ -55,3 +55,6 @@ Cargo.lock
 # Tauri
 muses-tauri/src-tauri/target/
 
+
+# Augment (local tooling)
+.augment/
