@@ -5,9 +5,9 @@
   "description": "Writing Assistant - AI-powered grammar checker and writing tool",
   "scripts": {
     "dev:web": "pnpm --filter saas-starter-base dev",
-    "dev:tauri": "cd muses-tauri && cargo tauri dev",
+    "dev:tauri": "cd apps/desktop && cargo tauri dev",
     "build:web": "pnpm --filter saas-starter-base build",
-    "build:tauri": "cd muses-tauri && cargo tauri build",
+    "build:tauri": "cd apps/desktop && cargo tauri build",
     "lint": "pnpm --filter saas-starter-base lint",
     "test": "pnpm --filter saas-starter-base test"
   },
