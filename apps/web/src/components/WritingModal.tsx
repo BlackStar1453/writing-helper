@@ -286,6 +286,8 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
   const [smartWritingSelectionEnd, setSmartWritingSelectionEnd] = useState(0);
   const [smartWritingSelectedText, setSmartWritingSelectedText] = useState('');
 
+  const [isIteratingSmartWriting, setIsIteratingSmartWriting] = useState(false);
+  const [lastSmartWritingSettings, setLastSmartWritingSettings] = useState<SmartWritingSettings | null>(null);
   // 选中文本状态(用于在Suggestions tab中显示)
   const [selectedTextInfo, setSelectedTextInfo] = useState<{
     text: string;
@@ -374,7 +376,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showVersionHistorySidebar]);
-  
+
 
 
   // 应用AI建议
@@ -438,7 +440,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
       }
     }
   };
-  
+
 
 
   // 关闭处理
@@ -636,6 +638,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
       setIsGeneratingSmartWriting(true);
       // 不要关闭modal，保持打开并显示loading状态
 
+      setLastSmartWritingSettings(settings);
       // 获取API设置
       const apiSettings = await getSettings();
       if (!apiSettings.apiToken) {
@@ -732,6 +735,101 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
       // 发生错误时不关闭modal，让用户可以重试或修改设置
     } finally {
       setIsGeneratingSmartWriting(false);
+    }
+  };
+
+  // 基于选中版本+用户反馈进行迭代生成
+  const handleIterateSmartWriting = async ({ base, feedback }: { base: SmartWritingCandidate; feedback: string }) => {
+    try {
+      setIsIteratingSmartWriting(true);
+
+      const apiSettings = await getSettings();
+      if (!apiSettings.apiToken) {
+        toast.error('请先在设置中配置 API Token');
+        setIsIteratingSmartWriting(false);
+        return;
+      }
+
+      // 上下文仍按当前选择范围计算
+      const contextBefore = text.substring(
+        Math.max(0, smartWritingSelectionStart - 500),
+        smartWritingSelectionStart
+      );
+      const contextAfter = text.substring(
+        smartWritingSelectionEnd,
+        Math.min(text.length, smartWritingSelectionEnd + 500)
+      );
+
+      // timeline（若启用）
+      let currentTimelineNode: ChapterTimelineItem | undefined;
+      if (lastSmartWritingSettings?.useTimeline && timeline && timeline.length > 0) {
+        const textBeforeCursor = text.substring(0, smartWritingSelectionStart);
+        const markers = textBeforeCursor.match(/<!-- TIMELINE_NODE:(.*?) -->/g) || [];
+        if (markers.length > 0) {
+          const lastMarker = markers[markers.length - 1];
+          const nodeId = lastMarker.match(/<!-- TIMELINE_NODE:(.*?) -->/)?.[1];
+          if (nodeId) {
+            currentTimelineNode = timeline.find(item => item.id === nodeId);
+          }
+        }
+      }
+
+      const s = lastSmartWritingSettings;
+
+      // 构建请求
+      const requestData = smartWritingMode === 'continue' ? {
+        selectedText: smartWritingSelectedText,
+        contextBefore,
+        contextAfter,
+        length: s?.length || 'medium',
+        selectedCharacters: s?.selectedCharacters || [],
+        selectedLocations: s?.selectedLocations || [],
+        selectedSettings: s?.selectedSettings || [],
+        selectedPrompts: s?.selectedPrompts || [],
+        useTimeline: !!s?.useTimeline,
+        currentTimelineNode: s?.useTimeline ? currentTimelineNode : undefined,
+        customPrompt: s?.customPrompt,
+        novelContext: novelContext || {},
+        apiToken: apiSettings.apiToken,
+        model: apiSettings.aiModel || 'deepseek-chat',
+        baseCandidateContent: base.content,
+        userFeedback: feedback
+      } : {
+        selectedText: smartWritingSelectedText,
+        contextBefore,
+        contextAfter,
+        rewriteStyle: s?.rewriteStyle,
+        selectedCharacters: s?.selectedCharacters || [],
+        selectedLocations: s?.selectedLocations || [],
+        selectedSettings: s?.selectedSettings || [],
+        selectedPrompts: s?.selectedPrompts || [],
+        customPrompt: s?.customPrompt,
+        novelContext: novelContext || {},
+        apiToken: apiSettings.apiToken,
+        model: apiSettings.aiModel || 'deepseek-chat',
+        baseCandidateContent: base.content,
+        userFeedback: feedback
+      };
+
+      const apiUrl = smartWritingMode === 'continue'
+        ? '/api/novel/continue-writing'
+        : '/api/novel/rewrite-paragraph';
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData)
+      });
+      if (!response.ok) throw new Error('生成失败');
+
+      const data = await response.json();
+      setSmartWritingCandidates(data.candidates);
+      toast.success(`已生成${data.candidates.length}个新版本`);
+    } catch (e) {
+      console.error('Iterate smart writing error:', e);
+      toast.error('迭代生成失败');
+    } finally {
+      setIsIteratingSmartWriting(false);
     }
   };
 
@@ -953,31 +1051,31 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showPopover]);
-  
+
   // ESC键关闭
   useEffect(() => {
     if (!isOpen) return;
-    
+
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         handleClose();
       }
     };
-    
+
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
-  
+
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 z-50">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/50 animate-in fade-in duration-200" 
-        onClick={handleClose} 
+      <div
+        className="absolute inset-0 bg-black/50 animate-in fade-in duration-200"
+        onClick={handleClose}
       />
-      
+
       {/* Modal */}
       <div className="absolute inset-4 md:inset-8 bg-white dark:bg-gray-800 rounded-lg shadow-2xl flex flex-col animate-in slide-in-from-bottom duration-300">
         {/* Header */}
@@ -993,8 +1091,8 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
               <p className="text-sm text-gray-600 dark:text-gray-400">Write and get instant grammar suggestions</p>
             </div>
           </div>
-          <button 
-            onClick={handleClose} 
+          <button
+            onClick={handleClose}
             className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
           >
             <svg className="w-6 h-6 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1002,7 +1100,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
             </svg>
           </button>
         </div>
-        
+
         {/* Content */}
         <div className="flex-1 flex overflow-hidden">
           {/* Left: Editor (70%) */}
@@ -1233,7 +1331,7 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
               />
             </div>
           </div>
-          
+
           {/* Right: Analysis Results and Agent Chat (30%) */}
           <div className="hidden md:flex md:w-[30%] p-4 md:p-6 flex-col overflow-hidden">
             {/* 分析结果和Agent Chat切换 */}
@@ -2156,6 +2254,8 @@ export const WritingModal = forwardRef<WritingModalRef, WritingModalProps>((prop
           mode={smartWritingMode}
           candidates={smartWritingCandidates}
           onApply={handleApplySmartWritingCandidate}
+          onIterate={handleIterateSmartWriting}
+          isIterating={isIteratingSmartWriting}
         />
       )}
     </div>

@@ -20,6 +20,9 @@ interface ContinueWritingRequest {
   novelContext: NovelContext;
   apiToken: string;
   model: string;
+  // 迭代生成相关（可选）
+  baseCandidateContent?: string;  // 上一轮选中的版本内容
+  userFeedback?: string;          // 用户反馈意见
 }
 
 interface ContinueWritingResponse {
@@ -163,6 +166,22 @@ function buildContinueWritingPrompt(request: ContinueWritingRequest): string {
   parts.push('**选中的文本(续写起点)**:');
   parts.push(request.selectedText);
   parts.push('');
+
+  if (request.baseCandidateContent && request.baseCandidateContent.trim()) {
+    parts.push('**基准版本（在此基础上继续优化/续写）**:');
+    parts.push(request.baseCandidateContent);
+    parts.push('');
+  }
+  if (request.userFeedback && request.userFeedback.trim()) {
+    parts.push('**用户反馈/优化方向**:');
+    parts.push(request.userFeedback);
+    parts.push('');
+  }
+  if (request.baseCandidateContent || request.userFeedback) {
+    parts.push('请基于上述“基准版本”和“用户反馈”，输出3个改进的新续写版本。');
+    parts.push('');
+  }
+
   parts.push('[在此处续写]');
   parts.push('');
 

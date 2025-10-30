@@ -18,6 +18,9 @@ interface RewriteRequest {
   novelContext: NovelContext;
   apiToken: string;
   model: string;
+  // 迭代生成相关（可选）
+  baseCandidateContent?: string;  // 上一轮选中的版本内容
+  userFeedback?: string;          // 用户反馈意见
 }
 
 interface RewriteResponse {
@@ -149,6 +152,21 @@ function buildRewritePrompt(request: RewriteRequest): string {
   parts.push('**需要重写的段落**:');
   parts.push(request.selectedText);
   parts.push('');
+
+  if (request.baseCandidateContent && request.baseCandidateContent.trim()) {
+    parts.push('**当前版本（本轮重写对象）**:');
+    parts.push(request.baseCandidateContent);
+    parts.push('');
+  }
+  if (request.userFeedback && request.userFeedback.trim()) {
+    parts.push('**用户反馈/优化方向**:');
+    parts.push(request.userFeedback);
+    parts.push('');
+  }
+  if (request.baseCandidateContent || request.userFeedback) {
+    parts.push('请基于上述“当前版本”和“用户反馈”，输出3个改进的新重写版本。');
+    parts.push('');
+  }
 
   if (request.contextAfter && request.contextAfter.trim()) {
     parts.push('**后文**:');
