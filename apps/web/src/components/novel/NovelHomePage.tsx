@@ -17,7 +17,8 @@ import {
   Calendar,
   PenTool,
   ChevronRight,
-  Cog
+  Cog,
+  Github
 } from 'lucide-react';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { Button } from '@/components/ui/button';
@@ -119,8 +120,21 @@ export function NovelHomePage() {
               </h1>
             </div>
 
-            {/* Project Selector */}
-            <DropdownMenu>
+            {/* Right Section: GitHub Link + Project Selector */}
+            <div className="flex items-center gap-4">
+              {/* GitHub Link */}
+              <a
+                href="https://github.com/BlackStar1453/writing-helper"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                title="GitHub Repository"
+              >
+                <Github className="h-5 w-5" />
+              </a>
+
+              {/* Project Selector */}
+              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="outline"
@@ -150,6 +164,7 @@ export function NovelHomePage() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </div>
           </div>
         </div>
       </header>
