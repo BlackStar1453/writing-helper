@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { EventCard, EventProcess, Character, Location } from '@/lib/novel/types';
+import { EventCard, EventProcess, Character, Location, SettingCard } from '@/lib/novel/types';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,6 +101,8 @@ interface EventDialogProps {
   event: EventCard | null;
   characters: Character[];
   locations: Location[];
+  settings: SettingCard[];
+  events: EventCard[];
   novelId: string;
   onCreateCharacter: (data: Partial<Character>) => Promise<string>;
   onCreate: (
@@ -108,7 +110,9 @@ interface EventDialogProps {
     outline: string,
     process: EventProcess[],
     relatedCharacterIds: string[],
-    relatedLocationIds: string[]
+    relatedLocationIds: string[],
+    relatedSettingIds: string[],
+    relatedEventIds: string[]
   ) => Promise<EventCard>;
   onUpdate: (
     id: string,
@@ -118,6 +122,8 @@ interface EventDialogProps {
       process?: EventProcess[];
       relatedCharacterIds?: string[];
       relatedLocationIds?: string[];
+      relatedSettingIds?: string[];
+      relatedEventIds?: string[];
     }
   ) => Promise<void>;
 }
@@ -128,6 +134,8 @@ export function EventDialog({
   event,
   characters,
   locations,
+  settings,
+  events,
   novelId,
   onCreateCharacter,
   onCreate,
@@ -138,6 +146,8 @@ export function EventDialog({
   const [process, setProcess] = useState<EventProcess[]>([]);
   const [selectedCharacterIds, setSelectedCharacterIds] = useState<string[]>([]);
   const [selectedLocationIds, setSelectedLocationIds] = useState<string[]>([]);
+  const [selectedSettingIds, setSelectedSettingIds] = useState<string[]>([]);
+  const [selectedEventIds, setSelectedEventIds] = useState<string[]>([]);
   const [isGeneratingProcess, setIsGeneratingProcess] = useState(false);
 
   // 配置拖拽传感器
@@ -157,12 +167,16 @@ export function EventDialog({
         setProcess(event.process);
         setSelectedCharacterIds(event.relatedCharacterIds);
         setSelectedLocationIds(event.relatedLocationIds);
+        setSelectedSettingIds(event.relatedSettingIds || []);
+        setSelectedEventIds(event.relatedEventIds || []);
       } else {
         setName('');
         setOutline('');
         setProcess([{ id: generateUUID(), order: 1, description: '' }]);
         setSelectedCharacterIds([]);
         setSelectedLocationIds([]);
+        setSelectedSettingIds([]);
+        setSelectedEventIds([]);
       }
     }
   }, [isOpen, event]);
@@ -221,6 +235,18 @@ export function EventDialog({
     );
   };
 
+  const toggleSetting = (id: string) => {
+    setSelectedSettingIds(prev =>
+      prev.includes(id) ? prev.filter(sid => sid !== id) : [...prev, id]
+    );
+  };
+
+  const toggleEvent = (id: string) => {
+    setSelectedEventIds(prev =>
+      prev.includes(id) ? prev.filter(eid => eid !== id) : [...prev, id]
+    );
+  };
+
   // 生成事件流程
   const handleGenerateProcess = async () => {
     if (!name.trim()) {
@@ -251,6 +277,26 @@ export function EventDialog({
         } : null;
       }).filter(Boolean);
 
+      // 准备关联的设定信息
+      const relatedSettings = selectedSettingIds.map(id => {
+        const setting = settings.find(s => s.id === id);
+        return setting ? {
+          name: setting.name,
+          category: setting.category,
+          description: setting.description
+        } : null;
+      }).filter(Boolean);
+
+      // 准备关联的事件信息
+      const relatedEvents = selectedEventIds.map(id => {
+        const evt = events.find(e => e.id === id);
+        return evt ? {
+          name: evt.name,
+          outline: evt.outline,
+          process: evt.process.map(p => p.description).join(' -> ')
+        } : null;
+      }).filter(Boolean);
+
       // 调用API生成事件流程和人物信息
       const response = await fetch('/api/novel/generate-event-process', {
         method: 'POST',
@@ -263,6 +309,8 @@ export function EventDialog({
           apiToken: apiSettings.apiToken,
           model: apiSettings.aiModel,
           existingCharacters,
+          relatedSettings,
+          relatedEvents,
         }),
       });
 
@@ -343,10 +391,12 @@ export function EventDialog({
           process: validProcess,
           relatedCharacterIds: selectedCharacterIds,
           relatedLocationIds: selectedLocationIds,
+          relatedSettingIds: selectedSettingIds,
+          relatedEventIds: selectedEventIds,
         });
         toast.success('事件卡片已更新');
       } else {
-        await onCreate(name, outline, validProcess, selectedCharacterIds, selectedLocationIds);
+        await onCreate(name, outline, validProcess, selectedCharacterIds, selectedLocationIds, selectedSettingIds, selectedEventIds);
         toast.success('事件卡片已创建');
       }
       onClose();
@@ -430,6 +480,58 @@ export function EventDialog({
                       className="text-sm cursor-pointer"
                     >
                       {location.name}
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 关联设定 */}
+          <div>
+            <label className="text-sm font-medium">关联设定</label>
+            {settings.length === 0 ? (
+              <p className="text-sm text-gray-500">暂无设定卡片</p>
+            ) : (
+              <div className="space-y-2 mt-2">
+                {settings.map((setting) => (
+                  <div key={setting.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`setting-${setting.id}`}
+                      checked={selectedSettingIds.includes(setting.id)}
+                      onCheckedChange={() => toggleSetting(setting.id)}
+                    />
+                    <label
+                      htmlFor={`setting-${setting.id}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {setting.name} <span className="text-xs text-gray-500">({setting.category})</span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 关联事件 */}
+          <div>
+            <label className="text-sm font-medium">关联事件</label>
+            {events.filter(e => !event || e.id !== event.id).length === 0 ? (
+              <p className="text-sm text-gray-500">暂无其他事件卡片</p>
+            ) : (
+              <div className="space-y-2 mt-2">
+                {events.filter(e => !event || e.id !== event.id).map((evt) => (
+                  <div key={evt.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`event-${evt.id}`}
+                      checked={selectedEventIds.includes(evt.id)}
+                      onCheckedChange={() => toggleEvent(evt.id)}
+                    />
+                    <label
+                      htmlFor={`event-${evt.id}`}
+                      className="text-sm cursor-pointer"
+                    >
+                      {evt.name}
                     </label>
                   </div>
                 ))}

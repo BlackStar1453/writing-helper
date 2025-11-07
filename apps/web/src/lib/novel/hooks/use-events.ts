@@ -43,7 +43,9 @@ export function useEvents(novelId: string | null) {
     outline: string,
     process: EventProcess[],
     relatedCharacterIds: string[],
-    relatedLocationIds: string[]
+    relatedLocationIds: string[],
+    relatedSettingIds: string[],
+    relatedEventIds: string[]
   ): Promise<EventCard> => {
     if (!novelId) {
       throw new Error('No novel selected');
@@ -56,10 +58,32 @@ export function useEvents(novelId: string | null) {
       process,
       relatedCharacterIds,
       relatedLocationIds,
+      relatedSettingIds,
+      relatedEventIds,
     };
 
     const storage = getStorageAdapter();
     const id = await storage.create('events', newEvent);
+
+    // 处理双向关联:为关联的事件添加反向关联
+    if (relatedEventIds.length > 0) {
+      for (const relatedEventId of relatedEventIds) {
+        try {
+          const relatedEvent = await storage.read('events', relatedEventId) as EventCard;
+          if (relatedEvent && !relatedEvent.relatedEventIds.includes(id)) {
+            const updatedRelatedEvent = {
+              ...relatedEvent,
+              relatedEventIds: [...relatedEvent.relatedEventIds, id],
+              updatedAt: new Date(),
+            };
+            await storage.update('events', relatedEventId, updatedRelatedEvent);
+          }
+        } catch (error) {
+          console.error(`Failed to update related event ${relatedEventId}:`, error);
+        }
+      }
+    }
+
     await loadEvents();
 
     // 返回创建的事件(包含生成的ID和时间戳)
@@ -76,12 +100,59 @@ export function useEvents(novelId: string | null) {
       process?: EventProcess[];
       relatedCharacterIds?: string[];
       relatedLocationIds?: string[];
+      relatedSettingIds?: string[];
+      relatedEventIds?: string[];
     }
   ): Promise<void> => {
     const storage = getStorageAdapter();
     const event = await storage.read('events', id) as EventCard;
     if (!event) {
       throw new Error('Event not found');
+    }
+
+    // 处理双向关联:如果relatedEventIds发生变化
+    if (updates.relatedEventIds !== undefined) {
+      const oldRelatedEventIds = event.relatedEventIds || [];
+      const newRelatedEventIds = updates.relatedEventIds;
+
+      // 找出新增的关联
+      const addedEventIds = newRelatedEventIds.filter(eid => !oldRelatedEventIds.includes(eid));
+      // 找出移除的关联
+      const removedEventIds = oldRelatedEventIds.filter(eid => !newRelatedEventIds.includes(eid));
+
+      // 为新增的关联事件添加反向关联
+      for (const relatedEventId of addedEventIds) {
+        try {
+          const relatedEvent = await storage.read('events', relatedEventId) as EventCard;
+          if (relatedEvent && !relatedEvent.relatedEventIds.includes(id)) {
+            const updatedRelatedEvent = {
+              ...relatedEvent,
+              relatedEventIds: [...relatedEvent.relatedEventIds, id],
+              updatedAt: new Date(),
+            };
+            await storage.update('events', relatedEventId, updatedRelatedEvent);
+          }
+        } catch (error) {
+          console.error(`Failed to update related event ${relatedEventId}:`, error);
+        }
+      }
+
+      // 为移除的关联事件删除反向关联
+      for (const relatedEventId of removedEventIds) {
+        try {
+          const relatedEvent = await storage.read('events', relatedEventId) as EventCard;
+          if (relatedEvent && relatedEvent.relatedEventIds.includes(id)) {
+            const updatedRelatedEvent = {
+              ...relatedEvent,
+              relatedEventIds: relatedEvent.relatedEventIds.filter(eid => eid !== id),
+              updatedAt: new Date(),
+            };
+            await storage.update('events', relatedEventId, updatedRelatedEvent);
+          }
+        } catch (error) {
+          console.error(`Failed to update related event ${relatedEventId}:`, error);
+        }
+      }
     }
 
     const updatedEvent = {

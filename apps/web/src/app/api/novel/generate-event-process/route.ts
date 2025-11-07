@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { eventName, eventOutline, apiToken, model, existingCharacters } = await request.json();
+    const { eventName, eventOutline, apiToken, model, existingCharacters, relatedSettings, relatedEvents } = await request.json();
 
     if (!eventName || !eventOutline) {
       return NextResponse.json(
@@ -23,7 +23,13 @@ export async function POST(request: NextRequest) {
     }
 
     // 构建 Prompt
-    const prompt = buildEventProcessPrompt(eventName, eventOutline, existingCharacters || []);
+    const prompt = buildEventProcessPrompt(
+      eventName,
+      eventOutline,
+      existingCharacters || [],
+      relatedSettings || [],
+      relatedEvents || []
+    );
 
     // 调用 AI API
     const aiModel = model || 'deepseek-chat';
@@ -99,7 +105,9 @@ export async function POST(request: NextRequest) {
 function buildEventProcessPrompt(
   eventName: string,
   eventOutline: string,
-  existingCharacters: Array<{ name: string; description?: string }>
+  existingCharacters: Array<{ name: string; description?: string }>,
+  relatedSettings: Array<{ name: string; category: string; description: string }>,
+  relatedEvents: Array<{ name: string; outline: string; process: string }>
 ): string {
   const parts: string[] = [];
 
@@ -110,6 +118,27 @@ function buildEventProcessPrompt(
   parts.push(`## 事件大纲`);
   parts.push(eventOutline);
   parts.push('');
+
+  if (relatedSettings.length > 0) {
+    parts.push(`## 相关设定`);
+    parts.push(`在生成事件流程时,请参考以下世界设定:`);
+    relatedSettings.forEach((setting) => {
+      parts.push(`### ${setting.name} (${setting.category})`);
+      parts.push(setting.description);
+      parts.push('');
+    });
+  }
+
+  if (relatedEvents.length > 0) {
+    parts.push(`## 相关事件`);
+    parts.push(`在生成事件流程时,请参考以下相关事件:`);
+    relatedEvents.forEach((evt) => {
+      parts.push(`### ${evt.name}`);
+      parts.push(`**大纲**: ${evt.outline}`);
+      parts.push(`**流程**: ${evt.process}`);
+      parts.push('');
+    });
+  }
 
   if (existingCharacters.length > 0) {
     parts.push(`## 已关联的人物`);

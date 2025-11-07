@@ -2,7 +2,7 @@
  * 事件卡片展示组件
  */
 
-import { EventCard as EventCardType, Character, Location } from '@/lib/novel/types';
+import { EventCard as EventCardType, Character, Location, SettingCard } from '@/lib/novel/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -10,11 +10,13 @@ interface EventCardProps {
   event: EventCardType;
   characters: Character[];
   locations: Location[];
+  settings: SettingCard[];
+  events: EventCardType[];
   onEdit: () => void;
   onDelete: () => void;
 }
 
-export function EventCard({ event, characters, locations, onEdit, onDelete }: EventCardProps) {
+export function EventCard({ event, characters, locations, settings, events, onEdit, onDelete }: EventCardProps) {
   // 获取关联的人物名称
   const relatedCharacterNames = event.relatedCharacterIds
     .map(id => characters.find(c => c.id === id)?.name)
@@ -24,6 +26,18 @@ export function EventCard({ event, characters, locations, onEdit, onDelete }: Ev
   // 获取关联的地点名称
   const relatedLocationNames = event.relatedLocationIds
     .map(id => locations.find(l => l.id === id)?.name)
+    .filter(Boolean)
+    .join(', ');
+
+  // 获取关联的设定名称
+  const relatedSettingNames = (event.relatedSettingIds || [])
+    .map(id => settings.find(s => s.id === id)?.name)
+    .filter(Boolean)
+    .join(', ');
+
+  // 获取关联的事件名称
+  const relatedEventNames = (event.relatedEventIds || [])
+    .map(id => events.find(e => e.id === id)?.name)
     .filter(Boolean)
     .join(', ');
 
@@ -44,6 +58,18 @@ export function EventCard({ event, characters, locations, onEdit, onDelete }: Ev
           <div>
             <div className="text-sm font-medium text-gray-700">发生地点:</div>
             <div className="text-sm text-gray-600">{relatedLocationNames}</div>
+          </div>
+        )}
+        {relatedSettingNames && (
+          <div>
+            <div className="text-sm font-medium text-gray-700">关联设定:</div>
+            <div className="text-sm text-gray-600">{relatedSettingNames}</div>
+          </div>
+        )}
+        {relatedEventNames && (
+          <div>
+            <div className="text-sm font-medium text-gray-700">关联事件:</div>
+            <div className="text-sm text-gray-600">{relatedEventNames}</div>
           </div>
         )}
         <div>

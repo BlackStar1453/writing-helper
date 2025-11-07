@@ -5,6 +5,7 @@ import { NovelNav } from '@/components/novel/NovelNav';
 import { useEvents } from '@/lib/novel/hooks/use-events';
 import { useCharacters } from '@/lib/novel/hooks/use-characters';
 import { useLocations } from '@/lib/novel/hooks/use-locations';
+import { useSettings } from '@/lib/novel/hooks/use-settings';
 import { useNovels } from '@/lib/novel/hooks/use-novels';
 import { EventCard } from '@/components/novel/EventCard';
 import { EventDialog } from '@/components/novel/EventDialog';
@@ -16,6 +17,7 @@ export default function EventsPage() {
   const { events, createEvent, updateEvent, deleteEvent } = useEvents(currentNovelId);
   const { characters, createCharacter } = useCharacters(currentNovelId);
   const { locations } = useLocations(currentNovelId);
+  const { settings } = useSettings(currentNovelId);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingEvent, setEditingEvent] = useState<EventCardType | null>(null);
 
@@ -71,6 +73,8 @@ export default function EventsPage() {
                 event={event}
                 characters={characters}
                 locations={locations}
+                settings={settings}
+                events={events}
                 onEdit={() => handleEdit(event)}
                 onDelete={() => handleDelete(event.id)}
               />
@@ -84,6 +88,8 @@ export default function EventsPage() {
           event={editingEvent}
           characters={characters}
           locations={locations}
+          settings={settings}
+          events={events}
           novelId={currentNovelId || ''}
           onCreateCharacter={createCharacter}
           onCreate={createEvent}

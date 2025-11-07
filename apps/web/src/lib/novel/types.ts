@@ -114,6 +114,8 @@ export interface EventCard {
   process: EventProcess[];    // 事件流程(前因后果)
   relatedCharacterIds: string[]; // 参与的人物ID列表
   relatedLocationIds: string[];  // 发生的地点ID列表
+  relatedSettingIds: string[];   // 关联的设定卡片ID列表
+  relatedEventIds: string[];     // 关联的其他事件卡片ID列表
   createdAt: Date;
   updatedAt: Date;
 }
